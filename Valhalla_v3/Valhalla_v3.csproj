@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Valhalla_v3.Client\Valhalla_v3.Client.csproj" />
     <ProjectReference Include="..\Valhalla_v3.Shared\Valhalla_v3.Shared.csproj" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.8">
