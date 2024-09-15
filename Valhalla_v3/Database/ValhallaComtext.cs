@@ -136,7 +136,15 @@ public class ValhallaComtext : DbContext
 		modelBuilder.Entity<CarHistoryFuel>()
 			.HasOne(b => b.GasStation)
 			.WithMany(a => a.Fuels);
-
+		
+		modelBuilder.Entity<CarHistoryFuel>()
+			.Property(c => c.CostPerLitr)
+			.HasColumnType("decimal(18,2)");
+		
+		modelBuilder.Entity<CarHistoryFuel>()
+			.Property(c => c.Cost)
+			.HasColumnType("decimal(18,2)");
+		
 		modelBuilder.Entity<CarHistoryFuel>()
 			.HasOne(b => b.Car)
 			.WithMany(a => a.Fuels)
@@ -146,7 +154,11 @@ public class ValhallaComtext : DbContext
 		#endregion
 		#region Configure the CarHistoryFuel table
 		modelBuilder.Entity<CarHistoryRepair>().ToTable("CarHistoryRepair");
-
+		
+		modelBuilder.Entity<CarHistoryRepair>()
+			.Property(c => c.Cost)
+			.HasColumnType("decimal(18,2)");
+		
 		modelBuilder.Entity<CarHistoryRepair>()
 			.HasOne(b => b.OperatorCreate)
 			.WithMany()
