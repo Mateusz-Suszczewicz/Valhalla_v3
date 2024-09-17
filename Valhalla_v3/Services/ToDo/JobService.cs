@@ -3,36 +3,37 @@ using System.Net;
 using System.Web.Http;
 using Valhalla_v3.Database;
 using Valhalla_v3.Shared.CarHistory;
+using Valhalla_v3.Shared.ToDo;
 
-namespace Valhalla_v3.Services.CarHistory;
+namespace Valhalla_v3.Services.ToDo;
 
-public interface ICarService
+public interface IJobService
 {
-	public Task<int> Create(Car car);
-	public Car Get(int id);
-	public List<Car> Get();
-	public Task Update(Car car);
+	public Task<int> Create(Job job);
+	public Job Get(int id);
+	public List<Job> Get();
+	public Task Update(Job job);
 	public Task Delete(int id);
 }
 
-public class CommentService : ICarService
+public class JobService : IJobService
 {
 	private readonly ValhallaComtext _context;
 
-	public CommentService(ValhallaComtext context) 
+	public JobService(ValhallaComtext context) 
 	{
 		_context = context;
 	}
 
-	public async Task<int> Create(Car car)
+	public async Task<int> Create(Job job)
 	{
-		if (car.Id != 0)
+		if (job.Id != 0)
 			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
-		car.DateTimeAdd = DateTime.Now;
-		car.DateTimeModify = DateTime.Now;
-		_context.AddAsync(car);
+		job.DateTimeAdd = DateTime.Now;
+		job.DateTimeModify = DateTime.Now;
+		_context.AddAsync(job);
 		await _context.SaveChangesAsync();
-		return car.Id;
+		return job.Id;
 	}
 
 	public async Task Delete(int id)
@@ -40,51 +41,49 @@ public class CommentService : ICarService
 		if (id == 0)
 			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
 
-		var car = _context.Car.First(x => x.Id == id);
+		var job = _context.Job.First(x => x.Id == id);
 
-		if(car == null)
+		if(job == null)
 			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.InternalServerError));
 
-		_context.Car.Remove(car);
+		_context.Job.Remove(job);
 		await _context.SaveChangesAsync();
 	}
 
-	public Car Get(int id)
+	public Job Get(int id)
 	{
 		if (id == 0)
 			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
 
-		var Car = Get().Find(x => x.Id == id);
+		var job = Get().Find(x => x.Id == id);
 
-		return Car;
+		return job;
 	}
 
-	public List<Car> Get()
+	public List<Job> Get()
 	{
-		var CarList = _context.Car
+		var jobList = _context.Job
 			.Include(x => x.OperatorCreate)
 			.Include(x => x.OperatorModify)
-			.Include(x => x.CarHistoryRepair)
-			.Include(x => x.Fuels)
 			.ToList();
 
-		return CarList;
+		return jobList;
 	}
 
-	public async Task Update(Car car)
+	public async Task Update(Job job)
 	{
-		if (car.Id != 0)
+		if (job.Id != 0)
 			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
 
-		var OldCar = _context.Car.First(x => x.Id == car.Id);
-		if (OldCar == null)
+		var OldJob = _context.Job.First(x => x.Id == job.Id);
+		if (OldJob == null)
 			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
-		OldCar.Year = car.Year;
-		OldCar.VIN = car.VIN;
-		OldCar.Brand = car.Brand;
-		OldCar.Model = car.Model;
-		OldCar.EngineCC = car.EngineCC;
-		OldCar.DateTimeModify = DateTime.Now;
+		OldJob.Description = job.Description;
+		OldJob.Name = job.Name;
+		OldJob.IsCompleted = job.IsCompleted;
+		OldJob.Term = job.Term;
+		OldJob.Project = job.Project;
+		OldJob.DateTimeModify = DateTime.Now;
 		await _context.SaveChangesAsync();
 	}
 }

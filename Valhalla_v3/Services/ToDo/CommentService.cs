@@ -3,19 +3,20 @@ using System.Net;
 using System.Web.Http;
 using Valhalla_v3.Database;
 using Valhalla_v3.Shared.CarHistory;
+using Valhalla_v3.Shared.ToDo;
 
-namespace Valhalla_v3.Services.CarHistory;
+namespace Valhalla_v3.Services.ToDo;
 
-public interface ICarService
+public interface ICommentService
 {
-	public Task<int> Create(Car car);
-	public Car Get(int id);
-	public List<Car> Get();
-	public Task Update(Car car);
+	public Task<int> Create(Comment comment);
+	public Comment Get(int id);
+	public List<Comment> Get();
+	public Task Update(Comment comment);
 	public Task Delete(int id);
 }
 
-public class CommentService : ICarService
+public class CommentService : ICommentService
 {
 	private readonly ValhallaComtext _context;
 
@@ -24,15 +25,15 @@ public class CommentService : ICarService
 		_context = context;
 	}
 
-	public async Task<int> Create(Car car)
+	public async Task<int> Create(Comment comment)
 	{
-		if (car.Id != 0)
+		if (comment.Id != 0)
 			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
-		car.DateTimeAdd = DateTime.Now;
-		car.DateTimeModify = DateTime.Now;
-		_context.AddAsync(car);
+		comment.DateTimeAdd = DateTime.Now;
+		comment.DateTimeModify = DateTime.Now;
+		_context.AddAsync(comment);
 		await _context.SaveChangesAsync();
-		return car.Id;
+		return comment.Id;
 	}
 
 	public async Task Delete(int id)
@@ -40,51 +41,45 @@ public class CommentService : ICarService
 		if (id == 0)
 			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
 
-		var car = _context.Car.First(x => x.Id == id);
+		var comment = _context.Comment.First(x => x.Id == id);
 
-		if(car == null)
+		if(comment == null)
 			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.InternalServerError));
 
-		_context.Car.Remove(car);
+		_context.Comment.Remove(comment);
 		await _context.SaveChangesAsync();
 	}
 
-	public Car Get(int id)
+	public Comment Get(int id)
 	{
 		if (id == 0)
 			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
 
-		var Car = Get().Find(x => x.Id == id);
+		var comment = Get().Find(x => x.Id == id);
 
-		return Car;
+		return comment;
 	}
 
-	public List<Car> Get()
+	public List<Comment> Get()
 	{
-		var CarList = _context.Car
+		var CommentList = _context.Comment
 			.Include(x => x.OperatorCreate)
 			.Include(x => x.OperatorModify)
-			.Include(x => x.CarHistoryRepair)
-			.Include(x => x.Fuels)
 			.ToList();
 
-		return CarList;
+		return CommentList;
 	}
 
-	public async Task Update(Car car)
+	public async Task Update(Comment comment)
 	{
-		if (car.Id != 0)
+		if (comment.Id != 0)
 			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
 
-		var OldCar = _context.Car.First(x => x.Id == car.Id);
-		if (OldCar == null)
+		var Oldcomment = _context.Comment.First(x => x.Id == comment.Id);
+		if (Oldcomment == null)
 			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
-		OldCar.Year = car.Year;
-		OldCar.VIN = car.VIN;
-		OldCar.Brand = car.Brand;
-		OldCar.Model = car.Model;
-		OldCar.EngineCC = car.EngineCC;
-		OldCar.DateTimeModify = DateTime.Now;
+		Oldcomment.Content = comment.Content;
+		Oldcomment.DateTimeModify = DateTime.Now;
 		await _context.SaveChangesAsync();
 	}
 }

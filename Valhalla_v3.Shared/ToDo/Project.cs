@@ -2,5 +2,5 @@
 
 public class Project : MainClassFull
 {
-    public virtual ICollection<Task> Tasks { get; set; } = new List<Task>();
+    public virtual ICollection<Job> Tasks { get; set; } = new List<Job>();
 }

@@ -2,10 +2,8 @@
 
 namespace Valhalla_v3.Shared;
 
-public class Operator
+public class Operator : MainClass
 {
-	[Key]
-	public int Id { get; set; }
 	[MaxLength(50)]
 	public required string Name { get; set; }
 	[MaxLength(50)]

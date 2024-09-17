@@ -10,7 +10,7 @@ public class ValhallaComtext : DbContext
     public DbSet<Operator> Operator { get; set; }
     //TO DO
     public DbSet<Comment> Comment { get; set; }
-    public DbSet<Shared.ToDo.Task> Task { get; set; }
+    public DbSet<Job> Job { get; set; }
     public DbSet<Project> Project { get; set; }
     //Car History
     public DbSet<Car> Car { get; set; }
@@ -51,22 +51,22 @@ public class ValhallaComtext : DbContext
             .OnDelete(DeleteBehavior.NoAction);
 		#endregion
         # region Configure the Task table
-		modelBuilder.Entity<Shared.ToDo.Task>().ToTable("Tasks");
+		modelBuilder.Entity<Shared.ToDo.job>().ToTable("Tasks");
 
-        modelBuilder.Entity<Shared.ToDo.Task>()
+        modelBuilder.Entity<Shared.ToDo.job>()
             .HasOne(b => b.OperatorCreate)
             .WithMany()
             .HasForeignKey(b => b.OperatorCreateId)
             .IsRequired()
             .OnDelete(DeleteBehavior.NoAction);
 
-        modelBuilder.Entity<Shared.ToDo.Task>()
+        modelBuilder.Entity<Shared.ToDo.job>()
             .HasOne(b => b.OperatorModify)
             .WithMany()
             .HasForeignKey(b => b.OperatorModifyId)
             .OnDelete(DeleteBehavior.NoAction);
 
-        modelBuilder.Entity<Shared.ToDo.Task>()
+        modelBuilder.Entity<Shared.ToDo.job>()
             .HasOne(b => b.Project)
             .WithMany(a => a.Tasks)
             .HasForeignKey(b => b.ProjectId)

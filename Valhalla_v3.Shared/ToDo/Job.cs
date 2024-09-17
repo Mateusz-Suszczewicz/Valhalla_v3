@@ -1,6 +1,6 @@
 ﻿namespace Valhalla_v3.Shared.ToDo;
 
-public class Task : MainClassFull
+public class Job : MainClassFull
 {
     public DateTime? Term { get; set; }
 	public bool IsCompleted { get; set; }
