@@ -8,10 +8,10 @@ namespace Valhalla_v3.Services.CarHistory;
 
 public interface ICarHistoryFuelService
 {
-	public Task<int> Create(CarHistoryFuel car);
+	public Task<int> Create(CarHistoryFuel fuel);
 	public CarHistoryFuel Get(int id);
 	public List<CarHistoryFuel> Get();
-	public Task Update(CarHistoryFuel car);
+	public Task Update(CarHistoryFuel fuel);
 	public Task Delete(int id);
 }
 
