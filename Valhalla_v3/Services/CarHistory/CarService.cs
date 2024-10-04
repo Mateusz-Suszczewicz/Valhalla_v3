@@ -15,11 +15,11 @@ public interface ICarService
 	public Task Delete(int id);
 }
 
-public class CommentService : ICarService
+public class CarService : ICarService
 {
 	private readonly ValhallaComtext _context;
 
-	public CommentService(ValhallaComtext context) 
+	public CarService(ValhallaComtext context) 
 	{
 		_context = context;
 	}

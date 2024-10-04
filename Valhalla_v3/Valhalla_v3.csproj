@@ -18,4 +18,12 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Components\Pages\Admin\" />
+    <Folder Include="Components\Pages\Cars\" />
+    <Folder Include="Components\Pages\Fees\" />
+    <Folder Include="Components\Pages\Quizzes\" />
+    <Folder Include="Components\Pages\Tasks\" />
+  </ItemGroup>
+
 </Project>

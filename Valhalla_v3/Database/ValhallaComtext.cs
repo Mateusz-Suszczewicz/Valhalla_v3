@@ -50,23 +50,23 @@ public class ValhallaComtext : DbContext
             .HasForeignKey(b => b.OperatorModifyId)
             .OnDelete(DeleteBehavior.NoAction);
 		#endregion
-        # region Configure the Task table
-		modelBuilder.Entity<Shared.ToDo.job>().ToTable("Tasks");
+		#region Configure the Job table
+		modelBuilder.Entity<Shared.ToDo.Job>().ToTable("Tasks");
 
-        modelBuilder.Entity<Shared.ToDo.job>()
+        modelBuilder.Entity<Shared.ToDo.Job>()
             .HasOne(b => b.OperatorCreate)
             .WithMany()
             .HasForeignKey(b => b.OperatorCreateId)
             .IsRequired()
             .OnDelete(DeleteBehavior.NoAction);
 
-        modelBuilder.Entity<Shared.ToDo.job>()
+        modelBuilder.Entity<Shared.ToDo.Job>()
             .HasOne(b => b.OperatorModify)
             .WithMany()
             .HasForeignKey(b => b.OperatorModifyId)
             .OnDelete(DeleteBehavior.NoAction);
 
-        modelBuilder.Entity<Shared.ToDo.job>()
+        modelBuilder.Entity<Shared.ToDo.Job>()
             .HasOne(b => b.Project)
             .WithMany(a => a.Tasks)
             .HasForeignKey(b => b.ProjectId)
