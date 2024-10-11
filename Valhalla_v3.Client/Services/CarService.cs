@@ -1,32 +1,61 @@
 ﻿using Valhalla_v3.Shared.CarHistory;
-using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.SignalR.Client;
 
 namespace Valhalla_v3.Client.Services;
-
-public class CarService
+public interface ICarClient : IAsyncDisposable
 {
-    private HubConnection? hubConnection;
-    private NavigationManager? navigationManager;
+    public event Action<List<Car>> OnReceiveMessage;
 
-    public CarService(HubConnection? hubConnection, )
+    public ValueTask DisposeAsync();
+    public Task InitializeAsync();
+
+}
+public class CarClient : ICarClient
+{
+    private readonly NavigationManager _navigationManager;
+    private HubConnection _hubConnection;
+
+    public event Action<List<Car>> OnReceiveMessage;
+
+    public CarClient(NavigationManager navigationManager)
     {
+        _navigationManager = navigationManager;
+    }
+
+    public async Task InitializeAsync()
+    {
+        _hubConnection = new HubConnectionBuilder()
+            .WithUrl(_navigationManager.ToAbsoluteUri("/carhub"))
+            .Build();
+
+        await _hubConnection.StartAsync();
+
+        _hubConnection.On<List<Car>>("CarList", (car) =>
+        {
+            OnReceiveMessage?.Invoke(car);
+        });
+        await _hubConnection.SendAsync("SendMessage");
 
     }
 
-    public void getCarList()
+    public async Task SendMessageAsync(string user, string message)
     {
-        hubConnection = new HubConnectionBuilder()
-           .WithUrl(Navigation.ToAbsoluteUri("/myhub"))
-           .Build();
-
-        hubConnection.On<List<MyObject>>("ReceiveList", (objects) =>
+        if (_hubConnection is not null)
         {
-            receivedObjects = objects;
-            StateHasChanged(); // Notify the component to re-render
-        });
+            await _hubConnection.SendAsync("SendMessage", user, message);
+        }
+    }
 
-        await hubConnection.StartAsync();
+    public bool IsConnected => _hubConnection?.State == HubConnectionState.Connected;
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_hubConnection is not null)
+        {
+            await _hubConnection.DisposeAsync();
+        }
     }
 }

@@ -22,7 +22,7 @@ public class ValhallaComtext : DbContext
 
 	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        string connectionString = $"Data Source=DESKTOP-I45S3D6;" +
+        string connectionString = $"Data Source=DESKTOP-663F3VE;" +
                   $"Initial Catalog=Valhallav3;" +
                   "Integrated Security=SSPI;Encrypt=True;TrustServerCertificate=True;";
 

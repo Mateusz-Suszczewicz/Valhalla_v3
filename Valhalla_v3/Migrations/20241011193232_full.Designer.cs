@@ -12,8 +12,8 @@ using Valhalla_v3.Database;
 namespace Valhalla_v3.Migrations
 {
     [DbContext(typeof(ValhallaComtext))]
-    [Migration("20240915140437_AddCar")]
-    partial class AddCar
+    [Migration("20241011193232_full")]
+    partial class full
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -332,6 +332,12 @@ namespace Valhalla_v3.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("DateTimeAdd")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DateTimeModify")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -365,65 +371,27 @@ namespace Valhalla_v3.Migrations
                     b.Property<DateTime>("DateTimeModify")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("JobId")
+                        .HasColumnType("int");
+
                     b.Property<int>("OperatorCreateId")
                         .HasColumnType("int");
 
                     b.Property<int>("OperatorModifyId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("TaskId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("JobId");
 
                     b.HasIndex("OperatorCreateId");
 
                     b.HasIndex("OperatorModifyId");
-
-                    b.HasIndex("TaskId");
 
                     b.ToTable("TaskComments", (string)null);
                 });
 
-            modelBuilder.Entity("Valhalla_v3.Shared.ToDo.Project", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("DateTimeAdd")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DateTimeModify")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int>("OperatorCreateId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("OperatorModifyId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OperatorCreateId");
-
-                    b.HasIndex("OperatorModifyId");
-
-                    b.ToTable("Projects", (string)null);
-                });
-
-            modelBuilder.Entity("Valhalla_v3.Shared.ToDo.Task", b =>
+            modelBuilder.Entity("Valhalla_v3.Shared.ToDo.Job", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -470,6 +438,44 @@ namespace Valhalla_v3.Migrations
                     b.HasIndex("ProjectId");
 
                     b.ToTable("Tasks", (string)null);
+                });
+
+            modelBuilder.Entity("Valhalla_v3.Shared.ToDo.Project", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("DateTimeAdd")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DateTimeModify")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("OperatorCreateId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OperatorModifyId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OperatorCreateId");
+
+                    b.HasIndex("OperatorModifyId");
+
+                    b.ToTable("Projects", (string)null);
                 });
 
             modelBuilder.Entity("Valhalla_v3.Shared.CarHistory.Car", b =>
@@ -601,29 +607,10 @@ namespace Valhalla_v3.Migrations
 
             modelBuilder.Entity("Valhalla_v3.Shared.ToDo.Comment", b =>
                 {
-                    b.HasOne("Valhalla_v3.Shared.Operator", "OperatorCreate")
-                        .WithMany()
-                        .HasForeignKey("OperatorCreateId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Valhalla_v3.Shared.Operator", "OperatorModify")
-                        .WithMany()
-                        .HasForeignKey("OperatorModifyId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Valhalla_v3.Shared.ToDo.Task", null)
+                    b.HasOne("Valhalla_v3.Shared.ToDo.Job", null)
                         .WithMany("Comments")
-                        .HasForeignKey("TaskId");
+                        .HasForeignKey("JobId");
 
-                    b.Navigation("OperatorCreate");
-
-                    b.Navigation("OperatorModify");
-                });
-
-            modelBuilder.Entity("Valhalla_v3.Shared.ToDo.Project", b =>
-                {
                     b.HasOne("Valhalla_v3.Shared.Operator", "OperatorCreate")
                         .WithMany()
                         .HasForeignKey("OperatorCreateId")
@@ -641,7 +628,7 @@ namespace Valhalla_v3.Migrations
                     b.Navigation("OperatorModify");
                 });
 
-            modelBuilder.Entity("Valhalla_v3.Shared.ToDo.Task", b =>
+            modelBuilder.Entity("Valhalla_v3.Shared.ToDo.Job", b =>
                 {
                     b.HasOne("Valhalla_v3.Shared.Operator", "OperatorCreate")
                         .WithMany()
@@ -668,6 +655,25 @@ namespace Valhalla_v3.Migrations
                     b.Navigation("Project");
                 });
 
+            modelBuilder.Entity("Valhalla_v3.Shared.ToDo.Project", b =>
+                {
+                    b.HasOne("Valhalla_v3.Shared.Operator", "OperatorCreate")
+                        .WithMany()
+                        .HasForeignKey("OperatorCreateId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Valhalla_v3.Shared.Operator", "OperatorModify")
+                        .WithMany()
+                        .HasForeignKey("OperatorModifyId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("OperatorCreate");
+
+                    b.Navigation("OperatorModify");
+                });
+
             modelBuilder.Entity("Valhalla_v3.Shared.CarHistory.Car", b =>
                 {
                     b.Navigation("CarHistoryRepair");
@@ -685,14 +691,14 @@ namespace Valhalla_v3.Migrations
                     b.Navigation("Repair");
                 });
 
+            modelBuilder.Entity("Valhalla_v3.Shared.ToDo.Job", b =>
+                {
+                    b.Navigation("Comments");
+                });
+
             modelBuilder.Entity("Valhalla_v3.Shared.ToDo.Project", b =>
                 {
                     b.Navigation("Tasks");
-                });
-
-            modelBuilder.Entity("Valhalla_v3.Shared.ToDo.Task", b =>
-                {
-                    b.Navigation("Comments");
                 });
 #pragma warning restore 612, 618
         }

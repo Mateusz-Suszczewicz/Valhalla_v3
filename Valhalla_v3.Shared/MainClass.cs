@@ -1,10 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Valhalla_v3.Shared;
 
 public class MainClass
 {
-	[Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    [Key]
 	public int Id { get; set; }
 
 	public int OperatorCreateId { get; set; }

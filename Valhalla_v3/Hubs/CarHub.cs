@@ -13,7 +13,7 @@ public class CarHub : Hub
         _CarService = carService;
     }
 
-    public async Task SendCars()
+    public async Task SendMessage()
     {
         var CarList = _CarService.Get();
         await Clients.All.SendAsync("CarList", CarList);

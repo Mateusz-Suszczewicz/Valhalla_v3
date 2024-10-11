@@ -1,6 +1,50 @@
 ﻿@page "/cars"
+@using Microsoft.AspNetCore.SignalR.Client
+@using Valhalla_v3.Client.Services
+@using Valhalla_v3.Shared.CarHistory
 @rendermode InteractiveAuto
+@inject CarClient carClient
+
+@inject NavigationManager Navigation
 
 <PageTitle>Samochody</PageTitle>
 
 <h1>Strona w przygotowaniu</h1>
+@if (messages is null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (messages.Count == 0)
+{
+    <p>No cars available.</p>
+}
+else
+{
+    <ul>
+        @foreach (var car in messages)
+        {
+            <li>@car.Id - @car.Model (@car.Year)</li>
+        }
+    </ul>
+}
+@code{
+    protected override async Task OnInitializedAsync()
+    {
+        _hubConnection = new HubConnectionBuilder()
+    .WithUrl(Navigation.ToAbsoluteUri("/carhub"))
+    .Build();
+        // Obsługa odbierania elementów z serwera
+        _hubConnection.On<List<Car>>("CarList", (receivedItems) =>
+        {
+            messages = receivedItems; // Aktualizacja listy z danymi
+            InvokeAsync(StateHasChanged); // Odświeżenie UI
+        });
+
+        // Uruchomienie połączenia
+        await _hubConnection.StartAsync();
+
+        // (opcjonalnie) Możesz wysłać zapytanie do serwera, aby natychmiastowo pobrać dane
+        await _hubConnection.InvokeAsync("SendMessage");
+
+    }
+}

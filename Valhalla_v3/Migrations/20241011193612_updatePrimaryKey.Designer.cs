@@ -12,8 +12,8 @@ using Valhalla_v3.Database;
 namespace Valhalla_v3.Migrations
 {
     [DbContext(typeof(ValhallaComtext))]
-    [Migration("20240917182012_updateOper")]
-    partial class updateOper
+    [Migration("20241011193612_updatePrimaryKey")]
+    partial class updatePrimaryKey
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

@@ -5,7 +5,7 @@
 namespace Valhalla_v3.Migrations
 {
     /// <inheritdoc />
-    public partial class AddCar : Migration
+    public partial class updatePrimaryKey : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

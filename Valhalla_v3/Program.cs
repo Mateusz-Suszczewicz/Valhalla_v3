@@ -5,6 +5,8 @@ using Valhalla_v3.Database;
 using Valhalla_v3.Services;
 using Valhalla_v3.Hubs;
 using Microsoft.AspNetCore.ResponseCompression;
+using Valhalla_v3.Services.CarHistory;
+using Valhalla_v3.Client.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +16,9 @@ builder.Services.AddRazorComponents()
 	.AddInteractiveWebAssemblyComponents();
 builder.Services.AddDbContext<ValhallaComtext>();
 builder.Services.AddScoped<IOperatorService, OperatorService>();
+builder.Services.AddScoped<ICarService, CarService>();
+builder.Services.AddScoped<CarClient>();
+
 builder.Services.AddSignalR();
 builder.Services.AddResponseCompression(opts =>
 {
@@ -34,7 +39,9 @@ else
 	// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 	app.UseHsts();
 }
+app.MapBlazorHub();
 app.MapHub<CarHub>("/carhub");
+//app.MapFallbackToPage("/_Host");
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
