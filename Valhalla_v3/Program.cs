@@ -1,12 +1,9 @@
-using System.Reflection.Emit;
-using Valhalla_v3.Client.Pages;
+using Microsoft.AspNetCore.ResponseCompression;
 using Valhalla_v3.Components;
 using Valhalla_v3.Database;
-using Valhalla_v3.Services;
 using Valhalla_v3.Hubs;
-using Microsoft.AspNetCore.ResponseCompression;
+using Valhalla_v3.Services;
 using Valhalla_v3.Services.CarHistory;
-using Valhalla_v3.Client.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,9 +14,9 @@ builder.Services.AddRazorComponents()
 builder.Services.AddDbContext<ValhallaComtext>();
 builder.Services.AddScoped<IOperatorService, OperatorService>();
 builder.Services.AddScoped<ICarService, CarService>();
-builder.Services.AddScoped<CarClient>();
-
+builder.Services.AddBlazorBootstrap();
 builder.Services.AddSignalR();
+
 builder.Services.AddResponseCompression(opts =>
 {
     opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(

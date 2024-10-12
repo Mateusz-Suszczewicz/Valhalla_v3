@@ -8,6 +8,29 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Components\Pages\Admin\**" />
+    <Compile Remove="Components\Pages\Cars\**" />
+    <Compile Remove="Components\Pages\Fees\**" />
+    <Compile Remove="Components\Pages\Quizzes\**" />
+    <Compile Remove="Components\Pages\Tasks\**" />
+    <Content Remove="Components\Pages\Admin\**" />
+    <Content Remove="Components\Pages\Cars\**" />
+    <Content Remove="Components\Pages\Fees\**" />
+    <Content Remove="Components\Pages\Quizzes\**" />
+    <Content Remove="Components\Pages\Tasks\**" />
+    <EmbeddedResource Remove="Components\Pages\Admin\**" />
+    <EmbeddedResource Remove="Components\Pages\Cars\**" />
+    <EmbeddedResource Remove="Components\Pages\Fees\**" />
+    <EmbeddedResource Remove="Components\Pages\Quizzes\**" />
+    <EmbeddedResource Remove="Components\Pages\Tasks\**" />
+    <None Remove="Components\Pages\Admin\**" />
+    <None Remove="Components\Pages\Cars\**" />
+    <None Remove="Components\Pages\Fees\**" />
+    <None Remove="Components\Pages\Quizzes\**" />
+    <None Remove="Components\Pages\Tasks\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Valhalla_v3.Client\Valhalla_v3.Client.csproj" />
     <ProjectReference Include="..\Valhalla_v3.Shared\Valhalla_v3.Shared.csproj" />
     <PackageReference Include="Microsoft.AspNet.SignalR.Core" Version="2.4.3" />
@@ -18,14 +41,6 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Components\Pages\Admin\" />
-    <Folder Include="Components\Pages\Cars\" />
-    <Folder Include="Components\Pages\Fees\" />
-    <Folder Include="Components\Pages\Quizzes\" />
-    <Folder Include="Components\Pages\Tasks\" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,31 @@
+﻿@using Valhalla_v3.Shared.CarHistory
+<EditForm Model="@FuelHistory" OnValidSubmit="HandleValidSubmit">
+    <div class="mb-3">
+        <label for="name" class="form-label">Imię</label>
+        <InputText id="name" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <InputText id="email" class="form-control"/>
+    </div>
+    <button class="btn btn-primary" type="submit">Zapisz</button>
+</EditForm>
+
+@code {
+    private static Operator oper = new() { Name = "admin", Id = 3 };
+
+    private CarHistoryFuel FuelHistory = new CarHistoryFuel() { OperatorCreate = oper, OperatorModify = oper };
+
+    [Parameter]
+    public EventCallback<CarHistoryFuel> OnFormSubmit { get; set; }
+
+    [Parameter]
+    public int CarId { get; set; }
+    private async Task HandleValidSubmit()
+    {
+
+        await OnFormSubmit.InvokeAsync(FuelHistory);
+    }
+
+    
+}

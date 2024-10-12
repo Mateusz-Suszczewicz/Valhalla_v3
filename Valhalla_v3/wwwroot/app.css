@@ -60,3 +60,14 @@ h1:focus {
 .blur {
     backdrop-filter: blur(5px);
 }
+
+.card-main {
+    background-color: #373A40;
+    border: 3px solid #DC5F00;
+    color: #EEEEEE;
+    border-radius: 10px;
+}
+
+.text-color-black{
+    color: black;
+}

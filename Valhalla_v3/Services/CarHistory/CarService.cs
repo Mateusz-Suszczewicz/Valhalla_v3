@@ -64,8 +64,6 @@ public class CarService : ICarService
 		var CarList = _context.Car
 			.Include(x => x.OperatorCreate)
 			.Include(x => x.OperatorModify)
-			.Include(x => x.CarHistoryRepair)
-			.Include(x => x.Fuels)
 			.ToList();
 
 		return CarList;

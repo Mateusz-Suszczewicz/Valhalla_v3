@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using Valhalla_v3.Client.Services;
 using Valhalla_v3.Services.CarHistory;
 
 namespace Valhalla_v3.Hubs;
@@ -17,5 +16,15 @@ public class CarHub : Hub
     {
         var CarList = _CarService.Get();
         await Clients.All.SendAsync("CarList", CarList);
+    }
+
+    public async Task GetCar(string id)
+    {
+        if (!int.TryParse(id, out var carId))
+        {
+            await Clients.All.SendAsync("Car", null);
+        }
+        var Car = _CarService.Get(carId);
+        await Clients.All.SendAsync("Car", Car);
     }
 }
