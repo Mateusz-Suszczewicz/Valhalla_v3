@@ -1,4 +1,5 @@
-﻿using Valhalla_v3.Shared.ToDo;
+﻿using System.Text.Json.Serialization;
+using Valhalla_v3.Shared.ToDo;
 
 namespace Valhalla_v3.Shared.CarHistory;
 
@@ -11,6 +12,7 @@ public class CarHistoryFuel : MainClass
 	public decimal Cost { get; set; }
 	public decimal CostPerLitr { get; set; }
 	public virtual GasStation GasStation { get; set; }
+	[JsonIgnore]
 	public virtual Car Car { get; set; }
 
 }

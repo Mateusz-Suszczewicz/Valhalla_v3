@@ -1,31 +1,84 @@
-﻿@using Valhalla_v3.Shared.CarHistory
-<EditForm Model="@FuelHistory" OnValidSubmit="HandleValidSubmit">
+﻿@page "/cars/{Id}/AddFuel"
+@rendermode InteractiveAuto
+
+@using Microsoft.AspNetCore.SignalR.Client
+@using Valhalla_v3.Shared.CarHistory
+@inject NavigationManager navigation
+
+<div class="container-fluid text-color-black text-center">
     <div class="mb-3">
-        <label for="name" class="form-label">Imię</label>
-        <InputText id="name" class="form-control" />
+        <div class="form-floating">
+            <input type="number" class="form-control" id="InNumCostFuel" @bind-value="@FuelHistory.Cost" />
+            <label for="InNumCostFuel">Koszt paliwa</label>
+        </div>
     </div>
     <div class="mb-3">
-        <label for="email" class="form-label">Email</label>
-        <InputText id="email" class="form-control"/>
+        <div class="form-floating">
+            <input type="number" class="form-control" id="InNumMilage" @bind-value="@FuelHistory.Mileage" />
+            <label for="InNumMilage">Przebieg</label>
+        </div>
     </div>
-    <button class="btn btn-primary" type="submit">Zapisz</button>
-</EditForm>
+    <div class="mb-3">
+        <div class="form-floating">
+            <input type="number" class="form-control" id="InNumCostPerLitr" @bind-value="@FuelHistory.CostPerLitr" />
+            <label for="InNumCostPerLitr">PLN/Litr</label>
+        </div>
+    </div>
+    <div class="mb-3">
+        <select class="form-select" aria-label="Default select example" @onchange="OnStationChanged">
+            <option selected>Wybierz stację</option>
+            @foreach (var i in ListGasStation)
+            {
+                <option value="@i.Id">@i.Name</option>
+            }
+        </select>
+    </div>
+    <button class="btn btn-outline-secondary h-100 w-100" type="button" @onclick="Zapisz">Zapisz</button>
+</div>
 
 @code {
+    [Parameter]
+    public string Id { get; set; }
+
     private static Operator oper = new() { Name = "admin", Id = 3 };
+    private List<GasStation> ListGasStation = new();
+    private CarHistoryFuel FuelHistory = new CarHistoryFuel() { OperatorCreateId = 3, OperatorModifyId = 3 };
+    private HubConnection _hubConnection;
 
-    private CarHistoryFuel FuelHistory = new CarHistoryFuel() { OperatorCreate = oper, OperatorModify = oper };
-
-    [Parameter]
-    public EventCallback<CarHistoryFuel> OnFormSubmit { get; set; }
-
-    [Parameter]
-    public int CarId { get; set; }
-    private async Task HandleValidSubmit()
+    protected override async Task OnInitializedAsync()
     {
+        _hubConnection = new HubConnectionBuilder()
+        .WithUrl(navigation.ToAbsoluteUri("/carhub"))
+        .Build();
 
-        await OnFormSubmit.InvokeAsync(FuelHistory);
+        _hubConnection.On<List<GasStation>>("GasStation", (receivedItem) =>
+        {
+            ListGasStation = receivedItem;
+            InvokeAsync(StateHasChanged);
+        });
+
+        _hubConnection.On<int>("AddedFuel", (receivedItem) =>
+       {
+           FuelHistory.Id = receivedItem;
+           if(FuelHistory.Id != 0)
+           {
+               navigation.NavigateTo($"/cars/{Id}");
+           }
+       });
+        int.TryParse(Id, out int id);
+        FuelHistory.CarId = id;
+        await _hubConnection.StartAsync();
+        await _hubConnection.InvokeAsync("GetGasStation");
     }
 
-    
+    private async void Zapisz()
+    {
+        await _hubConnection.SendAsync("AddFuel", FuelHistory);
+    }
+
+    private void OnStationChanged(ChangeEventArgs e)
+    {
+         FuelHistory.GasStationId =int.Parse(e.Value.ToString());
+    }
+
 }

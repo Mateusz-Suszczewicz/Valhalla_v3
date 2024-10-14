@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 using System.Net;
 using System.Web.Http;
 using Valhalla_v3.Database;
@@ -50,13 +51,13 @@ public class CarService : ICarService
 	}
 
 	public Car Get(int id)
-	{
+	 {
 		if (id == 0)
 			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
-
-		var Car = Get().Find(x => x.Id == id);
-
-		return Car;
+		
+			var car = Get()
+				.FirstOrDefault(x => x.Id == id);
+		return car;
 	}
 
 	public List<Car> Get()
@@ -64,7 +65,11 @@ public class CarService : ICarService
 		var CarList = _context.Car
 			.Include(x => x.OperatorCreate)
 			.Include(x => x.OperatorModify)
-			.ToList();
+            .Include(x => x.Fuels)
+            .ThenInclude(c => c.GasStation)
+            .Include(x => x.CarHistoryRepair)
+            .ThenInclude(c => c.Mechanic)
+            .ToList();
 
 		return CarList;
 	}

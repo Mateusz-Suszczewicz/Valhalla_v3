@@ -31,7 +31,14 @@ public class CarHistoryFuelService: ICarHistoryFuelService
 		fuel.DateTimeAdd = DateTime.Now;
 		fuel.DateTimeModify = DateTime.Now;
 		_context.AddAsync(fuel);
-		await _context.SaveChangesAsync();
+		try
+		{
+			await _context.SaveChangesAsync();
+		}
+		catch(Exception ex)
+		{
+			throw ex;
+		}
 		return fuel.Id;
 	}
 

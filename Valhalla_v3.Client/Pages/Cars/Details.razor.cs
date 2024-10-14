@@ -33,43 +33,30 @@ public partial class Details
         .WithUrl(navigation.ToAbsoluteUri("/carhub"))
         .Build();
 
+       
+
+
         _hubConnection.On<Car>("Car", (receivedItem) =>
         {
-            car = receivedItem;
-            ReloadDate();
-            InvokeAsync(StateHasChanged);
+                car = receivedItem;
+                ReloadDate();
+                InvokeAsync(StateHasChanged);
         });
 
         await _hubConnection.StartAsync();
         await _hubConnection.InvokeAsync("GetCar", Id);
+
     }
 
     private void ReloadDate()
     {
-        FuelCost = car.Fuels.Where(x => x.Date.Month == DateTime.Now.Month && x.Date.Year == DateTime.Now.Year).Sum(x => x.Cost);
+        FuelCost = car.Fuels.Where(x => x.DateTimeModify.Month == DateTime.Now.Month && x.DateTimeModify.Year == DateTime.Now.Year).Sum(x => x.Cost);
         RepairCost = car.CarHistoryRepair.Where(x => x.Date.Month == DateTime.Now.Month && x.Date.Year == DateTime.Now.Year).Sum(x => x.Cost);
     }
 
     public async ValueTask DisposeAsync()
     {
         await _hubConnection.DisposeAsync();
-    }
-
-    void OpenFuel()
-    {
-        isFuel = true;
-    }
-
-    void CloseFuel()
-    {
-        isFuel = false;
-    }
-
-    private void HandleFormSubmit(CarHistoryFuel model)
-    {
-        // Obsługa przesłanych danych (np. zapis do bazy danych)
-        Console.WriteLine($"");
-        CloseFuel(); // Zamknięcie modala po zapisaniu
     }
 }
 

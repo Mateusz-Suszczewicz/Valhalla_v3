@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Valhalla_v3.Shared.CarHistory;
 
@@ -18,6 +19,6 @@ public class GasStation : MainClassFull
 	public string Phone1 { get; set; }
 	[MaxLength(50)]
 	public string Phone2 { get; set; }
-
-	public virtual ICollection<CarHistoryFuel> Fuels { get; set; } = new List<CarHistoryFuel>();
+    [JsonIgnore]
+    public virtual ICollection<CarHistoryFuel> Fuels { get; set; } = new List<CarHistoryFuel>();
 }

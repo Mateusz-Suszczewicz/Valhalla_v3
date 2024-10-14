@@ -14,9 +14,13 @@ builder.Services.AddRazorComponents()
 builder.Services.AddDbContext<ValhallaComtext>();
 builder.Services.AddScoped<IOperatorService, OperatorService>();
 builder.Services.AddScoped<ICarService, CarService>();
-builder.Services.AddBlazorBootstrap();
+builder.Services.AddScoped<IGasStationService, GasStationService>();
+builder.Services.AddScoped<ICarHistoryFuelService, CarHistoryFuelService>();
 builder.Services.AddSignalR();
-
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+});
 builder.Services.AddResponseCompression(opts =>
 {
     opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(

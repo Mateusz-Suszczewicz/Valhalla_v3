@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Valhalla_v3.Database;
 
@@ -11,9 +12,11 @@ using Valhalla_v3.Database;
 namespace Valhalla_v3.Migrations
 {
     [DbContext(typeof(ValhallaComtext))]
-    partial class ValhallaComtextModelSnapshot : ModelSnapshot
+    [Migration("20241014174555_addIdenityOper")]
+    partial class addIdenityOper
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -101,9 +104,6 @@ namespace Valhalla_v3.Migrations
                     b.Property<int>("GasStationId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("GasStationId1")
-                        .HasColumnType("int");
-
                     b.Property<int>("Mileage")
                         .HasColumnType("int");
 
@@ -118,8 +118,6 @@ namespace Valhalla_v3.Migrations
                     b.HasIndex("CarId");
 
                     b.HasIndex("GasStationId");
-
-                    b.HasIndex("GasStationId1");
 
                     b.HasIndex("OperatorCreateId");
 
@@ -158,9 +156,6 @@ namespace Valhalla_v3.Migrations
                     b.Property<int>("MechanicId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("MechanicId1")
-                        .HasColumnType("int");
-
                     b.Property<int>("Mileage")
                         .HasColumnType("int");
 
@@ -175,8 +170,6 @@ namespace Valhalla_v3.Migrations
                     b.HasIndex("CarId");
 
                     b.HasIndex("MechanicId");
-
-                    b.HasIndex("MechanicId1");
 
                     b.HasIndex("OperatorCreateId");
 
@@ -506,21 +499,17 @@ namespace Valhalla_v3.Migrations
 
             modelBuilder.Entity("Valhalla_v3.Shared.CarHistory.CarHistoryFuel", b =>
                 {
-                    b.HasOne("Valhalla_v3.Shared.CarHistory.Car", null)
+                    b.HasOne("Valhalla_v3.Shared.CarHistory.Car", "Car")
                         .WithMany("Fuels")
                         .HasForeignKey("CarId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Valhalla_v3.Shared.CarHistory.GasStation", "GasStation")
-                        .WithMany()
+                        .WithMany("Fuels")
                         .HasForeignKey("GasStationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Valhalla_v3.Shared.CarHistory.GasStation", null)
-                        .WithMany("Fuels")
-                        .HasForeignKey("GasStationId1");
 
                     b.HasOne("Valhalla_v3.Shared.Operator", "OperatorCreate")
                         .WithMany()
@@ -533,6 +522,8 @@ namespace Valhalla_v3.Migrations
                         .HasForeignKey("OperatorModifyId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.Navigation("Car");
 
                     b.Navigation("GasStation");
 
@@ -543,21 +534,17 @@ namespace Valhalla_v3.Migrations
 
             modelBuilder.Entity("Valhalla_v3.Shared.CarHistory.CarHistoryRepair", b =>
                 {
-                    b.HasOne("Valhalla_v3.Shared.CarHistory.Car", null)
+                    b.HasOne("Valhalla_v3.Shared.CarHistory.Car", "Car")
                         .WithMany("CarHistoryRepair")
                         .HasForeignKey("CarId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Valhalla_v3.Shared.CarHistory.Mechanic", "Mechanic")
-                        .WithMany()
-                        .HasForeignKey("MechanicId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Valhalla_v3.Shared.CarHistory.Mechanic", null)
                         .WithMany("Repair")
-                        .HasForeignKey("MechanicId1");
+                        .HasForeignKey("MechanicId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Valhalla_v3.Shared.Operator", "OperatorCreate")
                         .WithMany()
@@ -570,6 +557,8 @@ namespace Valhalla_v3.Migrations
                         .HasForeignKey("OperatorModifyId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.Navigation("Car");
 
                     b.Navigation("Mechanic");
 

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Valhalla_v3.Shared.CarHistory;
 
@@ -18,7 +19,7 @@ public class Mechanic : MainClassFull
 	public string Phone1 { get; set; }
 	[MaxLength(50)]
 	public string Phone2 { get; set; }
-
-	public virtual ICollection<CarHistoryRepair> Repair { get; set; } = new List<CarHistoryRepair>();
+    [JsonIgnore]
+    public virtual ICollection<CarHistoryRepair> Repair { get; set; } = new List<CarHistoryRepair>();
 
 }
