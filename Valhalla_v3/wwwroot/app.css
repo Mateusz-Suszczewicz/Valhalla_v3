@@ -71,3 +71,13 @@ h1:focus {
 .text-color-black{
     color: black;
 }
+
+.modal-body-moje {
+    color: black;
+    background-color: #C7C8CC;
+}
+
+.modal-header-moje {
+    color: black;
+    background-color: #B4B4B8;
+}

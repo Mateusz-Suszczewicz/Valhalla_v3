@@ -1,0 +1,44 @@
+﻿@using Microsoft.AspNetCore.SignalR.Client
+@using Valhalla_v3.Shared.CarHistory
+@inject NavigationManager navigation
+
+<EditForm Model="@formModel" OnValidSubmit="HandleValidStationSubmit">
+    <div class="mb-3">
+        <label for="Cost" class="form-label">Nazwa</label>
+        <InputText id="Cost" class="form-control" @bind-Value="formModel.Name" />
+    </div>
+    <div class="mb-3">
+        <label for="CostPerLitr" class="form-label">Opis</label>
+        <InputTextArea id="CostPerLitr" class="form-control" @bind-Value="formModel.Description" />
+    </div>
+    <div class="mb-3">
+        <label for="Mileage" class="form-label">Ulica</label>
+        <InputText id="Mileage" class="form-control" @bind-Value="formModel.Street" />
+    </div>
+    <div class="mb-3">
+        <label for="Mileage" class="form-label">Numer</label>
+        <InputText id="Mileage" class="form-control" @bind-Value="formModel.StreetNumber" />
+    </div>
+    <div class="mb-3">
+        <label for="Mileage" class="form-label">Kod pocztowy</label>
+        <InputText id="Mileage" class="form-control" @bind-Value="formModel.PostalCode" />
+    </div>
+    <div class="mb-3">
+        <label for="Mileage" class="form-label">Miasto</label>
+        <InputText id="Mileage" class="form-control" @bind-Value="formModel.City" />
+    </div>
+    <div class="mb-3">
+        <label for="Mileage" class="form-label">Kraj</label>
+        <InputText id="Mileage" class="form-control" @bind-Value="formModel.Country"/>
+    </div>
+    <div class="mb-3">
+        <label for="Mileage" class="form-label">Telefon 1</label>
+        <InputText id="Mileage" class="form-control" @bind-Value="formModel.Phone1" />
+    </div>
+    <div class="mb-3">
+        <label for="Mileage" class="form-label">Telefon 2</label>
+        <InputText id="Mileage" class="form-control" @bind-Value="formModel.Phone2" />
+    </div>
+    <button class="btn btn-primary w-50" type="submit">Zapisz</button>
+</EditForm>
+

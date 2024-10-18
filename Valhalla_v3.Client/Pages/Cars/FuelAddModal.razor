@@ -1,84 +1,49 @@
-﻿@page "/cars/{Id}/AddFuel"
-@rendermode InteractiveAuto
-
-@using Microsoft.AspNetCore.SignalR.Client
+﻿@using Microsoft.AspNetCore.SignalR.Client
 @using Valhalla_v3.Shared.CarHistory
 @inject NavigationManager navigation
 
-<div class="container-fluid text-color-black text-center">
+<EditForm Model="@formModel" OnValidSubmit="HandleValidFuelSubmit">
     <div class="mb-3">
-        <div class="form-floating">
-            <input type="number" class="form-control" id="InNumCostFuel" @bind-value="@FuelHistory.Cost" />
-            <label for="InNumCostFuel">Koszt paliwa</label>
-        </div>
+        <label for="Cost" class="form-label">Koszt</label>
+        <InputNumber id="Cost" class="form-control" @bind-Value="formModel.Cost" />
     </div>
     <div class="mb-3">
-        <div class="form-floating">
-            <input type="number" class="form-control" id="InNumMilage" @bind-value="@FuelHistory.Mileage" />
-            <label for="InNumMilage">Przebieg</label>
-        </div>
+        <label for="CostPerLitr" class="form-label">Cena za litr</label>
+        <InputNumber id="CostPerLitr" class="form-control" @bind-Value="formModel.CostPerLitr" />
     </div>
     <div class="mb-3">
-        <div class="form-floating">
-            <input type="number" class="form-control" id="InNumCostPerLitr" @bind-value="@FuelHistory.CostPerLitr" />
-            <label for="InNumCostPerLitr">PLN/Litr</label>
-        </div>
+        <label for="Mileage" class="form-label">Przebieg</label>
+        <InputNumber id="Mileage" class="form-control" @bind-Value="formModel.Mileage" />
     </div>
     <div class="mb-3">
-        <select class="form-select" aria-label="Default select example" @onchange="OnStationChanged">
-            <option selected>Wybierz stację</option>
-            @foreach (var i in ListGasStation)
+        <label for="Mileage" class="form-label">Stacja</label>
+        <InputSelect id="Mileage" class="form-control" @bind-Value="formModel.GasStationId">
+            @if (formModel.GasStationId == 0)
             {
-                <option value="@i.Id">@i.Name</option>
+                <option selected value="">Wybierz stację</option>
             }
-        </select>
+            @foreach (var fuel in ListGasStation)
+            {
+                <option value="@fuel.Id">@fuel.Name</option>
+            }
+        </InputSelect>
     </div>
-    <button class="btn btn-outline-secondary h-100 w-100" type="button" @onclick="Zapisz">Zapisz</button>
+     <div class="d-flex justify-content-between">
+        <button class="btn btn-primary w-25" type="submit">Zapisz</button>
+        <button class="btn btn-primary w-25"type="button" @onclick="OpenStation">Dodaj stację</button>
+    </div>
+</EditForm>
+
+<div class="modal fade @(isGasSttionOpen ? "show" : "")" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display:@(isGasSttionOpen ? "block" : "none");">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header modal-header-moje">
+                <h5 class="modal-title" id="exampleModalLabel">Stacja paliw</h5>
+                <button type="button" class="btn-close" @onclick="CloseStation"></button>
+            </div>
+            <div class="modal-body modal-body-moje">
+                <GasStationAddModal OnFormStationSubmit="HandleStationSubmit" />
+            </div>
+        </div>
+    </div>
 </div>
-
-@code {
-    [Parameter]
-    public string Id { get; set; }
-
-    private static Operator oper = new() { Name = "admin", Id = 3 };
-    private List<GasStation> ListGasStation = new();
-    private CarHistoryFuel FuelHistory = new CarHistoryFuel() { OperatorCreateId = 3, OperatorModifyId = 3 };
-    private HubConnection _hubConnection;
-
-    protected override async Task OnInitializedAsync()
-    {
-        _hubConnection = new HubConnectionBuilder()
-        .WithUrl(navigation.ToAbsoluteUri("/carhub"))
-        .Build();
-
-        _hubConnection.On<List<GasStation>>("GasStation", (receivedItem) =>
-        {
-            ListGasStation = receivedItem;
-            InvokeAsync(StateHasChanged);
-        });
-
-        _hubConnection.On<int>("AddedFuel", (receivedItem) =>
-       {
-           FuelHistory.Id = receivedItem;
-           if(FuelHistory.Id != 0)
-           {
-               navigation.NavigateTo($"/cars/{Id}");
-           }
-       });
-        int.TryParse(Id, out int id);
-        FuelHistory.CarId = id;
-        await _hubConnection.StartAsync();
-        await _hubConnection.InvokeAsync("GetGasStation");
-    }
-
-    private async void Zapisz()
-    {
-        await _hubConnection.SendAsync("AddFuel", FuelHistory);
-    }
-
-    private void OnStationChanged(ChangeEventArgs e)
-    {
-         FuelHistory.GasStationId =int.Parse(e.Value.ToString());
-    }
-
-}

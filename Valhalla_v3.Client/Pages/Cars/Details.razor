@@ -8,13 +8,11 @@
 <div class="container-fluid text-color-black text-center">
     <div class="row">
         <div class="col-md-4 mb-4">
-            <NavLink class="nav-link" href=@{$"/cars/{Id}/AddFuel"}>
-                <button type="button" class="btn btn-outline-secondary h-100 w-100">Dodaj Tankowanie</button>
-            </NavLink>
+            <button type="button" class="btn btn-outline-secondary h-100 w-100" @onclick="OpenFuel">Dodaj tankowanie</button>
         </div>
         <div class="col-md-4 mb-4"></div>
         <div class="col-md-4 mb-4">
-            <button type="button" class="btn btn-outline-secondary h-100 w-100">Dodaj Naprawę</button>
+            <button type="button" class="btn btn-outline-secondary h-100 w-100" @onclick="OpenRepair">Dodaj naprawę</button>
         </div>
     </div>
     <div class="row">
@@ -134,4 +132,34 @@
             </div>
         </div>
     }
+</div>
+
+@* Modal dodanie paliwa *@
+<div class="modal fade @(isFuelOpen ? "show" : "")" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display:@(isFuelOpen ? "block" : "none");">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header modal-header-moje">
+                <h5 class="modal-title" id="exampleModalLabel">Tankowanie</h5>
+                <button type="button" class="btn-close" @onclick="CloseFuel"></button>
+            </div>
+            <div class="modal-body modal-body-moje">
+                <FuelAddModal OnFormFuelSubmit="HandleFuelSubmit" />
+            </div>
+        </div>
+    </div>
+</div>
+
+@* Modal dodanie napraw *@
+<div class="modal fade @(isRapairOpen ? "show" : "")" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display:@(isRapairOpen ? "block" : "none");">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header modal-header-moje">
+                <h5 class="modal-title" id="exampleModalLabel">Naprawa</h5>
+                <button type="button" class="btn-close" @onclick="CloseRepair"></button>
+            </div>
+            <div class="modal-body modal-body-moje">
+                <RapairAddModel OnFormSubmit="HandleRepairSubmit" />
+            </div>
+        </div>
+    </div>
 </div>

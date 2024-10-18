@@ -28,10 +28,17 @@ public class CarHistoryRepairService : ICarHistoryRepairService
 	{
 		if (Repair.Id != 0)
 			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
-		Repair.DateTimeAdd = DateTime.Now;
-		Repair.DateTimeModify = DateTime.Now;
-		_context.AddAsync(Repair);
-		await _context.SaveChangesAsync();
+		try
+		{
+			Repair.DateTimeAdd = DateTime.Now;
+			Repair.DateTimeModify = DateTime.Now;
+			_context.AddAsync(Repair);
+			await _context.SaveChangesAsync();
+		}
+		catch (Exception ex)
+		{
+			throw ex;
+		}
 		return Repair.Id;
 	}
 

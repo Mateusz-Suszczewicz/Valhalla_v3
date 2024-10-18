@@ -11,12 +11,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
 	.AddInteractiveServerComponents()
 	.AddInteractiveWebAssemblyComponents();
+
 builder.Services.AddDbContext<ValhallaComtext>();
 builder.Services.AddScoped<IOperatorService, OperatorService>();
 builder.Services.AddScoped<ICarService, CarService>();
 builder.Services.AddScoped<IGasStationService, GasStationService>();
 builder.Services.AddScoped<ICarHistoryFuelService, CarHistoryFuelService>();
+builder.Services.AddScoped<IMechanicService, MechanicService>();
+builder.Services.AddScoped<ICarHistoryRepairService, CarHistoryRepairService>();
 builder.Services.AddSignalR();
+
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;

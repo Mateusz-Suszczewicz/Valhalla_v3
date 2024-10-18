@@ -1,0 +1,29 @@
+﻿@inject NavigationManager navigation
+<EditForm Model="@formModel" OnValidSubmit="HandleValidSubmit">
+    <div class="mb-3">
+        <label for="Cost" class="form-label">Koszt</label>
+        <InputNumber id="Cost" class="form-control" @bind-Value="formModel.Cost" />
+    </div>
+    <div class="mb-3">
+        <label for="Mileage" class="form-label">Przebieg</label>
+        <InputNumber id="Mileage" class="form-control" @bind-Value="formModel.Mileage" />
+    </div>
+    <div class="mb-3">
+        <label for="Description" class="form-label">Opis</label>
+        <InputTextArea id="Description" class="form-control" @bind-Value="formModel.Description" />
+    </div>
+    <div class="mb-3">
+        <label for="Mechanic" class="form-label">Mechanik</label>
+        <InputSelect id="Mechanic" class="form-control" @bind-Value="formModel.Mechanic">
+            @if (formModel.Mechanic is null)
+            {
+                <option selected value="">Wybierz mechanika</option>
+            }
+            @foreach (var mechanic in ListMechanic)
+            {
+                <option value="@mechanic.Id">@mechanic.Name</option>
+            }
+        </InputSelect>
+    </div>
+    <button class="btn btn-primary w-50" type="submit">Zapisz</button>
+</EditForm>
