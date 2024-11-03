@@ -11,7 +11,6 @@ public partial class RapairAddModel
 {
     private CarHistoryRepair formModel = new CarHistoryRepair();
     private List<Mechanic> ListMechanic = new();
-    private HubConnection _hubConnection;
 
     [Parameter]
     public EventCallback<CarHistoryRepair> OnFormSubmit { get; set; }
@@ -19,18 +18,7 @@ public partial class RapairAddModel
 
     protected override async Task OnInitializedAsync()
     {
-        _hubConnection = new HubConnectionBuilder()
-        .WithUrl(navigation.ToAbsoluteUri("/carhub"))
-        .Build();
-
-        _hubConnection.On<List<Mechanic>>("Mechanics", (receivedItem) =>
-        {
-            ListMechanic = receivedItem;
-            InvokeAsync(StateHasChanged);
-        });
-
-        await _hubConnection.StartAsync();
-        await _hubConnection.InvokeAsync("GetMechanic");
+        //TODO: Pobranie listy mechaników
     }
 
     // Obsługa walidacji formularza i wywołanie callbacku
@@ -39,8 +27,4 @@ public partial class RapairAddModel
         await OnFormSubmit.InvokeAsync(formModel);
     }
 
-    public async ValueTask DisposeAsync()
-    {
-        await _hubConnection.DisposeAsync();
-    }
 }

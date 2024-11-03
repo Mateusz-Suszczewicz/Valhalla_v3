@@ -50,8 +50,9 @@ public class CarService : ICarService
 		await _context.SaveChangesAsync();
 	}
 
+	//TODO: pobierać pojedyńczy z bazy nie z metody GET
 	public Car Get(int id)
-	 {
+	{
 		if (id == 0)
 			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
 		
@@ -59,16 +60,12 @@ public class CarService : ICarService
 				.FirstOrDefault(x => x.Id == id);
 		return car;
 	}
-
+	//TODO: Zmienić na async
 	public List<Car> Get()
 	{
 		var CarList = _context.Car
 			.Include(x => x.OperatorCreate)
 			.Include(x => x.OperatorModify)
-            .Include(x => x.Fuels)
-            .ThenInclude(c => c.GasStation)
-            .Include(x => x.CarHistoryRepair)
-            .ThenInclude(c => c.Mechanic)
             .ToList();
 
 		return CarList;
