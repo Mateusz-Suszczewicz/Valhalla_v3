@@ -1,5 +1,5 @@
 ﻿@inject NavigationManager navigation
-<EditForm Model="@formModel" OnValidSubmit="HandleValidSubmit">
+<EditForm Model="@formModel" OnValidSubmit="HandleValidMechanicSubmit">
     <div class="mb-3">
         <label for="Cost" class="form-label">Koszt</label>
         <InputNumber id="Cost" class="form-control" @bind-Value="formModel.Cost" />
@@ -25,5 +25,22 @@
             }
         </InputSelect>
     </div>
-    <button class="btn btn-primary w-50" type="submit">Zapisz</button>
+    <div class="d-flex justify-content-between">
+        <button class="btn btn-primary w-25" type="submit">Zapisz</button>
+        <button class="btn btn-primary w-25"type="button" @onclick="OpenStation">Dodaj stację</button>
+    </div>
 </EditForm>
+
+<div class="modal fade @(isMechanicOpen ? "show" : "")" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display:@(isMechanicOpen ? "block" : "none");">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header modal-header-moje">
+                <h5 class="modal-title" id="exampleModalLabel">Mechanik</h5>
+                <button type="button" class="btn-close" @onclick="CloseStation"></button>
+            </div>
+            <div class="modal-body modal-body-moje">
+                <GasStationAddModal OnFormStationSubmit="HandleMechanicSubmit" />
+            </div>
+        </div>
+    </div>
+</div>

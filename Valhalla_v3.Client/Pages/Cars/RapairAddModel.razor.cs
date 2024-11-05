@@ -12,7 +12,7 @@ public partial class RapairAddModel
     private CarHistoryRepair formModel = new CarHistoryRepair();
     private List<Mechanic> ListMechanic = new();
     private HubConnection _hubConnection;
-
+    private bool isMechanicOpen = false;
     [Parameter]
     public EventCallback<CarHistoryRepair> OnFormSubmit { get; set; }
 
@@ -34,7 +34,7 @@ public partial class RapairAddModel
     }
 
     // Obsługa walidacji formularza i wywołanie callbacku
-    private async Task HandleValidSubmit()
+    private async Task HandleValidMechanicSubmit()
     {
         await OnFormSubmit.InvokeAsync(formModel);
     }
@@ -42,5 +42,24 @@ public partial class RapairAddModel
     public async ValueTask DisposeAsync()
     {
         await _hubConnection.DisposeAsync();
+    }
+
+    void OpenStation()
+    {
+        isMechanicOpen = true;
+        StateHasChanged();
+    }
+
+    async Task CloseStation()
+    {
+        await _hubConnection.InvokeAsync("GetGasStation");
+        isMechanicOpen = false;
+        StateHasChanged();
+    }
+
+    private async void HandleMechanicSubmit(GasStation model)
+    {
+        await _hubConnection.SendAsync("AddGasStation", model);
+        CloseStation();
     }
 }
