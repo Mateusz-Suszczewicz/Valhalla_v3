@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 using System.Net.Http.Json;
+using System.Text;
+using System.Text.Json;
 using Valhalla_v3.Shared;
 using Valhalla_v3.Shared.CarHistory;
 using static System.Net.WebRequestMethods;
@@ -74,9 +76,23 @@ public partial class Details
         model.CarId = car.Id;
         model.OperatorCreateId = 3;
         model.OperatorModifyId = 3;
-        //TODO: Dodanie tankowania
+        var json = JsonSerializer.Serialize(model);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+        try
+        {
+            var response = await Http.PostAsync(navigation.ToAbsoluteUri($"api/Fuel"), content);
+            if (response.IsSuccessStatusCode)
+            {
+                ReloadDate();
+                CloseFuel();
 
-        CloseFuel();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+
     }
 
     void OpenRepair()

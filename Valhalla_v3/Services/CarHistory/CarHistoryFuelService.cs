@@ -9,8 +9,8 @@ namespace Valhalla_v3.Services.CarHistory;
 public interface ICarHistoryFuelService
 {
 	public Task<int> Create(CarHistoryFuel fuel);
-	public CarHistoryFuel Get(int id);
-	public List<CarHistoryFuel> Get();
+	public Task<CarHistoryFuel> Get(int id);
+	public Task<List<CarHistoryFuel>> Get();
 	public Task Update(CarHistoryFuel fuel);
 	public Task Delete(int id);
 }
@@ -56,23 +56,27 @@ public class CarHistoryFuelService: ICarHistoryFuelService
 		await _context.SaveChangesAsync();
 	}
 
-	public CarHistoryFuel Get(int id)
+	public Task<CarHistoryFuel> Get(int id)
 	{
 		if (id == 0)
 			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
 
-		var fuel = Get().Find(x => x.Id == id);
-
-		return fuel;
-	}
-
-	public List<CarHistoryFuel> Get()
-	{
-		var FuelList = _context.CarHistoryFuels
+		var fuel = _context.CarHistoryFuels
 			.Include(x => x.OperatorCreate)
 			.Include(x => x.OperatorModify)
 			.Include(x => x.GasStation)
-			.ToList();
+			.FirstOrDefaultAsync(x => x.Id == id);
+
+        return fuel;
+	}
+
+	public async Task<List<CarHistoryFuel>> Get()
+	{
+		var FuelList = await _context.CarHistoryFuels
+			.Include(x => x.OperatorCreate)
+			.Include(x => x.OperatorModify)
+			.Include(x => x.GasStation)
+			.ToListAsync();
 
 		return FuelList;
 	}
