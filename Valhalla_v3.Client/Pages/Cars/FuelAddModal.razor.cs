@@ -15,7 +15,7 @@ public partial class FuelAddModal
 
     protected override async Task OnInitializedAsync()
     {
-        //TODO: Pobranie stacji benzynowych
+        //TODO Pobranie stacji benzynowych
     }
 
     // Obsługa walidacji formularza i wywołanie callbacku
