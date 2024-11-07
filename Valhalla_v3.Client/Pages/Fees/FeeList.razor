@@ -20,16 +20,28 @@
     <div class="row">
         <ul class="nav nav-tabs">
             <li class="nav-item">
-                <a class="nav-link @(activeTab == Tabs.currentYear ? "active" : "")" @onclick="() => SelectTab(Tabs.currentYear)">Aktualny miesiąc</a>
+                <a class="nav-link @(activeTab == Tabs.currentMonth ? "active" : "")" @onclick="() => SelectTab(Tabs.currentMonth)">Aktualny miesiąc</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link @(activeTab == Tabs.currentMonth ? "active" : "")" @onclick="() => SelectTab(Tabs.currentMonth)">Przyszły miesiąc</a>
+                <a class="nav-link @(activeTab == Tabs.nextMonth ? "active" : "")" @onclick="() => SelectTab(Tabs.nextMonth)">Przyszły miesiąc</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link @(activeTab == Tabs.currentMonth ? "active" : "")" @onclick="() => SelectTab(Tabs.currentMonth)">Zestawienie roczne</a>
+                <a class="nav-link @(activeTab == Tabs.currentYear ? "active" : "")" @onclick="() => SelectTab(Tabs.currentYear)">Zestawienie roczne</a>
             </li>
         </ul>
     </div>
-    
-
 </div>
+
+
+@if (activeTab == Tabs.currentMonth)
+{
+    <ComparisonCurrentMonth Month =true></ComparisonCurrentMonth>
+}
+@if (activeTab == Tabs.nextMonth)
+{
+    <ComparisonCurrentMonth Month=false></ComparisonCurrentMonth>
+}
+@if (activeTab == Tabs.currentYear)
+{
+    <ComparisonYear></ComparisonYear>
+}
