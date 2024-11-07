@@ -1,6 +1,7 @@
 ﻿@using Microsoft.AspNetCore.SignalR.Client
 @using Valhalla_v3.Shared.CarHistory
 @inject NavigationManager navigation
+@inject HttpClient Http
 
 <EditForm Model="@formModel" OnValidSubmit="HandleValidFuelSubmit">
     <div class="mb-3">

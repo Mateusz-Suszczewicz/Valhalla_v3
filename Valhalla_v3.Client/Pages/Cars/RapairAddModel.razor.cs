@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Valhalla_v3.Shared.CarHistory;
 using Microsoft.AspNetCore.SignalR.Client;
 using Valhalla_v3.Shared.CarHistory;
+using static System.Net.WebRequestMethods;
+using System.Net.Http.Json;
 
 namespace Valhalla_v3.Client.Pages.Cars;
 
@@ -11,26 +13,30 @@ public partial class RapairAddModel
 {
     private CarHistoryRepair formModel = new CarHistoryRepair();
     private List<Mechanic> ListMechanic = new();
-    private HubConnection _hubConnection;
-    private bool isMechanicOpen = false;
+
     [Parameter]
     public EventCallback<CarHistoryRepair> OnFormSubmit { get; set; }
 
 
     protected override async Task OnInitializedAsync()
     {
-        _hubConnection = new HubConnectionBuilder()
-        .WithUrl(navigation.ToAbsoluteUri("/carhub"))
-        .Build();
+        await LoadMechnic();
+    }
 
-        _hubConnection.On<List<Mechanic>>("Mechanics", (receivedItem) =>
+    private async Task LoadMechnic()
+    {
+        try
         {
-            ListMechanic = receivedItem;
-            InvokeAsync(StateHasChanged);
-        });
-
-        await _hubConnection.StartAsync();
-        await _hubConnection.InvokeAsync("GetMechanic");
+            var response = await Http.GetFromJsonAsync<List<Mechanic>>(navigation.ToAbsoluteUri($"api/Mechanic"));
+            if (response != null)
+            {
+                ListMechanic = response;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
     }
 
     // Obsługa walidacji formularza i wywołanie callbacku
@@ -42,24 +48,5 @@ public partial class RapairAddModel
     public async ValueTask DisposeAsync()
     {
         await _hubConnection.DisposeAsync();
-    }
-
-    void OpenStation()
-    {
-        isMechanicOpen = true;
-        StateHasChanged();
-    }
-
-    async Task CloseStation()
-    {
-        await _hubConnection.InvokeAsync("GetGasStation");
-        isMechanicOpen = false;
-        StateHasChanged();
-    }
-
-    private async void HandleMechanicSubmit(GasStation model)
-    {
-        await _hubConnection.SendAsync("AddGasStation", model);
-        CloseStation();
     }
 }

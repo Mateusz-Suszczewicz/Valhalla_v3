@@ -10,8 +10,8 @@ namespace Valhalla_v3.Services.CarHistory;
 public interface ICarService
 {
 	public Task<int> Create(Car car);
-	public Car Get(int id);
-	public List<Car> Get();
+	public Task<Car> Get(int id);
+	public Task<List<Car>> Get();
 	public Task Update(Car car);
 	public Task Delete(int id);
 }
@@ -50,26 +50,27 @@ public class CarService : ICarService
 		await _context.SaveChangesAsync();
 	}
 
-	public Car Get(int id)
-	 {
+	public async Task<Car> Get(int id)
+	{
 		if (id == 0)
 			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
 		
-			var car = Get()
-				.FirstOrDefault(x => x.Id == id);
-		return car;
+			var car = await _context.Car
+            .Include(x => x.OperatorCreate)
+            .Include(x => x.OperatorModify)
+			.Include(x => x.Fuels)
+			.ThenInclude(y => y.GasStation)
+            .Include(x => x.CarHistoryRepair)
+            .ThenInclude(z => z.Mechanic)
+            .FirstOrDefaultAsync(x => x.Id == id);
+        return car;
 	}
-
-	public List<Car> Get()
+	public async Task<List<Car>> Get()
 	{
-		var CarList = _context.Car
+		var CarList = await _context.Car
 			.Include(x => x.OperatorCreate)
 			.Include(x => x.OperatorModify)
-            .Include(x => x.Fuels)
-            .ThenInclude(c => c.GasStation)
-            .Include(x => x.CarHistoryRepair)
-            .ThenInclude(c => c.Mechanic)
-            .ToList();
+            .ToListAsync();
 
 		return CarList;
 	}
