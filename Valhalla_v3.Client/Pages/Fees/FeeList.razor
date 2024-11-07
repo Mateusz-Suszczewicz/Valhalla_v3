@@ -1,6 +1,35 @@
 ﻿@page "/fees"
 @rendermode InteractiveAuto
-
 <PageTitle>Opłaty</PageTitle>
 
-<h1>Strona w przygotowaniu</h1>
+<div class="container-fluid text-center">
+    <div class="row">
+        <h1>Opłaty</h1>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <button type="button" class="btn btn-outline-secondary h-100 w-100">Zestawienie bieżące</button>
+        </div>
+        <div class="col-md-4 mb-4">
+            <button type="button" class="btn btn-outline-secondary h-100 w-100">Zestawienie historyczne</button>
+        </div>
+        <div class="col-md-4 mb-4">
+            <button type="button" class="btn btn-outline-secondary h-100 w-100">Konfiguracja opłat</button>
+        </div>
+    </div>
+    <div class="row">
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link @(activeTab == Tabs.currentYear ? "active" : "")" @onclick="() => SelectTab(Tabs.currentYear)">Aktualny miesiąc</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(activeTab == Tabs.currentMonth ? "active" : "")" @onclick="() => SelectTab(Tabs.currentMonth)">Przyszły miesiąc</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(activeTab == Tabs.currentMonth ? "active" : "")" @onclick="() => SelectTab(Tabs.currentMonth)">Zestawienie roczne</a>
+            </li>
+        </ul>
+    </div>
+    
+
+</div>
