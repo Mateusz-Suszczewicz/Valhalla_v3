@@ -1,4 +1,6 @@
 ﻿@inject NavigationManager navigation
+@inject HttpClient Http
+
 <EditForm Model="@formModel" OnValidSubmit="HandleValidSubmit">
     <div class="mb-3">
         <label for="Cost" class="form-label">Koszt</label>

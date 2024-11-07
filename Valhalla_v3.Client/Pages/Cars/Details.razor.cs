@@ -33,10 +33,9 @@ public partial class Details
     {
         Operator oper = new() { Name = "admin", Id = 3 };
         car = new() { OperatorCreate = oper, OperatorModify = oper };
-        //TODO: Pobranie konkretnego auta
         await LoadCar();
-
     }
+    
     private async Task LoadCar()
     {
         try
@@ -53,6 +52,7 @@ public partial class Details
             Console.WriteLine(ex.Message);
         }
     }
+    
     private void ReloadDate()
     {
         FuelCost = car.Fuels.Where(x => x.DateTimeModify.Month == DateTime.Now.Month && x.DateTimeModify.Year == DateTime.Now.Year).Sum(x => x.Cost);
@@ -112,7 +112,22 @@ public partial class Details
         model.CarId = car.Id;
         model.OperatorCreateId = 3;
         model.OperatorModifyId = 3;
-        //TODO: Dodatnie naprawy
+        var json = JsonSerializer.Serialize(model);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+        try
+        {
+            var response = await Http.PostAsync(navigation.ToAbsoluteUri($"api/Repair"), content);
+            if (response.IsSuccessStatusCode)
+            {
+                ReloadDate();
+                CloseFuel();
+
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
 
         CloseRepair();
     }

@@ -16,7 +16,6 @@ public partial class GasStationAddModal
     protected override async Task OnInitializedAsync()
     {
 
-        //TODO: tutaj było pobieranie stacji z jakiegoś powodu
     }
 
     // Obsługa walidacji formularza i wywołanie callbacku

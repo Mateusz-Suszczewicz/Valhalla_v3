@@ -56,12 +56,12 @@ public class CarHistoryFuelService: ICarHistoryFuelService
 		await _context.SaveChangesAsync();
 	}
 
-	public Task<CarHistoryFuel> Get(int id)
+	public async Task<CarHistoryFuel> Get(int id)
 	{
 		if (id == 0)
 			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
 
-		var fuel = _context.CarHistoryFuels
+		var fuel = await _context.CarHistoryFuels
 			.Include(x => x.OperatorCreate)
 			.Include(x => x.OperatorModify)
 			.Include(x => x.GasStation)

@@ -9,8 +9,8 @@ namespace Valhalla_v3.Services.CarHistory;
 public interface ICarHistoryRepairService
 {
 	public Task<int> Create(CarHistoryRepair Repair);
-	public CarHistoryRepair Get(int id);
-	public List<CarHistoryRepair> Get();
+	public Task<CarHistoryRepair> Get(int id);
+	public Task<List<CarHistoryRepair>> Get();
 	public Task Update(CarHistoryRepair Repair);
 	public Task Delete(int id);
 }
@@ -56,23 +56,26 @@ public class CarHistoryRepairService : ICarHistoryRepairService
 		await _context.SaveChangesAsync();
 	}
 
-	public CarHistoryRepair Get(int id)
+	public async Task<CarHistoryRepair> Get(int id)
 	{
 		if (id == 0)
 			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
 
-		var repair = Get().Find(x => x.Id == id);
+		var repair = await _context.CarHistoryRepairs
+            .Include(x => x.OperatorCreate)
+            .Include(x => x.OperatorModify)
+            .Include(x => x.Mechanic).FirstOrDefaultAsync(x => x.Id == id);
 
 		return repair;
 	}
 
-	public List<CarHistoryRepair> Get()
+	public async Task<List<CarHistoryRepair>> Get()
 	{
-		var RepairList = _context.CarHistoryRepairs
+		var RepairList = await _context.CarHistoryRepairs
 			.Include(x => x.OperatorCreate)
 			.Include(x => x.OperatorModify)
 			.Include(x => x.Mechanic)
-			.ToList();
+			.ToListAsync();
 
 		return RepairList;
 	}

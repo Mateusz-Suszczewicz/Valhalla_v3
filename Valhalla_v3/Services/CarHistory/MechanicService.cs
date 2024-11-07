@@ -10,8 +10,8 @@ namespace Valhalla_v3.Services.CarHistory;
 public interface IMechanicService
 {
 	public Task<int> Create(Mechanic mechanic);
-	public Mechanic Get(int id);
-	public List<Mechanic> Get();
+	public Task<Mechanic> Get(int id);
+	public Task<List<Mechanic>> Get();
 	public Task Update(Mechanic mechanic);
 	public Task Delete(int id);
 }
@@ -50,22 +50,24 @@ public class MechanicService : IMechanicService
 		await _context.SaveChangesAsync();
 	}
 
-	public Mechanic Get(int id)
+	public async Task<Mechanic> Get(int id)
 	{
 		if (id == 0)
 			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
 
-		var mechanic = Get().Find(x => x.Id == id);
+		var mechanic = await _context.Mechanics
+            .Include(x => x.OperatorCreate)
+            .Include(x => x.OperatorModify).FirstOrDefaultAsync(x => x.Id == id);
 
 		return mechanic;
 	}
 
-	public List<Mechanic> Get()
+	public async Task<List<Mechanic>> Get()
 	{
-		var mechanicList = _context.Mechanics
+		var mechanicList = await _context.Mechanics
 			.Include(x => x.OperatorCreate)
 			.Include(x => x.OperatorModify)
-			.ToList();
+			.ToListAsync();
 
 		return mechanicList;
 	}
