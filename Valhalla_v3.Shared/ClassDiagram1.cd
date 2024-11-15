@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Valhalla_v3.Shared.MainClass">
+    <Position X="17.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAAACEEgAACAAAAAAAAAAgA=</HashCode>
+      <FileName>MainClass.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Valhalla_v3.Shared.MainClassFull">
+    <Position X="16.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MainClassFull.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Valhalla_v3.Shared.Operator">
+    <Position X="19.75" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAQAAEEAAAACAAAAAAAAAAA=</HashCode>
+      <FileName>Operator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Valhalla_v3.Shared.CarHistory.Car">
+    <Position X="20.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEBAAAAAAAAAAAQAAAAAEAAAAAAAgAAAABAgA=</HashCode>
+      <FileName>CarHistory\Car.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Valhalla_v3.Shared.CarHistory.CarHistoryFuel">
+    <Position X="14" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAMAAAAAAAQAAAAAAAAAABCAAAAAAAABAAAACAAAAAE=</HashCode>
+      <FileName>CarHistory\CarHistoryFuel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Valhalla_v3.Shared.CarHistory.CarHistoryRepair">
+    <Position X="18.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAAAQgAAAAAAAAABCAAAAAAgABAAAIAAAAAAA=</HashCode>
+      <FileName>CarHistory\CarHistoryRepair.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Valhalla_v3.Shared.CarHistory.GasStation">
+    <Position X="15.25" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAIIAAIQAAAAAIAAAAAAAIAIAAAAAA=</HashCode>
+      <FileName>CarHistory\GasStation.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Valhalla_v3.Shared.CarHistory.Mechanic">
+    <Position X="17.5" Y="6.75" Width="1.5" />
+    <InheritanceLine Type="Valhalla_v3.Shared.MainClassFull" ManuallyRouted="true">
+      <Path>
+        <Point X="17" Y="4.925" />
+        <Point X="17" Y="6.272" />
+        <Point X="18.25" Y="6.272" />
+        <Point X="18.25" Y="6.75" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAIIAAIAAAAACIAAAAAAAIAIAAAAAA=</HashCode>
+      <FileName>CarHistory\Mechanic.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
