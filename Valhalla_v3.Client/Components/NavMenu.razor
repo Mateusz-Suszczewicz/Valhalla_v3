@@ -1,4 +1,6 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@rendermode InteractiveAuto
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">Valhalla.v3</a>
     </div>
@@ -33,10 +35,29 @@
         </div>
 
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="fees">
-                <i class="fa-solid fa-wallet pe-2"></i>Opłaty
-            </NavLink>
+            <button class="btn btn-link nav-link" @onclick="ToggleFeesMenu">
+                <i class="fa-solid fa-wallet pe-2"></i>Opłaty <i class="fa-solid fa-chevron-down"></i>
+            </button>
         </div>
+
+            @if (IsFeesMenuOpen)
+            {
+                <div class="nav-item px-3 ms-3">
+                    <NavLink class="nav-link" href=@($"fees/{DateTime.Now.Year}")>
+                        Zestawienie bieżące
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3 ms-3">
+                    <NavLink class="nav-link" href="HistoricalOverview">
+                       Zestawienie historyczne
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3 ms-3">
+                    <NavLink class="nav-link" href="ConfigFees">
+                       Konfiguracja opłat
+                    </NavLink>
+                </div>
+            }
 
         <div class="nav-item px-3 position-absolute bottom-0 w-100">
             <NavLink class="nav-link" href="admin">
@@ -46,3 +67,11 @@
     </nav>
 </div>
 
+@code {
+    private bool IsFeesMenuOpen = false;
+
+    private void ToggleFeesMenu()
+    {
+        IsFeesMenuOpen = !IsFeesMenuOpen;
+    }
+}

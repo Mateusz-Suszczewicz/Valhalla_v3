@@ -1,4 +1,4 @@
-﻿@page "/fees"
+﻿@page "/fees/{Id:int}"
 @rendermode InteractiveAuto
 @inject NavigationManager NavManager
 <PageTitle>Opłaty</PageTitle>
@@ -8,23 +8,12 @@
         <h1>Opłaty</h1>
     </div>
     <div class="row">
-        <div class="col-md-4 mb-4">
-            <button type="button" class="btn btn-outline-secondary h-100 w-100">Zestawienie bieżące</button>
-        </div>
-        <div class="col-md-4 mb-4">
-            <button type="button" class="btn btn-outline-secondary h-100 w-100">Zestawienie historyczne</button>
-        </div>
-        <div class="col-md-4 mb-4">
-            <button type="button" class="btn btn-outline-secondary h-100 w-100">Konfiguracja opłat</button>
-        </div>
-    </div>
-    <div class="row">
         <ul class="nav nav-tabs">
             <li class="nav-item">
-                <a class="nav-link @(activeTab == Tabs.currentMonth ? "active" : "")" @onclick="() => SelectTab(Tabs.currentMonth)">Aktualny miesiąc</a>
+                <a class="nav-link @(Id != DateTime.Now.Year ? "disabled" : "") @(activeTab == Tabs.currentMonth ? "active" : "")" @onclick="() => SelectTab(Tabs.currentMonth)">Aktualny miesiąc</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link @(activeTab == Tabs.nextMonth ? "active" : "")" @onclick="() => SelectTab(Tabs.nextMonth)">Przyszły miesiąc</a>
+                <a class="nav-link @(Id != DateTime.Now.Year ? "disabled" : "") @(activeTab == Tabs.nextMonth ? "active" : "")" @onclick="() => SelectTab(Tabs.nextMonth)">Przyszły miesiąc</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link @(activeTab == Tabs.currentYear ? "active" : "")" @onclick="() => SelectTab(Tabs.currentYear)">Zestawienie roczne</a>
@@ -36,11 +25,11 @@
 
 @if (activeTab == Tabs.currentMonth)
 {
-    <ComparisonCurrentMonth Month=true></ComparisonCurrentMonth>
+    <ComparisonCurrentMonth Month=@(DateTime.Now.Month)></ComparisonCurrentMonth>
 }
 @if (activeTab == Tabs.nextMonth)
 {
-    <ComparisonCurrentMonth Month=false></ComparisonCurrentMonth>
+    <ComparisonCurrentMonth Month=@(DateTime.Now.Month+1)></ComparisonCurrentMonth>
 }
 @if (activeTab == Tabs.currentYear)
 {
