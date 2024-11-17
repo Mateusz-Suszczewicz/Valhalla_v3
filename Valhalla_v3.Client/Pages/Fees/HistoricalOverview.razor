@@ -1,5 +1,33 @@
 ﻿@page "/HistoricalOverview"
 @rendermode InteractiveAuto
 <PageTitle>Zestawienie historyczne</PageTitle>
-<h3>Zestawienie historyczne</h3>
 
+<div class="container-fluid text-center">
+    <div class="row">
+        <h1>Zestawienie historyczne</h1>
+    </div>
+    <div class="row">
+        @if (year is null)
+        {
+            <p><em>Pobieranie danych...</em></p>
+        }
+        else if (year.Count == 0)
+        {
+            <p>Brak historycznych wpisów w bazie.</p>
+        }
+        else
+        {
+            @for (int i = 0; i < year.Count; i += 3)
+            {
+                <div class="row">
+                    @for (int j = i; j < i + 3 && j < year.Count; j++)
+                    {
+                        <Valhalla_v3.Client.Components.Card Title="@year[j].ToString()"
+                                                            Description=""
+                                                            Url=@($"/fees/{year[j].ToString()}") />
+                    }
+                </div>
+            }
+        }
+    </div>
+</div>

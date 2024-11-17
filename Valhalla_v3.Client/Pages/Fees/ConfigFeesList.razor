@@ -1,0 +1,61 @@
+﻿@page "/ConfigFeesList"
+@rendermode InteractiveAuto
+<PageTitle>Konfiguracja opłat</PageTitle>
+
+<div class="container-fluid text-center">
+    <div class="row">
+        <h1>Konfiguracja opłat</h1>
+    </div>
+    <div class="row">
+        <table class="text-color-white table">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Nazwa</th>
+                    <th scope="col">Domyślna kwota</th>
+                    <th scope="col">Częstotliwość</th>
+                    <th scope="col">Data rozpoczęcia</th>
+                    <th scope="col">Data zakończenia</th>
+                    <th scope="col">Nieaktywna</th>
+                    <th scope="col">Usuń</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach(var fee in fees)
+                {
+                    <tr @onclick="() => OpenModal(fee.Id)">
+                        <th scope="row">@(fees.IndexOf(fee)+1)</th>
+                        <td>@fee.Name</td>
+                        <td>@($"{fee.DefultAmount:F2}") zł</td>
+                        <td>@fee.CycleOf</td>
+                        <td>@fee.DateStart.ToShortDateString()</td>
+                        <td>@fee.DateEnd.ToShortDateString()</td>
+                        <td>
+                            <input disabled type="checkbox" @bind="@fee.disable" class="form-check-input" />
+                        </td>
+                        <td>
+                            <button class="btn btn-danger" onclick="() => delete(@fee.Id)">Usuń</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="fixed-buttons">
+    <button class="btn btn-primary" @onclick="() => OpenModal(0)">Dodaj nową opłatę</button>
+</div>
+
+<div class="modal fade @(isModalOpen ? "show" : "")" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display:@(isModalOpen ? "block" : "none");">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header modal-header-moje">
+                <h5 class="modal-title" id="exampleModalLabel">Konfiguracja opłaty</h5>
+                <button type="button" class="btn-close" @onclick="CloseModal"></button>
+            </div>
+            <div class="modal-body modal-body-moje">
+                <FeeConfigModal Title="@Id.ToString()" />
+            </div>
+        </div>
+    </div>
+</div>
