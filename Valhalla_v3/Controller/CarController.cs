@@ -28,4 +28,14 @@ public class CarController : ControllerBase
             return NotFound();
         return await _carService.Get(id);
     }
+
+    [HttpPost]
+    public async Task<ActionResult> Create([FromBody] Car car)
+    {
+        if (car.Id != 0)
+            await _carService.Update(car);
+        else
+            await _carService.Create(car);
+        return CreatedAtAction("Create", car.Id);
+    }
 }

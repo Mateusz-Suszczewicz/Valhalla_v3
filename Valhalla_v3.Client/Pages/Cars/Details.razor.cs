@@ -22,6 +22,7 @@ public partial class Details
     private decimal RepairCost { get; set; }
     private bool isFuelOpen = false;
     private bool isRapairOpen = false;
+    private bool IsDisabled = true;
 
     private void SelectTab(Tabs tab)
     {
@@ -46,6 +47,7 @@ public partial class Details
                 car = response;
                 ReloadDate();
             }
+
         }
         catch (Exception ex)
         {
@@ -130,6 +132,29 @@ public partial class Details
         }
 
         CloseRepair();
+    }
+
+    private void EditModal()
+    {
+        IsDisabled = false;
+    }
+
+    private async Task Save()
+    {
+        var json = JsonSerializer.Serialize(car);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+        try
+        {
+            var response = await Http.PostAsync(navigation.ToAbsoluteUri($"api/Car"), content);
+            if (response.IsSuccessStatusCode)
+            {
+                IsDisabled = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
     }
 }
 

@@ -32,19 +32,19 @@
         <div class="row mt-3"> @*Pierwsza linia*@
             <div class="col-md-4 mb-4">
                 <div class="form-floating">
-                    <input type="text" class="form-control" id="InTextMarka" @bind-value="@car.Brand">
+                    <input type="text" disabled="@IsDisabled" class="form-control" id="InTextMarka" @bind-value="@car.Brand">
                     <label for="InTextMarka">Marka</label>
                 </div>
             </div>
             <div class="col-md-4 mb-4">
                 <div class="form-floating">
-                    <input type="text" class="form-control" id="InTextModel" @bind-value="@car.Model">
+                    <input type="text" disabled="@IsDisabled" class="form-control" id="InTextModel" @bind-value="@car.Model">
                     <label for="InTextModel">Model</label>
                 </div>
             </div>
             <div class="col-md-4 mb-4">
                 <div class="form-floating">
-                    <input type="number" class="form-control" id="InNumRokProdukcji" @bind-value="@car.Year">
+                    <input type="number" disabled="@IsDisabled" class="form-control" id="InNumRokProdukcji" @bind-value="@car.Year">
                     <label for="InNumRokProdukcji">Rok produkcji</label>
                 </div>
             </div>
@@ -52,13 +52,13 @@
         <div class="row">@*Druga linia*@
             <div class="col-md-4 mb-4">
                 <div class="form-floating">
-                    <input type="number" class="form-control" id="InNumEngineCC" @bind-value="@car.EngineCC">
+                    <input type="number" disabled="@IsDisabled" class="form-control" id="InNumEngineCC" @bind-value="@car.EngineCC">
                     <label for="InNumEngineCC">Pojemność silnika</label>
                 </div>
             </div>
             <div class="col-md-4 mb-4">
                 <div class="form-floating">
-                    <input type="text" class="form-control" id="InTextVin" @bind-value="@car.VIN">
+                    <input type="text" disabled="@IsDisabled" class="form-control" id="InTextVin" @bind-value="@car.VIN">
                     <label for="InTextVin">VIN</label>
                 </div>
             </div>
@@ -77,13 +77,13 @@
             </ul>
             <div class="col-md-4 mb-4 mt-3">
                 <div class="form-floating">
-                    <input type="date" class="form-control" id="InDateDataUbezp">
+                    <input type="date" disabled="@IsDisabled" class="form-control" id="InDateDataUbezp">
                     <label for="InDateDataUbezp">Data ważności</label>
                 </div>
             </div>
             <div class="col-md-4 mb-4 mt-3">
                 <div class="form-floating">
-                    <input type="number" class="form-control" id="InNumCost">
+                    <input type="number" disabled="@IsDisabled" class="form-control" id="InNumCost">
                     <label for="InNumCost">Koszt osatniego ubezpieczenia</label>
                 </div>
             </div>
@@ -96,13 +96,13 @@
             </ul>
             <div class="col-md-4 mb-4 mt-3">
                 <div class="form-floating">
-                    <input type="date" class="form-control" id="InDateDataPrzegladu">
+                    <input type="date" disabled="@IsDisabled" class="form-control" id="InDateDataPrzegladu">
                     <label for="InDateDataPrzegladu">Data ostatniego przeglądu</label>
                 </div>
             </div>
             <div class="col-md-4 mb-4 mt-3">
                 <div class="form-floating">
-                    <input type="number" class="form-control" id="InNumCostPrzglad">
+                    <input type="number" disabled="@IsDisabled" class="form-control" id="InNumCostPrzglad">
                     <label for="InNumCostPrzglad">Koszt osatniego przeglądu</label>
                 </div>
             </div>
@@ -162,4 +162,10 @@
             </div>
         </div>
     </div>
+</div>
+
+<div class="fixed-buttons">
+    <button class="btn btn-primary" style="display: @(IsDisabled ? "none":"block")" @onclick=Save>Zapisz</button>
+    <button class="btn btn-primary" @onclick=EditModal>Edytuj</button>
+    <button class="btn btn-primary">Usuń</button>
 </div>

@@ -4,7 +4,6 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using Valhalla_v3.Shared.CarHistory;
-using static System.Net.WebRequestMethods;
 
 namespace Valhalla_v3.Client.Pages.Cars;
 
