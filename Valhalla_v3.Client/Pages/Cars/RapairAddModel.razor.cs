@@ -63,7 +63,6 @@ public partial class RapairAddModel
 
     private async void HandleMechanicSubmit(Mechanic model)
     {
-        //TODO: dodanie mechaników
         model.OperatorCreateId = 3;
         model.OperatorModifyId = 3;
         var json = JsonSerializer.Serialize(model);
