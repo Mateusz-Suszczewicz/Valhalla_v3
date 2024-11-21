@@ -1,12 +1,9 @@
 ﻿using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.SignalR.Client;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using Valhalla_v3.Shared;
 using Valhalla_v3.Shared.CarHistory;
-using static System.Net.WebRequestMethods;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Valhalla_v3.Client.Pages.Cars;
 

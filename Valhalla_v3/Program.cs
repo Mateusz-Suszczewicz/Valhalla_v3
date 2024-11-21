@@ -21,7 +21,6 @@ builder.Services.AddScoped<ICarHistoryFuelService, CarHistoryFuelService>();
 builder.Services.AddScoped<IMechanicService, MechanicService>();
 builder.Services.AddScoped<ICarHistoryRepairService, CarHistoryRepairService>();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient("MyHttpClient", client =>
 {
     client.BaseAddress = new Uri("https://localhost:7070"); // Ustaw w³aœciwy adres bazowy
@@ -58,11 +57,11 @@ app.UseAuthentication();
 app.UseAuthorization(); 
 app.UseAntiforgery();
 
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllers();
-    endpoints.MapFallbackToFile("index.html");
-});
+//app.UseEndpoints(endpoints =>
+//{
+//    endpoints.MapControllers();
+//    endpoints.MapFallbackToFile("");
+//});
 app.MapControllers();
 app.UseStaticFiles();
 
@@ -70,5 +69,4 @@ app.MapRazorComponents<App>()
 	.AddInteractiveServerRenderMode()
 	.AddInteractiveWebAssemblyRenderMode()
 	.AddAdditionalAssemblies(typeof(Valhalla_v3.Client._Imports).Assembly);
-app.UseSwagger();
 app.Run();
