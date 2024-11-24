@@ -22,6 +22,7 @@ builder.Services.AddScoped<ICarHistoryFuelService, CarHistoryFuelService>();
 builder.Services.AddScoped<IMechanicService, MechanicService>();
 builder.Services.AddScoped<ICarHistoryRepairService, CarHistoryRepairService>();
 builder.Services.AddMudServices();
+builder.Services.AddBlazorBootstrap();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddHttpClient("MyHttpClient", client =>

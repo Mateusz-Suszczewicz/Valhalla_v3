@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using BlazorBootstrap;
+using Microsoft.AspNetCore.Components;
+using System;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
@@ -22,20 +24,74 @@ public partial class Details
     private bool isChoiceOpen = false;
     private bool IsDisabled = true;
 
+    private LineChart lineChart = default!;
+    private LineChartOptions lineChartOptions = default!;
+    private ChartData chartData = default!;
+    private int datasetsCount;
+    private int labelsCount;
 
-    private void SelectTab(Tabs tab)
+    private Random random = new();
+    private void reload()
     {
-        activeTab = tab;
-        StateHasChanged();
-    }
+        List<string> label = new List<string>()
+        {
+            "Styczeń",
+            "Luty",
+            "Marzec",
+            "Kwieceń",
+            "Maj",
+            "Czerwiec",
+            "Lipiec",
+            "Sierpień",
+            "Wrzesień",
+            "Październik",
+            "Listopad",
+            "Grudzień"
+        };
+        var c = ColorUtility.CategoricalTwelveColors[datasetsCount].ToColor();
 
+        var datasets = new List<IChartDataset>() {
+        new LineChartDataset
+        {
+            Label = $"Litry paliwa",
+            Data = GetCost(),
+            BackgroundColor = c.ToRgbString(),
+            BorderColor = c.ToRgbString(),
+            BorderWidth = 2,
+            HoverBorderWidth = 4,
+            // PointBackgroundColor = c.ToRgbString(),
+            // PointRadius = 0, // hide points
+            // PointHoverRadius = 4,
+        }}
+        ;
+        chartData = new ChartData { Labels = label, Datasets = datasets };
+        lineChartOptions = new() { Responsive = true, Interaction = new Interaction { Mode = InteractionMode.Dataset } };
+        lineChartOptions.Scales.Y!.Max = car.Fuels.Max(x => Convert.ToDouble(x.Cost/x.CostPerLitr))*1.1;
+    }
     protected override async Task OnInitializedAsync()
     {
         Operator oper = new() { Name = "admin", Id = 3 };
         car = new() { OperatorCreate = oper, OperatorModify = oper };
         await LoadCar();
+        reload();
     }
-    
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (lineChart != null)
+        {
+            await lineChart.InitializeAsync(chartData, lineChartOptions);
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private async Task SelectTab(Tabs tab)
+    {
+        activeTab = tab;
+        await InvokeAsync(StateHasChanged);
+    }
+
+
     private async Task LoadCar()
     {
         try
@@ -58,19 +114,18 @@ public partial class Details
     {
         FuelCost = car.Fuels.Where(x => x.DateTimeModify.Month == DateTime.Now.Month && x.DateTimeModify.Year == DateTime.Now.Year).Sum(x => x.Cost);
         RepairCost = car.CarHistoryRepair.Where(x => x.Date.Month == DateTime.Now.Month && x.Date.Year == DateTime.Now.Year).Sum(x => x.Cost);
-
-
-
     }
-    private double[] GetCost()
+
+    private List<double?> GetCost()
     {
-        var liters = new double [12];
+        var liters = new List<double?>();
         for (int i = 1; i <= 12; i++)
         {
-            liters[i-1] = car.Fuels.Where(x => x.DateTimeModify.Month == i && x.DateTimeModify.Year == DateTime.Now.Year).Sum(z => Convert.ToDouble(z.Cost / z.CostPerLitr));
+            liters.Add(car.Fuels.Where(x => x.DateTimeModify.Month == i && x.DateTimeModify.Year == DateTime.Now.Year).Sum(z => Convert.ToDouble(z.Cost / z.CostPerLitr)));
         }
         return liters;
     }
+    
     void OpenFuel()
     {
         isFuelOpen = true;
@@ -148,10 +203,12 @@ public partial class Details
     {
         IsDisabled = !IsDisabled;
     }
+    
     private void ChoiceModal()
     {
         isChoiceOpen = true;
     }
+    
     private async void Delete(bool choic)
     {
         if (!choic)
@@ -190,10 +247,6 @@ public partial class Details
             Console.WriteLine(ex.Message);
         }
     }
-
-
-    
-
 }
 
 public enum Tabs

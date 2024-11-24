@@ -1,5 +1,6 @@
 ﻿@page "/cars/{Id}"
 @rendermode InteractiveAuto
+@using BlazorBootstrap
 @using Valhalla_v3.Shared.CarHistory
 @using Valhalla_v3.Client.Components
 @inject NavigationManager navigation
@@ -134,14 +135,13 @@
         <div class="row mt-3">
             @*Druga linia*@
             <div class="col-md-4 mb-4 text-color-white">
-                <div>
-                    
+                <div class="container-fluid overflow-x-auto">
+                    <LineChart @ref="lineChart" Width="800" />
                 </div>
             </div>
         </div>
     }
 </div>
-
 @* Modal dodanie paliwa *@
 <div class="modal fade @(isFuelOpen ? "show" : "")" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display:@(isFuelOpen ? "block" : "none");">
     <div class="modal-dialog">
