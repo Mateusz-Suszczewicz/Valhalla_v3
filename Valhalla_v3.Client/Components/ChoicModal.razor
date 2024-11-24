@@ -1,0 +1,20 @@
+﻿@using Valhalla_v3.Shared.CarHistory
+@inject NavigationManager navigation
+
+<div class="modal fade @(isChoiceOpen ? "show" : "")" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display:@(isChoiceOpen ? "block" : "none");">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header modal-header-moje">
+                <h5 class="modal-title" id="exampleModalLabel">Pytanie</h5>
+                <button type="button" class="btn-close" @onclick="() => HandleValidStationSubmit(false)"></button>
+            </div>
+            <div class="modal-body modal-body-moje">
+                @Question
+            </div>
+            <div class="modal-footer modal-body-moje">
+                <button class="btn btn-danger" @onclick="() => HandleValidStationSubmit(true)">Tak</button>
+                <button class="btn btn-success" @onclick="() => HandleValidStationSubmit(false)">Nie</button>
+            </div>
+        </div>
+    </div>
+</div>

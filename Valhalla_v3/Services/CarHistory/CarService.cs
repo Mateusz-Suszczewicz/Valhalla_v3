@@ -41,12 +41,17 @@ public class CarService : ICarService
 		if (id == 0)
 			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
 
-		var car = _context.Car.First(x => x.Id == id);
+		var car = _context.Car
+                .Include(x => x.Fuels)
+            .ThenInclude(y => y.GasStation)
+            .Include(x => x.CarHistoryRepair)
+            .ThenInclude(z => z.Mechanic)
+            .FirstAsync(x => x.Id == id);
 
 		if(car == null)
 			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.InternalServerError));
 
-		_context.Car.Remove(car);
+		_context.Remove(car);
 		await _context.SaveChangesAsync();
 	}
 
@@ -77,7 +82,7 @@ public class CarService : ICarService
 
 	public async Task Update(Car car)
 	{
-		if (car.Id != 0)
+		if (car.Id == 0)
 			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
 
 		var OldCar = _context.Car.First(x => x.Id == car.Id);
@@ -89,6 +94,10 @@ public class CarService : ICarService
 		OldCar.Model = car.Model;
 		OldCar.EngineCC = car.EngineCC;
 		OldCar.DateTimeModify = DateTime.Now;
-		await _context.SaveChangesAsync();
-	}
+		OldCar.InsuranceCost = car.InsuranceCost;
+		OldCar.InsuranceDate = car.InsuranceDate;
+		OldCar.SurveyDate = car.SurveyDate;
+		OldCar.SurveyCost = car.SurveyCost;
+        await _context.SaveChangesAsync();
+    }
 }

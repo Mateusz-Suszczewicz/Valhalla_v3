@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.ResponseCompression;
+using MudBlazor.Services;
 using Valhalla_v3.Components;
 using Valhalla_v3.Controller;
 using Valhalla_v3.Database;
@@ -20,6 +21,8 @@ builder.Services.AddScoped<IGasStationService, GasStationService>();
 builder.Services.AddScoped<ICarHistoryFuelService, CarHistoryFuelService>();
 builder.Services.AddScoped<IMechanicService, MechanicService>();
 builder.Services.AddScoped<ICarHistoryRepairService, CarHistoryRepairService>();
+builder.Services.AddMudServices();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddHttpClient("MyHttpClient", client =>
 {

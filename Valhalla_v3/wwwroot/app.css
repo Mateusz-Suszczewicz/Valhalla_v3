@@ -71,7 +71,9 @@ h1:focus {
 .text-color-black{
     color: black;
 }
-
+.text-color-white {
+    color: white;
+}
 .modal-body-moje {
     color: black;
     background-color: #C7C8CC;
@@ -81,7 +83,6 @@ h1:focus {
     color: black;
     background-color: #B4B4B8;
 }
-
 .fixed-buttons {
     position: fixed;
     bottom: 20px;

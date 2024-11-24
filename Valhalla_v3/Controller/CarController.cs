@@ -38,4 +38,14 @@ public class CarController : ControllerBase
             await _carService.Create(car);
         return CreatedAtAction("Create", car.Id);
     }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> Delete(int id)
+    {
+        if (id == 0)
+            return NotFound();
+        await _carService.Delete(id);
+        return CreatedAtAction("Delete", id);
+
+    }
 }

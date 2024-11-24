@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Valhalla_v3.Database;
 
@@ -11,9 +12,11 @@ using Valhalla_v3.Database;
 namespace Valhalla_v3.Migrations
 {
     [DbContext(typeof(ValhallaComtext))]
-    partial class ValhallaComtextModelSnapshot : ModelSnapshot
+    [Migration("20241124145355_AddDateToCar")]
+    partial class AddDateToCar
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

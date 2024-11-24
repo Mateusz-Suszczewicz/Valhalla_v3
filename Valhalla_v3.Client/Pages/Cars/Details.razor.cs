@@ -19,7 +19,9 @@ public partial class Details
     private decimal RepairCost { get; set; }
     private bool isFuelOpen = false;
     private bool isRapairOpen = false;
+    private bool isChoiceOpen = false;
     private bool IsDisabled = true;
+
 
     private void SelectTab(Tabs tab)
     {
@@ -56,8 +58,19 @@ public partial class Details
     {
         FuelCost = car.Fuels.Where(x => x.DateTimeModify.Month == DateTime.Now.Month && x.DateTimeModify.Year == DateTime.Now.Year).Sum(x => x.Cost);
         RepairCost = car.CarHistoryRepair.Where(x => x.Date.Month == DateTime.Now.Month && x.Date.Year == DateTime.Now.Year).Sum(x => x.Cost);
-    }
 
+
+
+    }
+    private double[] GetCost()
+    {
+        var liters = new double [12];
+        for (int i = 1; i <= 12; i++)
+        {
+            liters[i-1] = car.Fuels.Where(x => x.DateTimeModify.Month == i && x.DateTimeModify.Year == DateTime.Now.Year).Sum(z => Convert.ToDouble(z.Cost / z.CostPerLitr));
+        }
+        return liters;
+    }
     void OpenFuel()
     {
         isFuelOpen = true;
@@ -133,7 +146,31 @@ public partial class Details
 
     private void EditModal()
     {
-        IsDisabled = false;
+        IsDisabled = !IsDisabled;
+    }
+    private void ChoiceModal()
+    {
+        isChoiceOpen = true;
+    }
+    private async void Delete(bool choic)
+    {
+        if (!choic)
+        {
+            isChoiceOpen = false;
+            return;
+        }
+        try
+        {
+            var response = await Http.DeleteAsync(navigation.ToAbsoluteUri($"api/Car/{car.Id}"));
+            if (response.IsSuccessStatusCode)
+            {
+                navigation.NavigateTo("/Car");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
     }
 
     private async Task Save()
@@ -153,6 +190,10 @@ public partial class Details
             Console.WriteLine(ex.Message);
         }
     }
+
+
+    
+
 }
 
 public enum Tabs

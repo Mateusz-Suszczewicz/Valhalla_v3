@@ -76,13 +76,13 @@
             </ul>
             <div class="col-md-4 mb-4 mt-3">
                 <div class="form-floating">
-                    <input type="date" disabled="@IsDisabled" class="form-control" id="InDateDataUbezp">
+                    <input type="date" disabled="@IsDisabled" class="form-control" id="InDateDataUbezp" @bind-value="@car.InsuranceDate">
                     <label for="InDateDataUbezp">Data ważności</label>
                 </div>
             </div>
             <div class="col-md-4 mb-4 mt-3">
                 <div class="form-floating">
-                    <input type="number" disabled="@IsDisabled" class="form-control" id="InNumCost">
+                    <input type="number" disabled="@IsDisabled" class="form-control" id="InNumCost" @bind-value="@car.InsuranceCost">
                     <label for="InNumCost">Koszt osatniego ubezpieczenia</label>
                 </div>
             </div>
@@ -95,18 +95,19 @@
             </ul>
             <div class="col-md-4 mb-4 mt-3">
                 <div class="form-floating">
-                    <input type="date" disabled="@IsDisabled" class="form-control" id="InDateDataPrzegladu">
+                    <input type="date" disabled="@IsDisabled" class="form-control" id="InDateDataPrzegladu" @bind-value="@car.SurveyDate">
                     <label for="InDateDataPrzegladu">Data ostatniego przeglądu</label>
                 </div>
             </div>
             <div class="col-md-4 mb-4 mt-3">
                 <div class="form-floating">
-                    <input type="number" disabled="@IsDisabled" class="form-control" id="InNumCostPrzglad">
+                    <input type="number" disabled="@IsDisabled" class="form-control" id="InNumCostPrzglad" @bind-value="@car.SurveyCost">
                     <label for="InNumCostPrzglad">Koszt osatniego przeglądu</label>
                 </div>
             </div>
         </div>
     }
+
     @if(activeTab == Tabs.Statystic)
     {
         <div class="row mt-3">
@@ -127,6 +128,14 @@
                 <div class="form-floating">
                     <input type="number" class="form-control" disabled id="InNumCostSum">
                     <label for="InNumCostSum">Koszt łączny</label>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-3">
+            @*Druga linia*@
+            <div class="col-md-4 mb-4 text-color-white">
+                <div>
+                    
                 </div>
             </div>
         </div>
@@ -163,8 +172,10 @@
     </div>
 </div>
 
+<ChoicModal SubmitChoice="Delete" Question="Czy chcesz usunąć samochód?" isChoiceOpen=@isChoiceOpen/>
+
 <div class="fixed-buttons">
-    <button class="btn btn-primary" style="display: @(IsDisabled ? "none":"block")" @onclick=Save>Zapisz</button>
+    <button class="btn btn-success" style="display: @(IsDisabled ? "none":"block")" @onclick=Save>Zapisz</button>
     <button class="btn btn-primary" @onclick=EditModal>Edytuj</button>
-    <button class="btn btn-primary">Usuń</button>
+    <button class="btn btn-danger" @onclick=ChoiceModal>Usuń</button>
 </div>
