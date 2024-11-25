@@ -20,6 +20,7 @@ public partial class Details
     private int mileage { get; set; }
     private decimal FuelCost { get; set; }
     private decimal RepairCost { get; set; }
+    private decimal SumCost { get; set; }
     private bool isFuelOpen = false;
     private bool isRapairOpen = false;
     private bool isChoiceOpen = false;
@@ -173,9 +174,8 @@ public partial class Details
     {
         FuelCost = car.Fuels.Where(x => x.DateTimeModify.Month == DateTime.Now.Month && x.DateTimeModify.Year == DateTime.Now.Year).Sum(x => x.Cost);
         RepairCost = car.CarHistoryRepair.Where(x => x.Date.Month == DateTime.Now.Month && x.Date.Year == DateTime.Now.Year).Sum(x => x.Cost);
+        SumCost = FuelCost + RepairCost;
     }
-
-
     
     void OpenFuel()
     {
