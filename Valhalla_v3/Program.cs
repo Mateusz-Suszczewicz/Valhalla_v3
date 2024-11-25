@@ -6,6 +6,8 @@ using Valhalla_v3.Controller;
 using Valhalla_v3.Database;
 using Valhalla_v3.Services;
 using Valhalla_v3.Services.CarHistory;
+using MudBlazor.Services;
+using MudBlazor;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +15,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
 	.AddInteractiveServerComponents()
 	.AddInteractiveWebAssemblyComponents();
+builder.Services.AddScoped<IMudPopoverService, MudPopoverService>();
 
+builder.Services.AddMudServices();
 builder.Services.AddDbContext<ValhallaComtext>();
 builder.Services.AddScoped<IOperatorService, OperatorService>();
 builder.Services.AddScoped<ICarService, CarService>();
@@ -21,7 +25,6 @@ builder.Services.AddScoped<IGasStationService, GasStationService>();
 builder.Services.AddScoped<ICarHistoryFuelService, CarHistoryFuelService>();
 builder.Services.AddScoped<IMechanicService, MechanicService>();
 builder.Services.AddScoped<ICarHistoryRepairService, CarHistoryRepairService>();
-builder.Services.AddMudServices();
 builder.Services.AddBlazorBootstrap();
 
 builder.Services.AddEndpointsApiExplorer();

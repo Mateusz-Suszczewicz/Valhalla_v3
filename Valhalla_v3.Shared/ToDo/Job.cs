@@ -1,4 +1,6 @@
-﻿namespace Valhalla_v3.Shared.ToDo;
+﻿using System.Text.Json.Serialization;
+
+namespace Valhalla_v3.Shared.ToDo;
 
 public class Job : MainClassFull
 {
@@ -6,6 +8,7 @@ public class Job : MainClassFull
 	public bool IsCompleted { get; set; }
 
 	public int ProjectId { get; set; }
-	public virtual Project Project { get; set; }
+    [JsonIgnore]
+    public virtual Project Project { get; set; }
 	public virtual ICollection<Comment>? Comments { get; set; }
 }
