@@ -134,10 +134,23 @@
         </div>
         <div class="row mt-3">
             @*Druga linia*@
-            <div class="col-md-4 mb-4 text-color-white">
-                <div class="container-fluid overflow-x-auto">
-                    <LineChart @ref="lineChart" Width="800" />
-                </div>
+            <div class="col-md-4 col-sm-1 mb-4 text-color-white">
+                 <LineChart @ref="lineChart1"/>
+            </div>
+            <div class="col-md-4 col-sm-1 mb-4 text-color-white">
+                 <LineChart @ref="lineChart2"/>
+            </div>
+            <div class="col-md-4 col-sm-1 mb-4 text-color-white">
+                <LineChart @ref="lineChart3" />
+            </div>
+        </div>
+        <div class="row mt-3">
+            @*Trzecia linia*@
+            <div class="col-md-4 col-sm-1 mb-4 text-color-white">
+                <LineChart @ref="lineChart4" />
+            </div>
+            <div class="col-md-4 col-sm-1 mb-4 text-color-white">
+                <LineChart @ref="lineChart5" />
             </div>
         </div>
     }

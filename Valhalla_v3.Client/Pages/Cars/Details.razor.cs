@@ -4,6 +4,7 @@ using System;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
+using Valhalla_v3.Client.Helpers;
 using Valhalla_v3.Shared;
 using Valhalla_v3.Shared.CarHistory;
 
@@ -24,13 +25,20 @@ public partial class Details
     private bool isChoiceOpen = false;
     private bool IsDisabled = true;
 
-    private LineChart lineChart = default!;
     private LineChartOptions lineChartOptions = default!;
-    private ChartData chartData = default!;
-    private int datasetsCount;
-    private int labelsCount;
+    
+    private LineChart lineChart1 = default!;
+    private LineChart lineChart2 = default!;
+    private LineChart lineChart3 = default!;
+    private LineChart lineChart4 = default!;
+    private LineChart lineChart5 = default!;
+    
+    private ChartData chartData1 = default!;
+    private ChartData chartData2 = default!;
+    private ChartData chartData3 = default!;
+    private ChartData chartData4 = default!;
+    private ChartData chartData5 = default!;
 
-    private Random random = new();
     private void reload()
     {
         List<string> label = new List<string>()
@@ -48,26 +56,74 @@ public partial class Details
             "Listopad",
             "Grudzień"
         };
-        var c = ColorUtility.CategoricalTwelveColors[datasetsCount].ToColor();
+        var color1 = ColorUtility.CategoricalTwelveColors[1].ToColor();
+        var color2 = ColorUtility.CategoricalTwelveColors[2].ToColor();
+        var color3 = ColorUtility.CategoricalTwelveColors[3].ToColor();
+        var color4 = ColorUtility.CategoricalTwelveColors[4].ToColor();
+        var color5 = ColorUtility.CategoricalTwelveColors[5].ToColor();
+        lineChartOptions = new() { Responsive = true, Interaction = new Interaction { Mode = InteractionMode.Index } };
 
-        var datasets = new List<IChartDataset>() {
+        var datasets1 = new List<IChartDataset>() {
         new LineChartDataset
         {
             Label = $"Litry paliwa",
-            Data = GetCost(),
-            BackgroundColor = c.ToRgbString(),
-            BorderColor = c.ToRgbString(),
+            Data = CarHelpers.GetFuels(car),
+            BackgroundColor = color1.ToRgbString(),
+            BorderColor = color1.ToRgbString(),
             BorderWidth = 2,
             HoverBorderWidth = 4,
-            // PointBackgroundColor = c.ToRgbString(),
-            // PointRadius = 0, // hide points
-            // PointHoverRadius = 4,
-        }}
-        ;
-        chartData = new ChartData { Labels = label, Datasets = datasets };
-        lineChartOptions = new() { Responsive = true, Interaction = new Interaction { Mode = InteractionMode.Dataset } };
-        lineChartOptions.Scales.Y!.Max = car.Fuels.Max(x => Convert.ToDouble(x.Cost/x.CostPerLitr))*1.1;
+        }};
+        chartData1 = new ChartData { Labels = label, Datasets = datasets1 };
+
+        var datasets2 = new List<IChartDataset>() {
+        new LineChartDataset
+        {
+            Label = $"Koszt paliwa",
+            Data = CarHelpers.GetCostFuels(car),
+            BackgroundColor = color2.ToRgbString(),
+            BorderColor = color2.ToRgbString(),
+            BorderWidth = 2,
+            HoverBorderWidth = 4,
+        }};
+        chartData2 = new ChartData { Labels = label, Datasets = datasets2 };
+
+        var datasets3 = new List<IChartDataset>() {
+        new LineChartDataset
+        {
+            Label = $"Średnie spalanie",
+            Data = CarHelpers.GetAvgBurning(car),
+            BackgroundColor = color3.ToRgbString(),
+            BorderColor = color3.ToRgbString(),
+            BorderWidth = 2,
+            HoverBorderWidth = 4,
+        }};
+        chartData3 = new ChartData { Labels = label, Datasets = datasets3 };
+
+        var datasets4 = new List<IChartDataset>() {
+        new LineChartDataset
+        {
+            Label = $"Przebieg",
+            Data = CarHelpers.GetMileage(car),
+            BackgroundColor = color4.ToRgbString(),
+            BorderColor = color4.ToRgbString(),
+            BorderWidth = 2,
+            HoverBorderWidth = 4,
+        }};
+        chartData4 = new ChartData { Labels = label, Datasets = datasets4 };
+
+        var datasets5 = new List<IChartDataset>() {
+        new LineChartDataset
+        {
+            Label = $"Koszty naprawy",
+            Data = CarHelpers.GetCostRapair(car),
+            BackgroundColor = color5.ToRgbString(),
+            BorderColor = color5.ToRgbString(),
+            BorderWidth = 2,
+            HoverBorderWidth = 4,
+        }};
+        chartData5 = new ChartData { Labels = label, Datasets = datasets5 };
     }
+
     protected override async Task OnInitializedAsync()
     {
         Operator oper = new() { Name = "admin", Id = 3 };
@@ -78,9 +134,13 @@ public partial class Details
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (lineChart != null)
+        if (lineChart1 != null)
         {
-            await lineChart.InitializeAsync(chartData, lineChartOptions);
+            await lineChart1.InitializeAsync(chartData1, lineChartOptions);
+            await lineChart2.InitializeAsync(chartData2, lineChartOptions);
+            await lineChart3.InitializeAsync(chartData3, lineChartOptions);
+            await lineChart4.InitializeAsync(chartData4, lineChartOptions);
+            await lineChart5.InitializeAsync(chartData5, lineChartOptions);
         }
         await base.OnAfterRenderAsync(firstRender);
     }
@@ -90,7 +150,6 @@ public partial class Details
         activeTab = tab;
         await InvokeAsync(StateHasChanged);
     }
-
 
     private async Task LoadCar()
     {
@@ -116,15 +175,7 @@ public partial class Details
         RepairCost = car.CarHistoryRepair.Where(x => x.Date.Month == DateTime.Now.Month && x.Date.Year == DateTime.Now.Year).Sum(x => x.Cost);
     }
 
-    private List<double?> GetCost()
-    {
-        var liters = new List<double?>();
-        for (int i = 1; i <= 12; i++)
-        {
-            liters.Add(car.Fuels.Where(x => x.DateTimeModify.Month == i && x.DateTimeModify.Year == DateTime.Now.Year).Sum(z => Convert.ToDouble(z.Cost / z.CostPerLitr)));
-        }
-        return liters;
-    }
+
     
     void OpenFuel()
     {
