@@ -129,7 +129,10 @@ public partial class Details
     {
         Operator oper = new() { Name = "admin", Id = 3 };
         car = new() { OperatorCreate = oper, OperatorModify = oper };
-        await LoadCar();
+        if(Id != "0")
+            await LoadCar();
+        else
+            IsDisabled = false;
         reload();
     }
 

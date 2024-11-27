@@ -28,4 +28,9 @@ public partial class List
             Console.WriteLine(ex.Message);
         }
     }
+
+    private void Create()
+    {
+        navigation.NavigateTo("/cars/0");
+    }
 }

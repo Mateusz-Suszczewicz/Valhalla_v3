@@ -189,6 +189,6 @@
 
 <div class="fixed-buttons">
     <button class="btn btn-success" style="display: @(IsDisabled ? "none":"block")" @onclick=Save>Zapisz</button>
-    <button class="btn btn-primary" @onclick=EditModal>Edytuj</button>
-    <button class="btn btn-danger" @onclick=ChoiceModal>Usuń</button>
+    <button class="btn btn-primary" style="display: @(Id == "0" ? "none":"block")" @onclick=EditModal>Edytuj</button>
+    <button class="btn btn-danger" style="display: @(Id == "0" ? "none":"block")" @onclick=ChoiceModal>Usuń</button>
 </div>
