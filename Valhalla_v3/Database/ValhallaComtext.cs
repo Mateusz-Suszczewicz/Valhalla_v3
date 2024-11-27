@@ -77,9 +77,13 @@ public class ValhallaComtext : DbContext
             .HasForeignKey(b => b.ProjectId)
             .IsRequired()
             .OnDelete(DeleteBehavior.NoAction);
-		#endregion
+        
+		modelBuilder.Entity<Job>()
+            .HasMany(b => b.Comments)
+            .WithOne(a => a.Job);
+        #endregion
         #region Configure the Project table
-		modelBuilder.Entity<Project>().ToTable("Projects");
+        modelBuilder.Entity<Project>().ToTable("Projects");
 
         modelBuilder.Entity<Project>()
             .HasOne(b => b.OperatorCreate)

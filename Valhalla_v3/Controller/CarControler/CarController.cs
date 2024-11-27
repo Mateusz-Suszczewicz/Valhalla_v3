@@ -2,7 +2,7 @@
 using Valhalla_v3.Services.CarHistory;
 using Valhalla_v3.Shared.CarHistory;
 
-namespace Valhalla_v3.Controller;
+namespace Valhalla_v3.Controller.CarControler;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -24,7 +24,7 @@ public class CarController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<Car>> Get(int id)
     {
-        if(id == 0)
+        if (id == 0)
             return NotFound();
         return await _carService.Get(id);
     }
@@ -40,7 +40,7 @@ public class CarController : ControllerBase
                 car.Id = await _carService.Create(car);
             return CreatedAtAction("Create", car.Id);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
             throw ex;

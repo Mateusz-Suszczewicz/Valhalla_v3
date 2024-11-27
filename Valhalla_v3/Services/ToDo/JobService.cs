@@ -10,8 +10,8 @@ namespace Valhalla_v3.Services.ToDo;
 public interface IJobService
 {
 	public Task<int> Create(Job job);
-	public Job Get(int id);
-	public List<Job> Get();
+	public Task<Job> Get(int id);
+	public Task<List<Job>> Get();
 	public Task Update(Job job);
 	public Task Delete(int id);
 }
@@ -50,22 +50,26 @@ public class JobService : IJobService
 		await _context.SaveChangesAsync();
 	}
 
-	public Job Get(int id)
+	public async Task<Job> Get(int id)
 	{
 		if (id == 0)
 			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
 
-		var job = Get().Find(x => x.Id == id);
+		var job = await _context.Job
+            .Include(x => x.OperatorCreate)
+            .Include(x => x.OperatorModify)
+			.Include(x => x.Comments)
+			.FirstOrDefaultAsync(x => x.Id == id);
 
 		return job;
 	}
 
-	public List<Job> Get()
+	public async Task<List<Job>> Get()
 	{
-		var jobList = _context.Job
+		var jobList = await _context.Job
 			.Include(x => x.OperatorCreate)
 			.Include(x => x.OperatorModify)
-			.ToList();
+			.ToListAsync();
 
 		return jobList;
 	}

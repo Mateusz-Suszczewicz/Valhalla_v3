@@ -2,7 +2,7 @@
 using Valhalla_v3.Services.CarHistory;
 using Valhalla_v3.Shared.CarHistory;
 
-namespace Valhalla_v3.Controller;
+namespace Valhalla_v3.Controller.CarControler;
 
 [ApiController]
 [Route("api/[controller]")]
