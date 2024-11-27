@@ -1,13 +1,11 @@
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.EntityFrameworkCore;
+using MudBlazor;
 using MudBlazor.Services;
 using Valhalla_v3.Components;
-using Valhalla_v3.Controller;
 using Valhalla_v3.Database;
 using Valhalla_v3.Services;
 using Valhalla_v3.Services.CarHistory;
-using MudBlazor.Services;
-using MudBlazor;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +16,6 @@ builder.Services.AddRazorComponents()
 builder.Services.AddScoped<IMudPopoverService, MudPopoverService>();
 
 builder.Services.AddMudServices();
-builder.Services.AddDbContext<ValhallaComtext>();
 builder.Services.AddScoped<IOperatorService, OperatorService>();
 builder.Services.AddScoped<ICarService, CarService>();
 builder.Services.AddScoped<IGasStationService, GasStationService>();
@@ -42,19 +39,34 @@ builder.Services.AddResponseCompression(opts =>
         ["application/octet-stream"]);
 });
 
+var connection = String.Empty;
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Development.json");
+    connection = builder.Configuration.GetConnectionString("Connection");
+}
+else
+{
+    connection = Environment.GetEnvironmentVariable("Connection");
+}
+
+builder.Services.AddDbContext<ValhallaComtext>(options =>
+    options.UseSqlServer(connection));
+
 var app = builder.Build();
 app.UseResponseCompression();
 // Configure the HTTP request pipeline.
+
 if (app.Environment.IsDevelopment())
 {
-	app.UseWebAssemblyDebugging();
+    app.UseWebAssemblyDebugging();
     app.UseDeveloperExceptionPage();
     
     //app.UseSwaggerUI();
 }
 else
 {
-	app.UseExceptionHandler("/Error", createScopeForErrors: true);
+    app.UseExceptionHandler("/Error", createScopeForErrors: true);
 	// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 	app.UseHsts();
 }
@@ -63,7 +75,18 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization(); 
 app.UseAntiforgery();
-
+try
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var dbContext = scope.ServiceProvider.GetRequiredService<ValhallaComtext>();
+        dbContext.Database.Migrate();
+    }
+}
+catch(Exception ex)
+{
+    Console.WriteLine(ex.Message);
+}
 //app.UseEndpoints(endpoints =>
 //{
 //    endpoints.MapControllers();

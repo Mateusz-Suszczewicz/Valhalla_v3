@@ -19,14 +19,19 @@ public class ValhallaComtext : DbContext
     public DbSet<GasStation> GasStations { get; set; }
     public DbSet<Mechanic> Mechanics { get; set; }
 
+    IConfiguration appConfig;
+    public ValhallaComtext(IConfiguration config)
+	{
+        appConfig = config;
+    }
 
 	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         string connectionString = $"Data Source=DESKTOP-663F3VE;" +
                   $"Initial Catalog=Valhallav3;" +
                   "Integrated Security=SSPI;Encrypt=True;TrustServerCertificate=True;";
-
-        optionsBuilder.UseSqlServer(connectionString);
+		var a = appConfig.GetConnectionString("Connection");
+        optionsBuilder.UseSqlServer(a);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

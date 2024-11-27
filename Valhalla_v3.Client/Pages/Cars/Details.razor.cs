@@ -128,7 +128,10 @@ public partial class Details
     protected override async Task OnInitializedAsync()
     {
         Operator oper = new() { Name = "admin", Id = 3 };
-        car = new() { OperatorCreate = oper, OperatorModify = oper };
+        car = new() { 
+           OperatorCreateId = 1
+        , OperatorModifyId = 1
+        };
         if(Id != "0")
             await LoadCar();
         else
@@ -275,7 +278,7 @@ public partial class Details
             var response = await Http.DeleteAsync(navigation.ToAbsoluteUri($"api/Car/{car.Id}"));
             if (response.IsSuccessStatusCode)
             {
-                navigation.NavigateTo("/Car");
+                navigation.NavigateTo("/cars");
             }
         }
         catch (Exception ex)
@@ -293,7 +296,8 @@ public partial class Details
             var response = await Http.PostAsync(navigation.ToAbsoluteUri($"api/Car"), content);
             if (response.IsSuccessStatusCode)
             {
-                IsDisabled = true;
+                var Id = response.Content.ReadFromJsonAsync<int>();
+                navigation.NavigateTo($"cars/{Id.Result}");
             }
         }
         catch (Exception ex)

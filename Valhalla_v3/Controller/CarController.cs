@@ -30,13 +30,21 @@ public class CarController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult> Create([FromBody] Car car)
+    public async Task<IActionResult> Create([FromBody] Car car)
     {
-        if (car.Id != 0)
-            await _carService.Update(car);
-        else
-            await _carService.Create(car);
-        return CreatedAtAction("Create", car.Id);
+        try
+        {
+            if (car.Id != 0)
+                await _carService.Update(car);
+            else
+                car.Id = await _carService.Create(car);
+            return CreatedAtAction("Create", car.Id);
+        }
+        catch(Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            throw ex;
+        }
     }
 
     [HttpDelete("{id}")]

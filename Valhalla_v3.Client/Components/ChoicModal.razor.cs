@@ -16,6 +16,7 @@ public partial class ChoicModal
     // Obsługa walidacji formularza i wywołanie callbacku
     private async Task HandleValidStationSubmit(bool answer)
     {
+        Console.WriteLine($"answer: {answer}");
         await SubmitChoice.InvokeAsync(answer);
     }
 }

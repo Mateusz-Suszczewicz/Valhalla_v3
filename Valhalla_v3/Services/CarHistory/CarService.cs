@@ -27,13 +27,20 @@ public class CarService : ICarService
 
 	public async Task<int> Create(Car car)
 	{
-		if (car.Id != 0)
-			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
-		car.DateTimeAdd = DateTime.Now;
-		car.DateTimeModify = DateTime.Now;
-		_context.AddAsync(car);
-		await _context.SaveChangesAsync();
-		return car.Id;
+		try
+		{
+			if (car.Id != 0)
+				throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
+			car.DateTimeAdd = DateTime.Now;
+			car.DateTimeModify = DateTime.Now;
+			_context.AddAsync(car);
+			await _context.SaveChangesAsync();
+			return car.Id;
+		}
+		catch(Exception ex)
+		{
+			throw ex;
+		}
 	}
 
 	public async Task Delete(int id)
@@ -41,7 +48,7 @@ public class CarService : ICarService
 		if (id == 0)
 			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
 
-		var car = _context.Car
+		var car = await _context.Car
                 .Include(x => x.Fuels)
             .ThenInclude(y => y.GasStation)
             .Include(x => x.CarHistoryRepair)
@@ -51,8 +58,15 @@ public class CarService : ICarService
 		if(car == null)
 			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.InternalServerError));
 
-		_context.Remove(car);
-		await _context.SaveChangesAsync();
+		try
+		{
+			_context.Remove(car);
+			await _context.SaveChangesAsync();
+		}
+		catch(Exception ex)
+		{
+			throw ex;
+		}
 	}
 
 	public async Task<Car> Get(int id)
@@ -72,12 +86,19 @@ public class CarService : ICarService
 	}
 	public async Task<List<Car>> Get()
 	{
-		var CarList = await _context.Car
-			.Include(x => x.OperatorCreate)
-			.Include(x => x.OperatorModify)
-            .ToListAsync();
+		try
+		{
+			var CarList = await _context.Car
+				.Include(x => x.OperatorCreate)
+				.Include(x => x.OperatorModify)
+				.ToListAsync();
 
-		return CarList;
+			return CarList;
+		}
+		catch(Exception ex)
+		{
+			return new List<Car>();
+		}
 	}
 
 	public async Task Update(Car car)
