@@ -5,18 +5,59 @@
 @inject HttpClient Http
 
 <PageTitle>Zadania</PageTitle>
+<div class="container-fluid text-color-black">
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <label for="formGroupExampleInput" class="form-label text-white">Projekt</label>
+            <select class="form-select" id="formGroupExampleInput" aria-label="Default select example" @bind=@projectsId>
+                @if (projectsId != 0)
+                {
+                    <option selected value="@projects.Select(x => x.Id).First(x => x == projectsId)">@projects.Where(x => x.Id == projectsId).Select(x => x.Name)</option>
+                }
+                @foreach (var project in projects.Where(x => x.Id != projectsId))
+                {
+                    <option value="@project.Id">@project.Name</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="row">
+        <MudDropContainer T="Job" Items="_items" ItemsSelector="@((item,dropzone) => (item.Term < DateTime.Today ? "przedawnione":"dzisiaj") == dropzone)" ItemDropped="ItemUpdated" Class="d-flex flex-grow-1 flex-wrap">
+            <ChildContent>
+                <MudPaper Class="ma-4 flex-grow-1">
+                    <MudList T="Job" Class="d-flex flex-column mud-height-full">
+                        <MudListSubheader>Po terminie</MudListSubheader>
+                        <MudDropZone T="Job" Identifier="przedawnione" Class="flex-grow-1" />
+                    </MudList>
+                </MudPaper>
+                <MudPaper Class="ma-4 flex-grow-1">
+                    <MudList T="Job" Class="d-flex flex-column mud-height-full">
+                        <MudListSubheader>dzisiaj</MudListSubheader>
+                        <MudDropZone T="Job" Identifier="Dzisiaj" Class="flex-grow-1" />
+                    </MudList>
+                </MudPaper>
+            </ChildContent>
+            <ItemRenderer>
+                <MudPaper Elevation="25" Class="pa-4 my-4">@context.Name</MudPaper>
+            </ItemRenderer>
+        </MudDropContainer>
+     </div>
+</div>
+<div class="fixed-buttons">
+    <button class="btn btn-success" @onclick=OpemModal>Dodaj nowy</button>
+</div>
 
-
-<MudDropContainer T="Job" Items="_items" ItemsSelector="@((item,dropzone) => item.IsCompleted == dropzone)" ItemDropped="ItemUpdated" Class="d-flex flex-wrap flex-grow-1">
-    <ChildContent>
-        <MudDropZone T="Job" Identifier=false Class="mud-background-gray pa-6 ma-8 flex-grow-1 rounded">
-            <MudText Typo="Typo.h6" Class="mb-4">Do zrobienia</MudText>
-        </MudDropZone>
-        <MudDropZone T="Job" Identifier=true Class="mud-background-gray pa-6 ma-8 flex-grow-1 rounded">
-            <MudText Typo="Typo.h6" Class="mb-4">Skończone</MudText>
-        </MudDropZone>
-    </ChildContent>
-    <ItemRenderer>
-        <MudPaper Elevation="25" Class="pa-4 my-4">@context.Name</MudPaper>
-    </ItemRenderer>
-</MudDropContainer>
+@* Modal dodanie napraw *@
+<div class="modal fade @(IsCreateOpen ? "show" : "")" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display:@(IsCreateOpen ? "block" : "none");">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header modal-header-moje">
+                <h5 class="modal-title" id="exampleModalLabel">Zadanie</h5>
+                <button type="button" class="btn-close" @onclick="CloseModal"></button>
+            </div>
+            <div class="modal-body modal-body-moje">
+                <JobAddModal OnFormSubmit="Create" />
+            </div>
+        </div>
+    </div>
+</div>

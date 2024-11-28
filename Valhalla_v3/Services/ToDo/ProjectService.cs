@@ -10,8 +10,8 @@ namespace Valhalla_v3.Services.ToDo;
 public interface IProjectService
 {
 	public Task<int> Create(Project project);
-	public Project Get(int id);
-	public List<Project> Get();
+	public Task<Project> Get(int id);
+	public Task<List<Project>> Get();
 	public Task Update(Project project);
 	public Task Delete(int id);
 }
@@ -50,23 +50,28 @@ public class ProjectService : IProjectService
 		await _context.SaveChangesAsync();
 	}
 
-	public Project Get(int id)
+	public async Task<Project> Get(int id)
 	{
 		if (id == 0)
 			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
 
-		var project = Get().Find(x => x.Id == id);
-
-		return project;
-	}
-
-	public List<Project> Get()
-	{
-		var ProjectList = _context.Project
+		var project = await _context.Project
 			.Include(x => x.OperatorCreate)
 			.Include(x => x.OperatorModify)
 			.Include(x => x.Tasks)
-			.ToList();
+			.FirstOrDefaultAsync(x => x.Id == id);
+
+
+        return project;
+	}
+
+	public async Task<List<Project>> Get()
+	{
+		var ProjectList = await _context.Project
+			.Include(x => x.OperatorCreate)
+			.Include(x => x.OperatorModify)
+			.Include(x => x.Tasks)
+			.ToListAsync();
 
 		return ProjectList;
 	}

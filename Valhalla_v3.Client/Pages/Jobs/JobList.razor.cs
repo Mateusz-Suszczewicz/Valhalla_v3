@@ -1,9 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using MudBlazor;
+﻿using MudBlazor;
 using System.Net.Http.Json;
-using Valhalla_v3.Shared.CarHistory;
+using System.Runtime.InteropServices;
 using Valhalla_v3.Shared.ToDo;
-using static System.Net.WebRequestMethods;
 
 namespace Valhalla_v3.Client.Pages.Jobs;
 
@@ -11,24 +9,47 @@ public partial class JobList
 {
     private List<Job> _items = new()
     {
-        new Job(){ Name = "Ogarnąć ikonki", IsCompleted = "false" },
-        new Job(){ Name = "Ładowanie zadań", IsCompleted = "true" },
-        new Job(){ Name = "Just Mud", IsCompleted = "false" },
+        new(){ Name = "test1", Term = DateTime.Today },
+        new(){ Name = "test2", Term = DateTime.Today.AddDays(-1) }
     };
+    private bool IsCreateOpen = false;
+    private List<Project> projects = new();
+    private int projectsId = new();
 
     protected override async Task OnInitializedAsync()
     {
         LoadJob();
+        LoadProject();
     }
 
     private async Task LoadJob()
     {
+        //_items.Clear();
         try
         {
-            var response = await Http.GetFromJsonAsync<List<Job>>(navigation.ToAbsoluteUri($"api/job/"));
+            var response = await Http.GetFromJsonAsync<List<Job>>(navigation.ToAbsoluteUri($"api/job"));
             if (response != null)
             {
-                _items = response;
+                _items.AddRange(response);
+                _items = _items.Where(x => x.ProjectId == projectsId).ToList();
+            }
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+    private async Task LoadProject()
+    {
+        //_items.Clear();
+        try
+        {
+            var response = await Http.GetFromJsonAsync<List<Project>>(navigation.ToAbsoluteUri($"api/project"));
+            if (response != null)
+            {
+                projects = response;
             }
 
         }
@@ -40,9 +61,19 @@ public partial class JobList
 
     private void ItemUpdated(MudItemDropInfo<Job> dropItem)
     {
-        dropItem.Item.IsCompleted = dropItem.DropzoneIdentifier;
+        dropItem.Item.Term = DateTime.Now;
     }
 
-    
+    private void Create(Job job)
+    {
 
+    }
+    private void CloseModal()
+    {
+        IsCreateOpen = false;
+    }
+    private void OpemModal()
+    {
+        IsCreateOpen = true;
+    }
 }
