@@ -24,12 +24,19 @@ public class FuelController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> Create([FromBody] CarHistoryFuel fuel)
     {
-        if (fuel == null)
+        try
         {
-            return BadRequest();
+            if (fuel.Id != 0)
+                await _CarHistoryFuelService.Update(fuel);
+            else
+                fuel.Id = await _CarHistoryFuelService.Create(fuel);
+            return CreatedAtAction("Create", fuel.Id);
         }
-        var id = await _CarHistoryFuelService.Create(fuel);
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            throw ex;
+        }
 
-        return CreatedAtAction("Create", id);
     }
 }

@@ -2,7 +2,7 @@
 @inject NavigationManager navigation
 @inject HttpClient Http
 
-<EditForm Model="@formModel" OnValidSubmit="HandleValidFuelSubmit">
+<EditForm Model="@formModel">
     <div class="mb-3">
         <label for="Cost" class="form-label">Koszt</label>
         <InputNumber id="Cost" class="form-control" @bind-Value="formModel.Cost" />
@@ -29,7 +29,7 @@
         </InputSelect>
     </div>
      <div class="d-flex justify-content-between">
-        <button class="btn btn-primary w-25" type="submit">Zapisz</button>
+        <button class="btn btn-primary w-25" type="button" @onclick="HandleValidFuelSubmit">Zapisz</button>
         <button class="btn btn-primary w-25"type="button" @onclick="OpenStation">Dodaj stację</button>
     </div>
 </EditForm>

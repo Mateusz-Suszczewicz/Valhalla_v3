@@ -20,4 +20,23 @@ public class GasStationController : ControllerBase
     {
         return await _gasStationService.Get();
     }
+
+    [HttpPost]
+    public async Task<IActionResult> Create([FromBody] GasStation gasStation)
+    {
+        try
+        {
+            if (gasStation.Id != 0)
+                await _gasStationService.Update(gasStation);
+            else
+                gasStation.Id = await _gasStationService.Create(gasStation);
+            return CreatedAtAction("Create", gasStation.Id);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            throw ex;
+        }
+    }
+
 }

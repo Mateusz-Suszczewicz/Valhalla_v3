@@ -11,7 +11,7 @@ public class CarHistoryFuel : MainClass
 	public DateTime Date { get; set; }
 	public decimal Cost { get; set; }
 	public decimal CostPerLitr { get; set; }
-	public virtual GasStation GasStation { get; set; }
+	public virtual GasStation? GasStation { get; set; }
 	[JsonIgnore]
 	public virtual Car? Car { get; set; }
 

@@ -48,6 +48,11 @@ public partial class Home
             isCarOpen = false;
             isFuelOpen = true;
         }
+        else
+        {
+            isCarOpen = false;
+            isFuelOpen = false;
+        }
     }
     private async void HandleFuelSubmit(CarHistoryFuel model)
     {
