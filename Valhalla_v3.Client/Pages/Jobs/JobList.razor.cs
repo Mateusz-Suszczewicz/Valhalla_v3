@@ -4,6 +4,8 @@ using System.Text.Json;
 using System.Text;
 using Valhalla_v3.Shared.ToDo;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
+using System.Linq;
 
 namespace Valhalla_v3.Client.Pages.Jobs;
 
@@ -19,7 +21,8 @@ public partial class JobList
     private List<Project> projects = new();
     private int projectsId { get; set; }
     private int _id { get; set; }
-    
+    private Job draggedItem = null;
+
     protected override async Task OnInitializedAsync()
     {
         LoadJob();
@@ -37,7 +40,7 @@ public partial class JobList
                 _items.AddRange(response);
                 //_items = _items.Where(x => x.ProjectId == projectsId && x.Term <= DateTime.Now.Date).ToList();
                 if (projectsId != 0)
-                    _items.Add(new Job() { Name = "nowy" });
+                    _items.Add(new Job() { Name = "nowy", Term = DateTime.Now.Date });
             }
 
         }
@@ -65,11 +68,6 @@ public partial class JobList
         {
             Console.WriteLine(ex.Message);
         }
-    }
-
-    private void ItemUpdated(MudItemDropInfo<Job> dropItem)
-    {
-        dropItem.Item.Term = DateTime.Now;
     }
 
     private async Task Create(Job job)
@@ -139,4 +137,25 @@ public partial class JobList
         if(projectsId != 0) 
             await LoadJob();
     }
+
+    private void DragStartHandler(DragEventArgs e, Job item)
+    {
+        // Ustawiamy przeciągany element w zmiennej
+        item.Term = DateTime.Now.Date.AddDays(-1);
+        Console.WriteLine($"Rozpoczęto przeciąganie: {item}");
+    }
+
+    //private void DropHandler(DragEventArgs e, int targetList)
+    //{
+    //    // Sprawdzamy, gdzie upuszczono element
+    //    if (draggedItem != null)
+    //    {
+            
+    //    }
+
+    //    // Resetujemy zmienną przeciąganego elementu
+    //    draggedItem = null;
+
+    //    Console.WriteLine($"Element upuszczony do listy {targetList}");
+    //}
 }

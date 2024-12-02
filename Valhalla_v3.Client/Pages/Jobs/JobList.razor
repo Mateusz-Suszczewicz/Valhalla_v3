@@ -19,8 +19,8 @@
                 }
                 else
                 {
-                    <option value="0">Wybierz projekt</option>
                 }
+                    <option value="0">Wybierz projekt</option>
                 @foreach (var project in projects.Where(x => x.Id != projectsId))
                 {
                     <option value="@project.Id">@project.Name</option>
@@ -31,41 +31,36 @@
             <button class="btn btn-primary" @onclick=OpenTextModal>Dodaj projekt</button>
         </div>
     </div>
-    <div class="row">
-        <MudDropContainer T="Job" Items="_items" ItemsSelector="@((item,dropzone) => (item.Term <= DateTime.Today ? "przedawnione":"Dzisiaj") == dropzone)" ItemDropped="ItemUpdated" Class="d-flex flex-grow-1 flex-wrap">
-            <ChildContent>
-                <MudPaper Class="ma-4 flex-grow-1">
-                    <MudList T="Job" Class="d-flex flex-column mud-height-full">
-                        <MudListSubheader>Po terminie</MudListSubheader>
-                        <MudDropZone T="Job" Identifier="przedawnione" Class="flex-grow-1" />
-                    </MudList>
-                </MudPaper>
-                <MudPaper Class="ma-4 flex-grow-1">
-                    <MudList T="Job" Class="d-flex flex-column mud-height-full">
-                        <MudListSubheader>Dzisiaj</MudListSubheader>
-                        <MudDropZone T="Job" Identifier="Dzisiaj" Class="flex-grow-1" />
-                    </MudList>
-                </MudPaper>
-            </ChildContent>
-            <ItemRenderer>
-                <MudListItem T="string" Text="@context.Name">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" role="switch" id=@($"flexSwitchCheckDefault{context.Id}") @bind="@context.IsCompleted">
-                        <label class="form-check-label" for=@($"flexSwitchCheckDefault{context.Id}")>@context.Name</label>
-                        <button class="btn btn-outline-primary" @onclick="() => OpemModal(context.Id)">Szczegóły</button>
+    <div class="row text-white">
+        <div class="col-md-6">
+            <h3>Po terminie</h3>
+            <div ondragover="event.preventDefault()" class="rounded border">
+                @foreach (var item in _items.Where(x => x.Term < DateTime.Now.Date))
+                {
+                    <div draggable="true" @ondragstart="e => DragStartHandler(e, item)">
+                        @item.Name
                     </div>
-                </MudListItem>
-            </ItemRenderer>
-        </MudDropContainer>
+                }
+            </div>
+        </div>
+        <div class="col-md-6">
+            <h3>Dzisiaj</h3>
+
+            <div ondragover="event.preventDefault()" class="rounded border">
+                @foreach (var item in _items.Where(x => x.Term == DateTime.Now.Date))
+                {
+                    <div draggable="true" @ondragstart="e => DragStartHandler(e, item)">
+                        @item.Name
+                    </div>
+                }
+            </div>
+        </div>
+
     </div>
 </div>
 <div class="fixed-buttons">
     <button class="btn btn-success" @onclick="()=>OpemModal(0)">Dodaj nowy</button>
 </div>
-@foreach(var proj in _items)
-{
-    <h1>@proj.Name</h1>
-}
 @* Modal dodanie napraw *@
 <div class="modal fade @(IsCreateOpen ? "show" : "")" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display:@(IsCreateOpen ? "block" : "none");">
     <div class="modal-dialog">
@@ -82,3 +77,28 @@
 </div>
 
 <Valhalla_v3.Client.Components.TextModal Question="Podaj nazwę projektu" isChoiceOpen="@IsTextOpen" SubmitChoice="CreateProjekt"/>
+
+<script>
+    let dragged = null;
+    const source = document.getElementById("draggable");
+source.addEventListener("dragstart", (event) => {
+  // store a ref. on the dragged elem
+  dragged = event.target;
+});
+
+const target = document.getElementById("drop-target");
+target.addEventListener("dragover", (event) => {
+  // prevent default to allow drop
+  event.preventDefault();
+});
+
+target.addEventListener("drop", (event) => {
+  // prevent default action (open as link for some elements)
+  event.preventDefault();
+  // move dragged element to the selected drop target
+  if (event.target.className === "dropzone") {
+    dragged.parentNode.removeChild(dragged);
+    event.target.appendChild(dragged);
+  }
+});
+</script>
