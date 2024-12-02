@@ -40,19 +40,19 @@ public partial class FuelAddModal
         await OnFormFuelSubmit.InvokeAsync(formModel);
     }
 
-    void OpenStation()
+    private void OpenStation()
     {
         isGasSttionOpen = true;
         StateHasChanged();
     }
 
-    async Task CloseStation()
+    private async Task CloseStation()
     {
         isGasSttionOpen = false;
         StateHasChanged();
     }
 
-    private async void HandleStationSubmit(GasStation model)
+    private async Task HandleStationSubmit(GasStation model)
     {
         model.OperatorCreateId = 3;
         model.OperatorModifyId = 3;

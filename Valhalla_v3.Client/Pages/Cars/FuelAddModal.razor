@@ -2,7 +2,7 @@
 @inject NavigationManager navigation
 @inject HttpClient Http
 
-<EditForm Model="@formModel">
+<EditForm Model="@formModel" OnValidSubmit="HandleValidFuelSubmit">
     <div class="mb-3">
         <label for="Cost" class="form-label">Koszt</label>
         <InputNumber id="Cost" class="form-control" @bind-Value="formModel.Cost" />

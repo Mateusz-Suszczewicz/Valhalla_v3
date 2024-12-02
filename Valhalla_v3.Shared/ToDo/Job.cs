@@ -9,6 +9,6 @@ public class Job : MainClassFull
 
 	public int ProjectId { get; set; }
     [JsonIgnore]
-    public virtual Project Project { get; set; }
+    public virtual Project? Project { get; set; }
 	public virtual ICollection<Comment>? Comments { get; set; } = new List<Comment>();
 }

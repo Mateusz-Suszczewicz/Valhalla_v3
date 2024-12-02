@@ -6,6 +6,7 @@ using Valhalla_v3.Components;
 using Valhalla_v3.Database;
 using Valhalla_v3.Services;
 using Valhalla_v3.Services.CarHistory;
+using Valhalla_v3.Services.ToDo;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,7 +23,9 @@ builder.Services.AddScoped<IGasStationService, GasStationService>();
 builder.Services.AddScoped<ICarHistoryFuelService, CarHistoryFuelService>();
 builder.Services.AddScoped<IMechanicService, MechanicService>();
 builder.Services.AddScoped<ICarHistoryRepairService, CarHistoryRepairService>();
-builder.Services.AddBlazorBootstrap();
+builder.Services.AddScoped<IProjectService, ProjectService>();
+builder.Services.AddScoped<IJobService, JobService>();
+builder.Services.AddBlazorBootstrap(); 
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddHttpClient("MyHttpClient", client =>

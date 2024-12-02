@@ -1,5 +1,6 @@
 ﻿@using Valhalla_v3.Shared.CarHistory
 @inject NavigationManager navigation
+@inject HttpClient Http
 
 <EditForm Model="@formModel" OnValidSubmit="HandleValidStationSubmit">
     <div class="container-fluid text-color-black">
@@ -11,6 +12,10 @@
                         @if (projectsId != 0)
                         {
                             <option selected value="@projects.Select(x => x.Id).First(x => x == projectsId)">@projects.Where(x => x.Id == projectsId).Select(x => x.Name)</option>
+                        }
+                        else
+                        {
+                            <option value="0">Wybierz projekt</option>
                         }
                         @foreach (var project in projects.Where(x => x.Id != projectsId))
                         {
