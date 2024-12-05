@@ -198,8 +198,8 @@ public partial class Details
     private async void HandleFuelSubmit(CarHistoryFuel model)
     {
         model.CarId = car.Id;
-        model.OperatorCreateId = 3;
-        model.OperatorModifyId = 3;
+        model.OperatorCreateId = 1;
+        model.OperatorModifyId = 1;
         var json = JsonSerializer.Serialize(model);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
         try
@@ -234,8 +234,8 @@ public partial class Details
     private async void HandleRepairSubmit(CarHistoryRepair model)
     {
         model.CarId = car.Id;
-        model.OperatorCreateId = 3;
-        model.OperatorModifyId = 3;
+        model.OperatorCreateId = 1;
+        model.OperatorModifyId = 1;
         var json = JsonSerializer.Serialize(model);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
         try

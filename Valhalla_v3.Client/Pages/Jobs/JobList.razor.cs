@@ -16,6 +16,7 @@ public partial class JobList
         new(){ Name = "test1", Term = DateTime.Today, Id = 1 },
         new(){ Name = "test2", Term = DateTime.Today.AddDays(-1), Id= 2 }
     };
+    private Job job = new();
     private bool IsCreateOpen = false;
     private bool IsTextOpen = false;
     private List<Project> projects = new();
@@ -38,11 +39,10 @@ public partial class JobList
             if (response != null)
             {
                 _items.AddRange(response);
-                //_items = _items.Where(x => x.ProjectId == projectsId && x.Term <= DateTime.Now.Date).ToList();
-                if (projectsId != 0)
-                    _items.Add(new Job() { Name = "nowy", Term = DateTime.Now.Date });
+                _items = _items.Where(x => x.Term <= DateTime.Now.Date).ToList();
+                if(projectsId != 0)
+                    _items = _items.Where(x => x.ProjectId == projectsId).ToList();
             }
-
         }
         catch (Exception ex)
         {
@@ -72,8 +72,8 @@ public partial class JobList
 
     private async Task Create(Job job)
     {
-        job.OperatorCreateId = 3;
-        job.OperatorModifyId = 3;
+        job.OperatorCreateId = 1;
+        job.OperatorModifyId = 1;
         var json = JsonSerializer.Serialize(job);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
         try
@@ -91,14 +91,29 @@ public partial class JobList
         }
     }
 
-    private void CloseModal()
+    private void CloseModal(bool close)
     {
-        IsCreateOpen = false;
+        IsCreateOpen = close;
+        
     }
     
-    private void OpemModal(int id)
+    private async Task OpemModal(int id)
     {
-        _id = id;
+        try
+        {
+
+            var response = await Http.GetFromJsonAsync<Job>(navigation.ToAbsoluteUri($"api/job/{id}"));
+            if (response != null)
+            {
+                job = response;
+            }
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+
         IsCreateOpen = true;
     }
 
@@ -111,8 +126,8 @@ public partial class JobList
     {
         Project project = new Project()
         {
-            OperatorCreateId = 3,
-            OperatorModifyId = 3,
+            OperatorCreateId = 1,
+            OperatorModifyId = ,
             Name = name
         };
         var json = JsonSerializer.Serialize(project);
@@ -140,22 +155,14 @@ public partial class JobList
 
     private void DragStartHandler(DragEventArgs e, Job item)
     {
-        // Ustawiamy przeciągany element w zmiennej
-        item.Term = DateTime.Now.Date.AddDays(-1);
+        item.Term = DateTime.Now.Date;
         Console.WriteLine($"Rozpoczęto przeciąganie: {item}");
     }
 
-    //private void DropHandler(DragEventArgs e, int targetList)
-    //{
-    //    // Sprawdzamy, gdzie upuszczono element
-    //    if (draggedItem != null)
-    //    {
-            
-    //    }
-
-    //    // Resetujemy zmienną przeciąganego elementu
-    //    draggedItem = null;
-
-    //    Console.WriteLine($"Element upuszczony do listy {targetList}");
-    //}
+    private void check(int id)
+    {
+        var item = _items.Where(x => x.Id == id).First();
+        item.IsCompleted = !item.IsCompleted;
+        Create(item);
+    }
 }

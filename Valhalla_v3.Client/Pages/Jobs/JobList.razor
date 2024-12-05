@@ -8,8 +8,12 @@
 
 <div class="container-fluid text-color-black">
     <div class="row">
-        <div class="col-md-4 mb-4">
+        <div class="col-md-4 mb-1">
             <label for="formGroupExampleInput" class="form-label text-white">Projekt</label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-4">
             <select class="form-select" id="formGroupExampleInput" aria-label="Default select example" @bind="projectsId" @bind:after="() =>SetProject()">
                 @if (projectsId != 0)
                 {
@@ -27,30 +31,35 @@
                 }
             </select>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-2 mb-4">
             <button class="btn btn-primary" @onclick=OpenTextModal>Dodaj projekt</button>
         </div>
     </div>
     <div class="row text-white">
-        <div class="col-md-6">
+        <div class="col-md-5 m-2">
             <h3>Po terminie</h3>
-            <div ondragover="event.preventDefault()" class="rounded border">
+            <div ondragover="event.preventDefault()" class="border-secondary rounded border">
                 @foreach (var item in _items.Where(x => x.Term < DateTime.Now.Date))
                 {
-                    <div draggable="true" @ondragstart="e => DragStartHandler(e, item)">
-                        @item.Name
+                    <div class="border-success m-2 border" draggable="true" @ondragstart="e => DragStartHandler(e, item)">
+                        <input class="form-check-input m-2" type="checkbox" @onclick="()=>check(item.Id)"/>
+                        <label class="form-check-label m-2" @onclick="()=>OpemModal(item.Id)" style="text-decoration: @(item.IsCompleted ? "line-through" : "none")">
+                            @item.Name
+                        </label>
                     </div>
                 }
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-5 m-2">
             <h3>Dzisiaj</h3>
-
-            <div ondragover="event.preventDefault()" class="rounded border">
+            <div ondragover="event.preventDefault()" class="border-secondary rounded border">
                 @foreach (var item in _items.Where(x => x.Term == DateTime.Now.Date))
                 {
-                    <div draggable="true" @ondragstart="e => DragStartHandler(e, item)">
-                        @item.Name
+                    <div class="border-success m-2 border" draggable="true" @ondragstart="e => DragStartHandler(e, item)">
+                        <input class="form-check-input m-2" type="checkbox" @onclick="()=>check(item.Id)" />
+                        <label class="form-check-label m-2" @onclick="()=>OpemModal(item.Id)" style="text-decoration: @(item.IsCompleted ? "line-through" : "none")">
+                            @item.Name
+                        </label>
                     </div>
                 }
             </div>
@@ -63,17 +72,7 @@
 </div>
 @* Modal dodanie napraw *@
 <div class="modal fade @(IsCreateOpen ? "show" : "")" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display:@(IsCreateOpen ? "block" : "none");">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header modal-header-moje">
-                <h5 class="modal-title" id="exampleModalLabel">Zadanie</h5>
-                <button type="button" class="btn-close" @onclick="CloseModal"></button>
-            </div>
-            <div class="modal-body modal-body-moje">
-                <JobAddModal OnFormSubmit="Create" Id="_id" />
-            </div>
-        </div>
-    </div>
+    <JobAddModal OnFormSubmit="Create" OnClose="CloseModal" formModel="job" projects="projects" Id="_id" />
 </div>
 
 <Valhalla_v3.Client.Components.TextModal Question="Podaj nazwę projektu" isChoiceOpen="@IsTextOpen" SubmitChoice="CreateProjekt"/>

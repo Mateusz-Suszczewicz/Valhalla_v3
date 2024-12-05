@@ -76,7 +76,7 @@ public class JobService : IJobService
 
 	public async Task Update(Job job)
 	{
-		if (job.Id != 0)
+		if (job.Id == 0)
 			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
 
 		var OldJob = _context.Job.First(x => x.Id == job.Id);
@@ -88,6 +88,7 @@ public class JobService : IJobService
 		OldJob.Term = job.Term;
 		OldJob.Project = job.Project;
 		OldJob.DateTimeModify = DateTime.Now;
+		OldJob.Comments = job.Comments;
 		await _context.SaveChangesAsync();
 	}
 }
