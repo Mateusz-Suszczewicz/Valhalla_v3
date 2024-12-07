@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Net;
 using System.Web.Http;
 using Valhalla_v3.Database;
 using Valhalla_v3.Shared;
@@ -8,8 +9,8 @@ namespace Valhalla_v3.Services;
 public interface IOperatorService
 {
     public Task<int> Create(Operator oper);
-    public Operator Get(int id);
-    public List<Operator> Get();
+    public Task<Operator> Get(int id);
+    public Task<List<Operator>> Get();
     public Task Update(Operator oper);
     public Task Delete(int id);
 }
@@ -39,19 +40,20 @@ public class OperatorService(ValhallaComtext context) : IOperatorService
         await _context.SaveChangesAsync();
     }
 
-    public Operator Get(int id)
+    public async Task<Operator> Get(int id)
     {
         if (id == 0)
             throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
 
-        var oper = Get().Find(x => x.Id == id) ?? throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
+        var oper = await _context.Operator
+            .FirstOrDefaultAsync(x => x.Id == id);
         return oper;
     }
 
-    public List<Operator> Get()
+    public async Task<List<Operator>> Get()
     {
-        var operList = _context.Operator
-            .ToList();
+        var operList = await _context.Operator
+            .ToListAsync();
 
         return  operList;
     }
