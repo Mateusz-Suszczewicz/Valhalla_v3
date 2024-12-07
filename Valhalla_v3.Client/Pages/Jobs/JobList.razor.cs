@@ -127,7 +127,7 @@ public partial class JobList
         Project project = new Project()
         {
             OperatorCreateId = 1,
-            OperatorModifyId = ,
+            OperatorModifyId = 1,
             Name = name
         };
         var json = JsonSerializer.Serialize(project);
