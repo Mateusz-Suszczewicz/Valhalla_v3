@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 
 namespace Valhalla_v3.Client.Components;
 
@@ -15,6 +17,8 @@ public partial class TextModal
 
     [Parameter]
     public EventCallback<string> SubmitChoice { get; set; }
+    [Parameter]
+    public EventCallback<string> CloseModal { get; set; }
 
     // Obsługa walidacji formularza i wywołanie callbacku
     private async Task HandleValidStationSubmit()
@@ -22,10 +26,24 @@ public partial class TextModal
         Console.WriteLine($"answer: {Answer}");
         await SubmitChoice.InvokeAsync(Answer);
     }
-
-    private void Close()
+    
+    private async Task Close()
     {
-        isChoiceOpen = false;
         Answer = "";
+        isChoiceOpen = false;
+        await CloseModal.InvokeAsync();
     }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Escape")
+        {
+            await Close();
+        }
+        else if(e.CtrlKey &&  e.Key == "s")
+        {
+           await  HandleValidStationSubmit();
+        }
+    }
+
 }

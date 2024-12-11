@@ -20,5 +20,6 @@ public partial class GasStationAddModal
     private async Task HandleValidStationSubmit()
     {
         await OnFormStationSubmit.InvokeAsync(formModel);
+        formModel = new();
     }
 }

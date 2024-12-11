@@ -34,6 +34,14 @@
         <div class="col-md-2 mb-4">
             <button class="btn btn-primary" @onclick=OpenTextModal>Dodaj projekt</button>
         </div>
+        <div class="col-md-2 text-white">
+            <div class="form-check" @onclick="() => LoadJob()">
+                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" @bind="OnlyNoDoneJobs" >
+                <label class="form-check-label" for="flexCheckDefault">
+                    Tylko niezakończone zadania
+                </label>
+            </div>
+        </div>
     </div>
     <div class="row text-white">
         <div class="col-md-5 m-2">
@@ -42,7 +50,7 @@
                 @foreach (var item in _items.Where(x => x.Term < DateTime.Now.Date))
                 {
                     <div class="border-success m-2 border" draggable="true" @ondragstart="e => DragStartHandler(e, item)">
-                        <input class="form-check-input m-2" type="checkbox" @onclick="()=>check(item.Id)"/>
+                        <input class="form-check-input m-2" type="checkbox" @bind="item.IsCompleted" @onclick="() => SetProjectDone(item.Id)" />
                         <label class="form-check-label m-2" @onclick="()=>OpemModal(item.Id)" style="text-decoration: @(item.IsCompleted ? "line-through" : "none")">
                             @item.Name
                         </label>
@@ -56,7 +64,7 @@
                 @foreach (var item in _items.Where(x => x.Term == DateTime.Now.Date))
                 {
                     <div class="border-success m-2 border" draggable="true" @ondragstart="e => DragStartHandler(e, item)">
-                        <input class="form-check-input m-2" type="checkbox" @onclick="()=>check(item.Id)" />
+                        <input class="form-check-input m-2" type="checkbox" @bind="item.IsCompleted" @onclick="() => SetProjectDone(item.Id)" />
                         <label class="form-check-label m-2" @onclick="()=>OpemModal(item.Id)" style="text-decoration: @(item.IsCompleted ? "line-through" : "none")">
                             @item.Name
                         </label>
@@ -75,7 +83,7 @@
     <JobAddModal OnFormSubmit="Create" OnClose="CloseModal" formModel="job" projects="projects" Id="_id" />
 </div>
 
-<Valhalla_v3.Client.Components.TextModal Question="Podaj nazwę projektu" isChoiceOpen="@IsTextOpen" SubmitChoice="CreateProjekt"/>
+<Valhalla_v3.Client.Components.TextModal Question="Podaj nazwę projektu" isChoiceOpen="@IsTextOpen" SubmitChoice="CreateProjekt" CloseModal="CloseProject" />
 
 <script>
     let dragged = null;

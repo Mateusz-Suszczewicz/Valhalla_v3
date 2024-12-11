@@ -22,8 +22,7 @@ public partial class JobList
     private List<Project> projects = new();
     private int projectsId { get; set; }
     private int _id { get; set; }
-    private Job draggedItem = null;
-
+    private bool OnlyNoDoneJobs = false;
     protected override async Task OnInitializedAsync()
     {
         LoadJob();
@@ -33,15 +32,20 @@ public partial class JobList
     private async Task LoadJob()
     {
         _items.Clear();
+
         try
         {
             var response = await Http.GetFromJsonAsync<List<Job>>(navigation.ToAbsoluteUri($"api/job"));
             if (response != null)
             {
+                _items.Clear();
                 _items.AddRange(response);
                 _items = _items.Where(x => x.Term <= DateTime.Now.Date).ToList();
                 if(projectsId != 0)
                     _items = _items.Where(x => x.ProjectId == projectsId).ToList();
+                if(OnlyNoDoneJobs)
+                    _items = _items.Where(x => !x.IsCompleted).ToList();
+
             }
         }
         catch (Exception ex)
@@ -72,8 +76,8 @@ public partial class JobList
 
     private async Task Create(Job job)
     {
-        job.OperatorCreateId = 1;
-        job.OperatorModifyId = 1;
+        job.OperatorCreateId = 3;
+        job.OperatorModifyId = 3;
         var json = JsonSerializer.Serialize(job);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
         try
@@ -94,24 +98,31 @@ public partial class JobList
     private void CloseModal(bool close)
     {
         IsCreateOpen = close;
-        
+        job = new Job();
     }
-    
+
     private async Task OpemModal(int id)
     {
-        try
-        {
-
-            var response = await Http.GetFromJsonAsync<Job>(navigation.ToAbsoluteUri($"api/job/{id}"));
-            if (response != null)
+        if (id != 0) 
+        { 
+            try
             {
-                job = response;
-            }
+                var response = await Http.GetFromJsonAsync<Job>(navigation.ToAbsoluteUri($"api/job/{id}"));
+                if (response != null)
+                {
+                    job = response;
+                }
 
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
-        catch (Exception ex)
+        else
         {
-            Console.WriteLine(ex.Message);
+            job = new Job();
+            job.Term = DateTime.Now.Date;
         }
 
         IsCreateOpen = true;
@@ -124,10 +135,15 @@ public partial class JobList
 
     private async Task CreateProjekt(string name)
     {
+        if (string.IsNullOrEmpty(name))
+        {
+            IsTextOpen = false;
+            return;
+        }
         Project project = new Project()
         {
-            OperatorCreateId = 1,
-            OperatorModifyId = 1,
+            OperatorCreateId = 3,
+            OperatorModifyId = 3,
             Name = name
         };
         var json = JsonSerializer.Serialize(project);
@@ -145,6 +161,7 @@ public partial class JobList
         {
             Console.WriteLine(ex.Message);
         }
+        IsTextOpen = false;
     }
 
     private async Task SetProject()
@@ -159,10 +176,16 @@ public partial class JobList
         Console.WriteLine($"Rozpoczęto przeciąganie: {item}");
     }
 
-    private void check(int id)
+    private void SetProjectDone(int id)
     {
         var item = _items.Where(x => x.Id == id).First();
         item.IsCompleted = !item.IsCompleted;
         Create(item);
     }
+    
+    private void CloseProject()
+    {
+        IsTextOpen = false;
+    }
+
 }

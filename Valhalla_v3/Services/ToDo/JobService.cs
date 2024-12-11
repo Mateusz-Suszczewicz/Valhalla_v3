@@ -86,7 +86,7 @@ public class JobService : IJobService
 		OldJob.Name = job.Name;
 		OldJob.IsCompleted = job.IsCompleted;
 		OldJob.Term = job.Term;
-		OldJob.Project = job.Project;
+		OldJob.ProjectId = job.ProjectId;
 		OldJob.DateTimeModify = DateTime.Now;
 		OldJob.Comments = job.Comments;
 		await _context.SaveChangesAsync();

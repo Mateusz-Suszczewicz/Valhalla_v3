@@ -1,5 +1,6 @@
 ﻿using Azure.Core.GeoJson;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using System.Net.Http.Json;
 using Valhalla_v3.Shared.CarHistory;
 using Valhalla_v3.Shared.ToDo;
@@ -53,5 +54,17 @@ public partial class JobAddModal
         formModel.Comments.Add(com);
         kom = "";
 
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Escape")
+        {
+            await Close();
+        }
+        else if (e.CtrlKey && e.Key == "s")
+        {
+            await HandleValidStationSubmit();
+        }
     }
 }
