@@ -15,9 +15,9 @@ public interface ICarHistoryFuelService
 
 public class CarHistoryFuelService : ICarHistoryFuelService
 {
-    private readonly ValhallaComtext _context;
+    private readonly ValhallaContext _context;
 
-    public CarHistoryFuelService(ValhallaComtext context)
+    public CarHistoryFuelService(ValhallaContext context)
     {
         _context = context;
     }

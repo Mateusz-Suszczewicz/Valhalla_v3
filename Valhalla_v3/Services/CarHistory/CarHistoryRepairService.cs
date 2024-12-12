@@ -15,9 +15,9 @@ public interface ICarHistoryRepairService
 
 public class CarHistoryRepairService : ICarHistoryRepairService
 {
-    private readonly ValhallaComtext _context;
+    private readonly ValhallaContext _context;
 
-    public CarHistoryRepairService(ValhallaComtext context)
+    public CarHistoryRepairService(ValhallaContext context)
     {
         _context = context;
     }

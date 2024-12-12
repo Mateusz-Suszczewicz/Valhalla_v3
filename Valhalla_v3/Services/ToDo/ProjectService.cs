@@ -15,9 +15,9 @@ public interface IProjectService
 
 public class ProjectService : IProjectService
 {
-    private readonly ValhallaComtext _context;
+    private readonly ValhallaContext _context;
 
-    public ProjectService(ValhallaComtext context)
+    public ProjectService(ValhallaContext context)
     {
         _context = context;
     }

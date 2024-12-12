@@ -15,9 +15,9 @@ public interface IOperatorService
 
 public class OperatorService : IOperatorService
 {
-    private readonly ValhallaComtext _context;
+    private readonly ValhallaContext _context;
 
-    public OperatorService(ValhallaComtext context)
+    public OperatorService(ValhallaContext context)
     {
         _context = context;
     }

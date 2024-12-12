@@ -15,9 +15,9 @@ public interface IGasStationService
 
 public class GasStationService : IGasStationService
 {
-    private readonly ValhallaComtext _context;
+    private readonly ValhallaContext _context;
 
-    public GasStationService(ValhallaComtext context)
+    public GasStationService(ValhallaContext context)
     {
         _context = context;
     }

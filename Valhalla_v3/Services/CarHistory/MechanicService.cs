@@ -15,9 +15,9 @@ public interface IMechanicService
 
 public class MechanicService : IMechanicService
 {
-    private readonly ValhallaComtext _context;
+    private readonly ValhallaContext _context;
 
-    public MechanicService(ValhallaComtext context)
+    public MechanicService(ValhallaContext context)
     {
         _context = context;
     }

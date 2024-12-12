@@ -18,9 +18,9 @@ public interface IJobService
 
 public class JobService : IJobService
 {
-    private readonly ValhallaComtext _context;
+    private readonly ValhallaContext _context;
 
-    public JobService(ValhallaComtext context)
+    public JobService(ValhallaContext context)
     {
         _context = context;
     }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.Extensions.Configuration;
 using Moq;
 using System.Linq.Expressions;
 using Valhalla_v3.Database;
@@ -9,13 +10,13 @@ using Valhalla_v3.Shared;
 public class OperatorServiceTests
 {
     private readonly Mock<DbSet<Operator>> _mockDbSet;
-    private readonly Mock<ValhallaComtext> _mockContext;
+    private readonly Mock<ValhallaContext> _mockContext;
     private readonly OperatorService _operatorService;
 
     public OperatorServiceTests()
     {
         _mockDbSet = new Mock<DbSet<Operator>>();
-        Mock<ValhallaComtext> mock = new Mock<ValhallaComtext>();
+        Mock<ValhallaContext> mock = new Mock<ValhallaContext>();
         _mockContext = mock;
         _mockContext.Setup(c => c.Operator).Returns(_mockDbSet.Object);
         _operatorService = new OperatorService(_mockContext.Object);
@@ -123,24 +124,24 @@ public class OperatorServiceTests
     public async Task Get_ValidId_ReturnsOperator()
     {
         // Arrange
-        var operators = new List<Operator>
-    {
-        new Operator { Id = 1, Name = "Test Operator" },
-        new Operator { Id = 2, Name = "Another Operator" }
-    };
+        var options = new DbContextOptionsBuilder<ValhallaContext>()
+            .UseInMemoryDatabase(databaseName: "TestDatabase")
+            .Options;
 
-        var mockDbSet = CreateMockDbSet(operators);
-        _mockContext.Setup(c => c.Operator).Returns(mockDbSet.Object);
+        using var context = new ValhallaContext(new ConfigurationBuilder().Build());
+        context.Operator.Add(new Operator { Id = 1, Name = "Test Operator" });
+        await context.SaveChangesAsync();
+
+        var service = new OperatorService(context);
 
         // Act
-        var result = await _operatorService.Get(1);
+        var result = await service.Get(1);
 
         // Assert
         Assert.NotNull(result);
         Assert.Equal(1, result.Id);
         Assert.Equal("Test Operator", result.Name);
     }
-
 
     [Fact]
     public async Task Get_InvalidId_ThrowsKeyNotFoundException()

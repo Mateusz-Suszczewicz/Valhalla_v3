@@ -18,9 +18,9 @@ public interface ICarService
 
 public class CarService : ICarService
 {
-	private readonly ValhallaComtext _context;
+	private readonly ValhallaContext _context;
 
-	public CarService(ValhallaComtext context) 
+	public CarService(ValhallaContext context) 
 	{
 		_context = context;
 	}

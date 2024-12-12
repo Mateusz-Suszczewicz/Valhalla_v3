@@ -19,41 +19,51 @@ public interface IValhallaContext
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
 
-public class ValhallaComtext : DbContext
+public class ValhallaContext : DbContext, IValhallaContext
 {
-    public DbSet<Operator> Operator { get; set; }
-    //TO DO
-    public DbSet<Comment> Comment { get; set; }
-    public DbSet<Job> Job { get; set; }
-    public DbSet<Project> Project { get; set; }
-    //Car History
-    public DbSet<Car> Car { get; set; }
-    public DbSet<CarHistoryFuel> CarHistoryFuels { get; set; }
-    public DbSet<CarHistoryRepair> CarHistoryRepairs { get; set; }
-    public DbSet<GasStation> GasStations { get; set; }
-    public DbSet<Mechanic> Mechanics { get; set; }
+    public virtual DbSet<Operator> Operator { get; set; }
+    public virtual DbSet<Comment> Comment { get; set; }
+    public virtual DbSet<Job> Job { get; set; }
+    public virtual DbSet<Project> Project { get; set; }
+    public virtual DbSet<Car> Car { get; set; }
+    public virtual DbSet<CarHistoryFuel> CarHistoryFuels { get; set; }
+    public virtual DbSet<CarHistoryRepair> CarHistoryRepairs { get; set; }
+    public virtual DbSet<GasStation> GasStations { get; set; }
+    public virtual DbSet<Mechanic> Mechanics { get; set; }
 
-    IConfiguration appConfig;
-    public ValhallaComtext(IConfiguration config)
-	{
-        appConfig = config;
+    private readonly IConfiguration _configuration;
+
+    public ValhallaContext(IConfiguration configuration)
+    {
+        _configuration = configuration;
     }
 
-	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        string connectionString = $"Data Source=DESKTOP-663F3VE;" +
-                  $"Initial Catalog=Valhallav3;" +
-                  "Integrated Security=SSPI;Encrypt=True;TrustServerCertificate=True;";
-		var a = appConfig.GetConnectionString("Connection");
-        optionsBuilder.UseSqlServer(a);
+        string connectionString = _configuration.GetConnectionString("Connection");
+        optionsBuilder.UseSqlServer(connectionString);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        //Configure the Operator table
-        modelBuilder.Entity<Operator>().ToTable("Operators");
+        ConfigureOperatorTable(modelBuilder);
+        ConfigureCommentTable(modelBuilder);
+        ConfigureJobTable(modelBuilder);
+        ConfigureProjectTable(modelBuilder);
+        ConfigureCarTable(modelBuilder);
+        ConfigureCarHistoryFuelTable(modelBuilder);
+        ConfigureCarHistoryRepairTable(modelBuilder);
+        ConfigureGasStationTable(modelBuilder);
+        ConfigureMechanicTable(modelBuilder);
+    }
 
-        #region Configure the Comment table
+    private void ConfigureOperatorTable(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Operator>().ToTable("Operators");
+    }
+
+    private void ConfigureCommentTable(ModelBuilder modelBuilder)
+    {
         modelBuilder.Entity<Comment>().ToTable("TaskComments");
 
         modelBuilder.Entity<Comment>()
@@ -68,35 +78,39 @@ public class ValhallaComtext : DbContext
             .WithMany()
             .HasForeignKey(b => b.OperatorModifyId)
             .OnDelete(DeleteBehavior.NoAction);
-		#endregion
-		#region Configure the Job table
-		modelBuilder.Entity<Shared.ToDo.Job>().ToTable("Tasks");
+    }
 
-        modelBuilder.Entity<Shared.ToDo.Job>()
+    private void ConfigureJobTable(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Job>().ToTable("Tasks");
+
+        modelBuilder.Entity<Job>()
             .HasOne(b => b.OperatorCreate)
             .WithMany()
             .HasForeignKey(b => b.OperatorCreateId)
             .IsRequired()
             .OnDelete(DeleteBehavior.NoAction);
 
-        modelBuilder.Entity<Shared.ToDo.Job>()
+        modelBuilder.Entity<Job>()
             .HasOne(b => b.OperatorModify)
             .WithMany()
             .HasForeignKey(b => b.OperatorModifyId)
             .OnDelete(DeleteBehavior.NoAction);
 
-        modelBuilder.Entity<Shared.ToDo.Job>()
+        modelBuilder.Entity<Job>()
             .HasOne(b => b.Project)
             .WithMany(a => a.Tasks)
             .HasForeignKey(b => b.ProjectId)
             .IsRequired()
             .OnDelete(DeleteBehavior.NoAction);
-        
-		modelBuilder.Entity<Job>()
+
+        modelBuilder.Entity<Job>()
             .HasMany(b => b.Comments)
             .WithOne(a => a.Job);
-        #endregion
-        #region Configure the Project table
+    }
+
+    private void ConfigureProjectTable(ModelBuilder modelBuilder)
+    {
         modelBuilder.Entity<Project>().ToTable("Projects");
 
         modelBuilder.Entity<Project>()
@@ -115,137 +129,147 @@ public class ValhallaComtext : DbContext
         modelBuilder.Entity<Project>()
             .HasMany(b => b.Tasks)
             .WithOne(a => a.Project);
-		#endregion
-        #region Configure the Car table
-		modelBuilder.Entity<Car>().ToTable("Car");
+    }
 
-		modelBuilder.Entity<Car>()
-			.HasOne(b => b.OperatorCreate)
-			.WithMany()
-			.HasForeignKey(b => b.OperatorCreateId)
-			.IsRequired()
-			.OnDelete(DeleteBehavior.NoAction);
+    private void ConfigureCarTable(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Car>().ToTable("Car");
 
-		modelBuilder.Entity<Car>()
-			.HasOne(b => b.OperatorModify)
-			.WithMany()
-			.HasForeignKey(b => b.OperatorModifyId)
-			.OnDelete(DeleteBehavior.NoAction);
-
-		modelBuilder.Entity<Car>()
-			.HasMany(b => b.CarHistoryRepair)
-			.WithOne(a => a.Car);
-		
         modelBuilder.Entity<Car>()
-	        .HasMany(b => b.Fuels)
-	        .WithOne(a => a.Car);
-		#endregion
-		#region Configure the CarHistoryFuel table
-		modelBuilder.Entity<CarHistoryFuel>().ToTable("CarHistoryFuel");
+            .HasOne(b => b.OperatorCreate)
+            .WithMany()
+            .HasForeignKey(b => b.OperatorCreateId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.NoAction);
 
-		modelBuilder.Entity<CarHistoryFuel>()
-			.HasOne(b => b.OperatorCreate)
-			.WithMany()
-			.HasForeignKey(b => b.OperatorCreateId)
-			.IsRequired()
-			.OnDelete(DeleteBehavior.NoAction);
+        modelBuilder.Entity<Car>()
+            .HasOne(b => b.OperatorModify)
+            .WithMany()
+            .HasForeignKey(b => b.OperatorModifyId)
+            .OnDelete(DeleteBehavior.NoAction);
 
-		modelBuilder.Entity<CarHistoryFuel>()
-			.HasOne(b => b.OperatorModify)
-			.WithMany()
-			.HasForeignKey(b => b.OperatorModifyId)
-			.OnDelete(DeleteBehavior.NoAction);
+        modelBuilder.Entity<Car>()
+            .HasMany(b => b.CarHistoryRepair)
+            .WithOne(a => a.Car);
 
-		modelBuilder.Entity<CarHistoryFuel>()
-			.HasOne(b => b.GasStation)
-			.WithMany(a => a.Fuels);
-		
-		modelBuilder.Entity<CarHistoryFuel>()
-			.Property(c => c.CostPerLitr)
-			.HasColumnType("decimal(18,2)");
-		
-		modelBuilder.Entity<CarHistoryFuel>()
-			.Property(c => c.Cost)
-			.HasColumnType("decimal(18,2)");
-		
-		modelBuilder.Entity<CarHistoryFuel>()
-			.HasOne(b => b.Car)
-			.WithMany(a => a.Fuels)
-			.HasForeignKey(b => b.CarId)
-			.IsRequired()
-			.OnDelete(DeleteBehavior.NoAction);
-		#endregion
-		#region Configure the CarHistoryFuel table
-		modelBuilder.Entity<CarHistoryRepair>().ToTable("CarHistoryRepair");
-		
-		modelBuilder.Entity<CarHistoryRepair>()
-			.Property(c => c.Cost)
-			.HasColumnType("decimal(18,2)");
-		
-		modelBuilder.Entity<CarHistoryRepair>()
-			.HasOne(b => b.OperatorCreate)
-			.WithMany()
-			.HasForeignKey(b => b.OperatorCreateId)
-			.IsRequired()
-			.OnDelete(DeleteBehavior.NoAction);
+        modelBuilder.Entity<Car>()
+            .HasMany(b => b.Fuels)
+            .WithOne(a => a.Car);
+    }
 
-		modelBuilder.Entity<CarHistoryRepair>()
-			.HasOne(b => b.OperatorModify)
-			.WithMany()
-			.HasForeignKey(b => b.OperatorModifyId)
-			.OnDelete(DeleteBehavior.NoAction);
+    private void ConfigureCarHistoryFuelTable(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<CarHistoryFuel>().ToTable("CarHistoryFuel");
 
-		modelBuilder.Entity<CarHistoryRepair>()
-			.HasOne(b => b.Mechanic)
-			.WithMany(a => a.Repair)
-			.HasForeignKey(b => b.MechanicId);
+        modelBuilder.Entity<CarHistoryFuel>()
+            .HasOne(b => b.OperatorCreate)
+            .WithMany()
+            .HasForeignKey(b => b.OperatorCreateId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.NoAction);
 
-		modelBuilder.Entity<CarHistoryRepair>()
-			.HasOne(b => b.Car)
-			.WithMany(a => a.CarHistoryRepair)
-			.HasForeignKey(b => b.CarId)
-			.IsRequired()
-			.OnDelete(DeleteBehavior.NoAction);
-		#endregion
-		#region Configure the GasStation table
-		modelBuilder.Entity<GasStation>().ToTable("GasStation");
+        modelBuilder.Entity<CarHistoryFuel>()
+            .HasOne(b => b.OperatorModify)
+            .WithMany()
+            .HasForeignKey(b => b.OperatorModifyId)
+            .OnDelete(DeleteBehavior.NoAction);
 
-		modelBuilder.Entity<GasStation>()
-			.HasOne(b => b.OperatorCreate)
-			.WithMany()
-			.HasForeignKey(b => b.OperatorCreateId)
-			.IsRequired()
-			.OnDelete(DeleteBehavior.NoAction);
+        modelBuilder.Entity<CarHistoryFuel>()
+            .HasOne(b => b.GasStation)
+            .WithMany(a => a.Fuels);
 
-		modelBuilder.Entity<GasStation>()
-			.HasOne(b => b.OperatorModify)
-			.WithMany()
-			.HasForeignKey(b => b.OperatorModifyId)
-			.OnDelete(DeleteBehavior.NoAction);
+        modelBuilder.Entity<CarHistoryFuel>()
+            .Property(c => c.CostPerLitr)
+            .HasColumnType("decimal(18,2)");
 
-		modelBuilder.Entity<GasStation>()
-			.HasMany(b => b.Fuels)
-			.WithOne(a => a.GasStation);
-		#endregion
-		#region Configure the Mechanic table
-		modelBuilder.Entity<Mechanic>().ToTable("Mechanic");
+        modelBuilder.Entity<CarHistoryFuel>()
+            .Property(c => c.Cost)
+            .HasColumnType("decimal(18,2)");
 
-		modelBuilder.Entity<Mechanic>()
-			.HasOne(b => b.OperatorCreate)
-			.WithMany()
-			.HasForeignKey(b => b.OperatorCreateId)
-			.IsRequired()
-			.OnDelete(DeleteBehavior.NoAction);
+        modelBuilder.Entity<CarHistoryFuel>()
+            .HasOne(b => b.Car)
+            .WithMany(a => a.Fuels)
+            .HasForeignKey(b => b.CarId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.NoAction);
+    }
 
-		modelBuilder.Entity<Mechanic>()
-			.HasOne(b => b.OperatorModify)
-			.WithMany()
-			.HasForeignKey(b => b.OperatorModifyId)
-			.OnDelete(DeleteBehavior.NoAction);
+    private void ConfigureCarHistoryRepairTable(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<CarHistoryRepair>().ToTable("CarHistoryRepair");
 
-		modelBuilder.Entity<Mechanic>()
-			.HasMany(b => b.Repair)
-			.WithOne(a => a.Mechanic);
-		#endregion
-	}
+        modelBuilder.Entity<CarHistoryRepair>()
+            .Property(c => c.Cost)
+            .HasColumnType("decimal(18,2)");
+
+        modelBuilder.Entity<CarHistoryRepair>()
+            .HasOne(b => b.OperatorCreate)
+            .WithMany()
+            .HasForeignKey(b => b.OperatorCreateId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<CarHistoryRepair>()
+            .HasOne(b => b.OperatorModify)
+            .WithMany()
+            .HasForeignKey(b => b.OperatorModifyId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<CarHistoryRepair>()
+            .HasOne(b => b.Mechanic)
+            .WithMany(a => a.Repair)
+            .HasForeignKey(b => b.MechanicId);
+
+        modelBuilder.Entity<CarHistoryRepair>()
+            .HasOne(b => b.Car)
+            .WithMany(a => a.CarHistoryRepair)
+            .HasForeignKey(b => b.CarId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.NoAction);
+    }
+
+    private void ConfigureGasStationTable(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<GasStation>().ToTable("GasStation");
+
+        modelBuilder.Entity<GasStation>()
+            .HasOne(b => b.OperatorCreate)
+            .WithMany()
+            .HasForeignKey(b => b.OperatorCreateId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<GasStation>()
+            .HasOne(b => b.OperatorModify)
+            .WithMany()
+            .HasForeignKey(b => b.OperatorModifyId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<GasStation>()
+            .HasMany(b => b.Fuels)
+            .WithOne(a => a.GasStation);
+    }
+
+    private void ConfigureMechanicTable(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Mechanic>().ToTable("Mechanic");
+
+        modelBuilder.Entity<Mechanic>()
+            .HasOne(b => b.OperatorCreate)
+            .WithMany()
+            .HasForeignKey(b => b.OperatorCreateId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<Mechanic>()
+            .HasOne(b => b.OperatorModify)
+            .WithMany()
+            .HasForeignKey(b => b.OperatorModifyId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<Mechanic>()
+            .HasMany(b => b.Repair)
+            .WithOne(a => a.Mechanic);
+    }
 }
+

@@ -53,7 +53,7 @@ else
     connection = Environment.GetEnvironmentVariable("Connection");
 }
 
-builder.Services.AddDbContext<ValhallaComtext>(options =>
+builder.Services.AddDbContext<ValhallaContext>(options =>
     options.UseSqlServer(connection));
 
 var app = builder.Build();
@@ -82,7 +82,7 @@ try
 {
     using (var scope = app.Services.CreateScope())
     {
-        var dbContext = scope.ServiceProvider.GetRequiredService<ValhallaComtext>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ValhallaContext>();
         dbContext.Database.Migrate();
     }
 }

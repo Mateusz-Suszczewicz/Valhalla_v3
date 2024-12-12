@@ -11,7 +11,7 @@ using Valhalla_v3.Database;
 
 namespace Valhalla_v3.Migrations
 {
-    [DbContext(typeof(ValhallaComtext))]
+    [DbContext(typeof(ValhallaContext))]
     [Migration("20241124145355_AddDateToCar")]
     partial class AddDateToCar
     {

@@ -10,8 +10,8 @@ using Valhalla_v3.Database;
 
 namespace Valhalla_v3.Migrations
 {
-    [DbContext(typeof(ValhallaComtext))]
-    partial class ValhallaComtextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(ValhallaContext))]
+    partial class ValhallaContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {

@@ -18,9 +18,9 @@ public interface ICommentService
 
 public class CommentService : ICommentService
 {
-    private readonly ValhallaComtext _context;
+    private readonly ValhallaContext _context;
 
-    public CommentService(ValhallaComtext context)
+    public CommentService(ValhallaContext context)
     {
         _context = context;
     }
