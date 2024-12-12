@@ -18,18 +18,42 @@ public class RepairController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<CarHistoryRepair>>> Get()
     {
-        return await _carHistoryRepairService.Get();
+        try
+        {
+            var repairs = await _carHistoryRepairService.Get();
+            if (repairs == null || !repairs.Any())
+                return NoContent(); 
+
+            return Ok(repairs); 
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+            return StatusCode(500, new { message = "An unexpected error occurred while retrieving repair history." });
+        }
     }
 
     [HttpPost]
-    public async Task<ActionResult> Create([FromBody] CarHistoryRepair fuel)
+    public async Task<ActionResult> Create([FromBody] CarHistoryRepair repair)
     {
-        if (fuel == null)
+        if (repair == null)
         {
-            return BadRequest();
+            return BadRequest(new { message = "Repair object cannot be null." });
         }
-        var id = await _carHistoryRepairService.Create(fuel);
 
-        return CreatedAtAction("Create", id);
+        try
+        {
+            var id = await _carHistoryRepairService.Create(repair);
+            return CreatedAtAction(nameof(Create), new { id }, repair); 
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+            return StatusCode(500, new { message = "An unexpected error occurred while creating the repair history." });
+        }
     }
 }

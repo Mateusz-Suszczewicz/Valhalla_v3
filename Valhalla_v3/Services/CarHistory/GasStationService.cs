@@ -1,93 +1,107 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Net;
-using System.Web.Http;
 using Valhalla_v3.Database;
 using Valhalla_v3.Shared.CarHistory;
-using static System.Collections.Specialized.BitVector32;
 
 namespace Valhalla_v3.Services.CarHistory;
 
 public interface IGasStationService
 {
-	public Task<int> Create(GasStation station);
-	public Task<GasStation> Get(int id);
-	public Task<List<GasStation>> Get();
-	public Task Update(GasStation station);
-	public Task Delete(int id);
+	Task<int> Create(GasStation station);
+	Task<GasStation> Get(int id);
+	Task<List<GasStation>> Get();
+	Task Update(GasStation station);
+	Task Delete(int id);
 }
 
 public class GasStationService : IGasStationService
 {
-	private readonly ValhallaComtext _context;
+    private readonly ValhallaComtext _context;
 
-	public GasStationService(ValhallaComtext context) 
-	{
-		_context = context;
-	}
+    public GasStationService(ValhallaComtext context)
+    {
+        _context = context;
+    }
 
-	public async Task<int> Create(GasStation station)
-	{ 
-		if (station.Id != 0)
-			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
-		station.DateTimeAdd = DateTime.Now;
-		station.DateTimeModify = DateTime.Now;
-		_context.AddAsync(station);
-		await _context.SaveChangesAsync();
-		return station.Id;
-	}
+    public async Task<int> Create(GasStation station)
+    {
+        if (station == null)
+            throw new ArgumentNullException(nameof(station), "Station object cannot be null.");
 
-	public async Task Delete(int id)
-	{
-		if (id == 0)
-			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
+        if (station.Id != 0)
+            throw new ArgumentException("Station ID must be 0 for a new entry.");
 
-		var station = _context.GasStations.First(x => x.Id == id);
+        station.DateTimeAdd = DateTime.Now;
+        station.DateTimeModify = DateTime.Now;
 
-		if(station == null)
-			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.InternalServerError));
+        await _context.GasStations.AddAsync(station);
+        await _context.SaveChangesAsync();
 
-		_context.GasStations.Remove(station);
-		await _context.SaveChangesAsync();
-	}
+        return station.Id;
+    }
 
-	public async Task<GasStation> Get(int id)
-	{
-		if (id == 0)
-			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
+    public async Task Delete(int id)
+    {
+        if (id <= 0)
+            throw new ArgumentException("Invalid ID. ID must be greater than zero.");
 
-		var station = await _context.GasStations
+        var station = await _context.GasStations.FirstOrDefaultAsync(x => x.Id == id);
+
+        if (station == null)
+            throw new KeyNotFoundException($"Gas station with ID {id} not found.");
+
+        _context.GasStations.Remove(station);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task<GasStation> Get(int id)
+    {
+        if (id <= 0)
+            throw new ArgumentException("Invalid ID. ID must be greater than zero.");
+
+        var station = await _context.GasStations
             .Include(x => x.OperatorCreate)
-            .Include(x => x.OperatorModify).FirstOrDefaultAsync(x => x.Id == id);
+            .Include(x => x.OperatorModify)
+            .FirstOrDefaultAsync(x => x.Id == id);
 
-		return station;
-	}
+        if (station == null)
+            throw new KeyNotFoundException($"Gas station with ID {id} not found.");
 
-	public async Task<List<GasStation>> Get()
-	{
-		var StationList = await _context.GasStations
-			.Include(x => x.OperatorCreate)
-			.Include(x => x.OperatorModify)
-			.ToListAsync();
+        return station;
+    }
 
-		return StationList;
-	}
+    public async Task<List<GasStation>> Get()
+    {
+        var stationList = await _context.GasStations
+            .Include(x => x.OperatorCreate)
+            .Include(x => x.OperatorModify)
+            .ToListAsync();
 
-	public async Task Update(GasStation station)
-	{
-		if (station.Id != 0)
-			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
+        return stationList ?? new List<GasStation>();
+    }
 
-		var Oldstation = _context.GasStations.First(x => x.Id == station.Id);
-		if (Oldstation == null)
-			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
-		Oldstation.Street = station.Street;
-		Oldstation.StreetNumber = station.StreetNumber;
-		Oldstation.PostalCode = station.PostalCode;
-		Oldstation.City = station.City;
-		Oldstation.Country = station.Country;
-		Oldstation.Phone1 = station.Phone1;
-		Oldstation.Phone2 = station.Phone2;
-		Oldstation.DateTimeModify = DateTime.Now;
-		await _context.SaveChangesAsync();
-	}
+    public async Task Update(GasStation station)
+    {
+        if (station == null)
+            throw new ArgumentNullException(nameof(station), "Station object cannot be null.");
+
+        if (station.Id <= 0)
+            throw new ArgumentException("Invalid ID. ID must be greater than zero.");
+
+        var existingStation = await _context.GasStations.FirstOrDefaultAsync(x => x.Id == station.Id);
+
+        if (existingStation == null)
+            throw new KeyNotFoundException($"Gas station with ID {station.Id} not found.");
+
+        existingStation.Street = station.Street;
+        existingStation.StreetNumber = station.StreetNumber;
+        existingStation.PostalCode = station.PostalCode;
+        existingStation.City = station.City;
+        existingStation.Country = station.Country;
+        existingStation.Phone1 = station.Phone1;
+        existingStation.Phone2 = station.Phone2;
+        existingStation.DateTimeModify = DateTime.Now;
+
+        await _context.SaveChangesAsync();
+    }
 }
+

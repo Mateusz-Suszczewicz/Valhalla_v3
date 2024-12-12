@@ -42,9 +42,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         // Simulate asynchronous loading to demonstrate streaming rendering
-        opers = _operService.Get();
-        
-    
+        opers = await _operService.Get();
     }
 
     private class WeatherForecast

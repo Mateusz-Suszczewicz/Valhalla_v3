@@ -9,77 +9,96 @@ namespace Valhalla_v3.Services.ToDo;
 
 public interface ICommentService
 {
-	public Task<int> Create(Comment comment);
-	public Comment Get(int id);
-	public List<Comment> Get();
-	public Task Update(Comment comment);
-	public Task Delete(int id);
+	Task<int> Create(Comment comment);
+	Task<Comment> Get(int id);
+	Task<List<Comment>> Get();
+	Task Update(Comment comment);
+	Task Delete(int id);
 }
 
 public class CommentService : ICommentService
 {
-	private readonly ValhallaComtext _context;
+    private readonly ValhallaComtext _context;
 
-	public CommentService(ValhallaComtext context) 
-	{
-		_context = context;
-	}
+    public CommentService(ValhallaComtext context)
+    {
+        _context = context;
+    }
 
-	public async Task<int> Create(Comment comment)
-	{
-		if (comment.Id != 0)
-			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
-		comment.DateTimeAdd = DateTime.Now;
-		comment.DateTimeModify = DateTime.Now;
-		_context.AddAsync(comment);
-		await _context.SaveChangesAsync();
-		return comment.Id;
-	}
+    public async Task<int> Create(Comment comment)
+    {
+        if (comment == null)
+            throw new ArgumentNullException(nameof(comment), "Comment object cannot be null.");
 
-	public async Task Delete(int id)
-	{
-		if (id == 0)
-			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
+        if (comment.Id != 0)
+            throw new ArgumentException("Comment ID must be 0 for a new entry.");
 
-		var comment = _context.Comment.First(x => x.Id == id);
+        comment.DateTimeAdd = DateTime.Now;
+        comment.DateTimeModify = DateTime.Now;
 
-		if(comment == null)
-			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.InternalServerError));
+        await _context.Comment.AddAsync(comment);
+        await _context.SaveChangesAsync();
 
-		_context.Comment.Remove(comment);
-		await _context.SaveChangesAsync();
-	}
+        return comment.Id;
+    }
 
-	public Comment Get(int id)
-	{
-		if (id == 0)
-			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
+    public async Task Delete(int id)
+    {
+        if (id <= 0)
+            throw new ArgumentException("Invalid ID. ID must be greater than zero.");
 
-		var comment = Get().Find(x => x.Id == id);
+        var comment = await _context.Comment.FirstOrDefaultAsync(x => x.Id == id);
 
-		return comment;
-	}
+        if (comment == null)
+            throw new KeyNotFoundException($"Comment with ID {id} not found.");
 
-	public List<Comment> Get()
-	{
-		var CommentList = _context.Comment
-			.Include(x => x.OperatorCreate)
-			.Include(x => x.OperatorModify)
-			.ToList();
+        _context.Comment.Remove(comment);
+        await _context.SaveChangesAsync();
+    }
 
-		return CommentList;
-	}
+    public async Task<Comment> Get(int id)
+    {
+        if (id <= 0)
+            throw new ArgumentException("Invalid ID. ID must be greater than zero.");
 
-	public async Task Update(Comment comment)
-	{
-		if (comment.Id != 0)
-			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
+        var comment = await _context.Comment
+            .Include(x => x.OperatorCreate)
+            .Include(x => x.OperatorModify)
+            .FirstOrDefaultAsync(x => x.Id == id);
 
-		var Oldcomment = _context.Comment.First(x => x.Id == comment.Id);
-		if (Oldcomment == null)
-			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
-		Oldcomment.Content = comment.Content;
-		Oldcomment.DateTimeModify = DateTime.Now;
-		await _context.SaveChangesAsync();
-	}
+        if (comment == null)
+            throw new KeyNotFoundException($"Comment with ID {id} not found.");
+
+        return comment;
+    }
+
+    public async Task<List<Comment>> Get()
+    {
+        var commentList = await _context.Comment
+            .Include(x => x.OperatorCreate)
+            .Include(x => x.OperatorModify)
+            .ToListAsync();
+
+        return commentList ?? new List<Comment>();
+    }
+
+    public async Task Update(Comment comment)
+    {
+        if (comment == null)
+            throw new ArgumentNullException(nameof(comment), "Comment object cannot be null.");
+
+        if (comment.Id <= 0)
+            throw new ArgumentException("Invalid ID. ID must be greater than zero.");
+
+        var existingComment = await _context.Comment.FirstOrDefaultAsync(x => x.Id == comment.Id);
+
+        if (existingComment == null)
+            throw new KeyNotFoundException($"Comment with ID {comment.Id} not found.");
+
+        existingComment.Content = comment.Content;
+        existingComment.DateTimeModify = DateTime.Now;
+
+        await _context.SaveChangesAsync();
+    }
 }
+

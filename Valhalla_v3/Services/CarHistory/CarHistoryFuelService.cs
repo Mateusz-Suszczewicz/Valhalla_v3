@@ -1,6 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Net;
-using System.Web.Http;
 using Valhalla_v3.Database;
 using Valhalla_v3.Shared.CarHistory;
 
@@ -8,93 +6,102 @@ namespace Valhalla_v3.Services.CarHistory;
 
 public interface ICarHistoryFuelService
 {
-	public Task<int> Create(CarHistoryFuel fuel);
-	public Task<CarHistoryFuel> Get(int id);
-	public Task<List<CarHistoryFuel>> Get();
-	public Task Update(CarHistoryFuel fuel);
-	public Task Delete(int id);
+    Task<int> Create(CarHistoryFuel fuel);
+    Task<CarHistoryFuel> Get(int id);
+    Task<List<CarHistoryFuel>> Get();
+    Task Update(CarHistoryFuel fuel);
+    Task Delete(int id);
 }
 
-public class CarHistoryFuelService: ICarHistoryFuelService
+public class CarHistoryFuelService : ICarHistoryFuelService
 {
-	private readonly ValhallaComtext _context;
+    private readonly ValhallaComtext _context;
 
-	public CarHistoryFuelService(ValhallaComtext context)
-	{
-		_context = context;
-	}
+    public CarHistoryFuelService(ValhallaComtext context)
+    {
+        _context = context;
+    }
 
-	public async Task<int> Create(CarHistoryFuel fuel)
-	{
-		if (fuel.Id != 0)
-			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
-		fuel.DateTimeAdd = DateTime.Now;
-		fuel.DateTimeModify = DateTime.Now;
-		_context.AddAsync(fuel);
-		try
-		{
-			await _context.SaveChangesAsync();
-		}
-		catch(Exception ex)
-		{
-			throw ex;
-		}
-		return fuel.Id;
-	}
+    public async Task<int> Create(CarHistoryFuel fuel)
+    {
+        if (fuel == null)
+            throw new ArgumentNullException(nameof(fuel), "Fuel object cannot be null.");
 
-	public async Task Delete(int id)
-	{
-		if (id == 0)
-			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
+        if (fuel.Id != 0)
+            throw new ArgumentException("Fuel ID must be 0 for a new entry.");
 
-		var fuel = _context.CarHistoryFuels.First(x => x.Id == id);
+        fuel.DateTimeAdd = DateTime.Now;
+        fuel.DateTimeModify = DateTime.Now;
 
-		if (fuel == null)
-			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.InternalServerError));
+        await _context.CarHistoryFuels.AddAsync(fuel);
+        await _context.SaveChangesAsync();
 
-		_context.CarHistoryFuels.Remove(fuel);
-		await _context.SaveChangesAsync();
-	}
+        return fuel.Id;
+    }
 
-	public async Task<CarHistoryFuel> Get(int id)
-	{
-		if (id == 0)
-			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
+    public async Task Delete(int id)
+    {
+        if (id <= 0)
+            throw new ArgumentException("Invalid ID. ID must be greater than zero.");
 
-		var fuel = await _context.CarHistoryFuels
-			.Include(x => x.OperatorCreate)
-			.Include(x => x.OperatorModify)
-			.Include(x => x.GasStation)
-			.FirstOrDefaultAsync(x => x.Id == id);
+        var fuel = await _context.CarHistoryFuels.FirstOrDefaultAsync(x => x.Id == id);
+
+        if (fuel == null)
+            throw new KeyNotFoundException($"Fuel with ID {id} not found.");
+
+        _context.CarHistoryFuels.Remove(fuel);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task<CarHistoryFuel> Get(int id)
+    {
+        if (id <= 0)
+            throw new ArgumentException("Invalid ID. ID must be greater than zero.");
+
+        var fuel = await _context.CarHistoryFuels
+            .Include(x => x.OperatorCreate)
+            .Include(x => x.OperatorModify)
+            .Include(x => x.GasStation)
+            .FirstOrDefaultAsync(x => x.Id == id);
+
+        if (fuel == null)
+            throw new KeyNotFoundException($"Fuel with ID {id} not found.");
 
         return fuel;
-	}
+    }
 
-	public async Task<List<CarHistoryFuel>> Get()
-	{
-		var FuelList = await _context.CarHistoryFuels
-			.Include(x => x.OperatorCreate)
-			.Include(x => x.OperatorModify)
-			.Include(x => x.GasStation)
-			.ToListAsync();
+    public async Task<List<CarHistoryFuel>> Get()
+    {
+        var fuelList = await _context.CarHistoryFuels
+            .Include(x => x.OperatorCreate)
+            .Include(x => x.OperatorModify)
+            .Include(x => x.GasStation)
+            .ToListAsync();
 
-		return FuelList;
-	}
+        return fuelList ?? new List<CarHistoryFuel>();
+    }
 
-	public async Task Update(CarHistoryFuel fuel)
-	{
-		if (fuel.Id != 0)
-			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
+    public async Task Update(CarHistoryFuel fuel)
+    {
+        if (fuel == null)
+            throw new ArgumentNullException(nameof(fuel), "Fuel object cannot be null.");
 
-		var Oldfuel = _context.CarHistoryFuels.First(x => x.Id == fuel.Id);
-		if (Oldfuel == null)
-			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
-		Oldfuel.Mileage = fuel.Mileage;
-		Oldfuel.Date = fuel.Date;
-		Oldfuel.Cost = fuel.Cost;
-		Oldfuel.CostPerLitr = fuel.CostPerLitr;
-		Oldfuel.GasStation = fuel.GasStation;
-		Oldfuel.DateTimeModify = DateTime.Now;
-		await _context.SaveChangesAsync();
-	}
+        if (fuel.Id <= 0)
+            throw new ArgumentException("Invalid ID. ID must be greater than zero.");
+
+        var existingFuel = await _context.CarHistoryFuels.FirstOrDefaultAsync(x => x.Id == fuel.Id);
+
+        if (existingFuel == null)
+            throw new KeyNotFoundException($"Fuel with ID {fuel.Id} not found.");
+
+        existingFuel.Mileage = fuel.Mileage;
+        existingFuel.Date = fuel.Date;
+        existingFuel.Cost = fuel.Cost;
+        existingFuel.CostPerLitr = fuel.CostPerLitr;
+        existingFuel.GasStation = fuel.GasStation;
+        existingFuel.DateTimeModify = DateTime.Now;
+
+        await _context.SaveChangesAsync();
+    }
 }
+

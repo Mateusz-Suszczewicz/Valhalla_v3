@@ -5,6 +5,20 @@ using Valhalla_v3.Shared.ToDo;
 
 namespace Valhalla_v3.Database;
 
+public interface IValhallaContext
+{
+    DbSet<Operator> Operator { get; set; }
+    DbSet<Comment> Comment { get; set; }
+    DbSet<Job> Job { get; set; }
+    DbSet<Project> Project { get; set; }
+    DbSet<Car> Car { get; set; }
+    DbSet<CarHistoryFuel> CarHistoryFuels { get; set; }
+    DbSet<CarHistoryRepair> CarHistoryRepairs { get; set; }
+    DbSet<GasStation> GasStations { get; set; }
+    DbSet<Mechanic> Mechanics { get; set; }
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+}
+
 public class ValhallaComtext : DbContext
 {
     public DbSet<Operator> Operator { get; set; }
