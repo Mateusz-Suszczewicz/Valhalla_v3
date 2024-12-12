@@ -24,48 +24,47 @@
             <li class="nav-item">
                 <a class="nav-link @(activeTab == Tabs.Statystic ? "active" : "")" @onclick="() => SelectTab(Tabs.Statystic)">Statystyki</a>
             </li>
-
         </ul>
     </div>
     
-    @if(activeTab == Tabs.Details)
+    @if (activeTab == Tabs.Details)
     {
-        <div class="row mt-3"> @*Pierwsza linia*@
+        <div class="row mt-3">
             <div class="col-md-4 mb-4">
                 <div class="form-floating">
-                    <input type="text" disabled="@IsDisabled" class="form-control" id="InTextMarka" @bind-value="@car.Brand">
+                    <input type="text" class="form-control" disabled="@isDisabled" id="InTextMarka" @bind-value="car.Brand"/>
                     <label for="InTextMarka">Marka</label>
                 </div>
             </div>
             <div class="col-md-4 mb-4">
                 <div class="form-floating">
-                    <input type="text" disabled="@IsDisabled" class="form-control" id="InTextModel" @bind-value="@car.Model">
+                    <input type="text" class="form-control" disabled="@isDisabled" id="InTextModel" @bind-value="car.Model"/>
                     <label for="InTextModel">Model</label>
                 </div>
             </div>
             <div class="col-md-4 mb-4">
                 <div class="form-floating">
-                    <input type="number" disabled="@IsDisabled" class="form-control" id="InNumRokProdukcji" @bind-value="@car.Year">
+                    <input type="number" class="form-control" disabled="@isDisabled" id="InNumRokProdukcji" @bind-value="car.Year">
                     <label for="InNumRokProdukcji">Rok produkcji</label>
                 </div>
             </div>
         </div>
-        <div class="row">@*Druga linia*@
+        <div class="row">
             <div class="col-md-4 mb-4">
                 <div class="form-floating">
-                    <input type="number" disabled="@IsDisabled" class="form-control" id="InNumEngineCC" @bind-value="@car.EngineCC">
+                    <input type="number" class="form-control" disabled="@isDisabled" id="InNumEngineCC" @bind-value="car.EngineCC">
                     <label for="InNumEngineCC">Pojemność silnika</label>
                 </div>
             </div>
             <div class="col-md-4 mb-4">
                 <div class="form-floating">
-                    <input type="text" disabled="@IsDisabled" class="form-control" id="InTextVin" @bind-value="@car.VIN">
+                    <input type="text" class="form-control" disabled="@isDisabled" id="InTextVin" @bind-value="car.VIN">
                     <label for="InTextVin">VIN</label>
                 </div>
             </div>
             <div class="col-md-4 mb-4">
                 <div class="form-floating">
-                    <input type="number" class="form-control" disabled id="InNumPrzebieg" @bind-value="@mileage">
+                    <input type="number" class="form-control" disabled id="InNumPrzebieg" @bind-value="mileage">
                     <label for="InNumPrzebieg">Aktualny przebieg</label>
                 </div>
             </div>
@@ -78,13 +77,13 @@
             </ul>
             <div class="col-md-4 mb-4 mt-3">
                 <div class="form-floating">
-                    <input type="date" disabled="@IsDisabled" class="form-control" id="InDateDataUbezp" @bind-value="@car.InsuranceDate">
+                    <input type="date" disabled="@isDisabled" class="form-control" id="InDateDataUbezp" @bind-value="@car.InsuranceDate">
                     <label for="InDateDataUbezp">Data ważności</label>
                 </div>
             </div>
             <div class="col-md-4 mb-4 mt-3">
                 <div class="form-floating">
-                    <input type="number" disabled="@IsDisabled" class="form-control" id="InNumCost" @bind-value="@car.InsuranceCost">
+                    <input type="number" disabled="@isDisabled" class="form-control" id="InNumCost" @bind-value="@car.InsuranceCost">
                     <label for="InNumCost">Koszt osatniego ubezpieczenia</label>
                 </div>
             </div>
@@ -97,99 +96,95 @@
             </ul>
             <div class="col-md-4 mb-4 mt-3">
                 <div class="form-floating">
-                    <input type="date" disabled="@IsDisabled" class="form-control" id="InDateDataPrzegladu" @bind-value="@car.SurveyDate">
+                    <input type="date" disabled="@isDisabled" class="form-control" id="InDateDataPrzegladu" @bind-value="@car.SurveyDate">
                     <label for="InDateDataPrzegladu">Data ostatniego przeglądu</label>
                 </div>
             </div>
             <div class="col-md-4 mb-4 mt-3">
                 <div class="form-floating">
-                    <input type="number" disabled="@IsDisabled" class="form-control" id="InNumCostPrzglad" @bind-value="@car.SurveyCost">
+                    <input type="number" disabled="@isDisabled" class="form-control" id="InNumCostPrzglad" @bind-value="@car.SurveyCost">
                     <label for="InNumCostPrzglad">Koszt osatniego przeglądu</label>
                 </div>
             </div>
         </div>
     }
 
-    @if(activeTab == Tabs.Statystic)
+    @if (activeTab == Tabs.Statystic)
     {
         <div class="row mt-3">
-            @*Pierwsza linia*@
             <div class="col-md-4 mb-4">
                 <div class="form-floating">
-                    <input type="number" class="form-control" disabled id="InNumCostFuel" @bind-value="@FuelCost">
+                    <input type="number" class="form-control" disabled id="InNumCostFuel" @bind-value="@fuelCost">
                     <label for="InNumCostFuel">Koszt tankowania</label>
                 </div>
             </div>
             <div class="col-md-4 mb-4">
                 <div class="form-floating">
-                    <input type="number" class="form-control" disabled id="InNumCostRepair" @bind-value="@RepairCost">
+                    <input type="number" class="form-control" disabled id="InNumCostRepair" @bind-value="@repairCost">
                     <label for="InNumCostRepair">Koszt napraw</label>
                 </div>
             </div>
             <div class="col-md-4 mb-4">
                 <div class="form-floating">
-                    <input type="number" class="form-control" disabled id="InNumCostSum" @bind-value="@SumCost">
+                    <input type="number" class="form-control" disabled id="InNumCostSum" @bind-value="@sumCost">
                     <label for="InNumCostSum">Koszt łączny</label>
                 </div>
             </div>
         </div>
         <div class="row mt-3">
-            @*Druga linia*@
             <div class="col-md-4 col-sm-1 mb-4 text-color-white">
-                 <LineChart @ref="lineChart1"/>
+                <LineChart @ref="lineCharts[0]" />
             </div>
             <div class="col-md-4 col-sm-1 mb-4 text-color-white">
-                 <LineChart @ref="lineChart2"/>
+                <LineChart @ref="lineCharts[1]" />
             </div>
             <div class="col-md-4 col-sm-1 mb-4 text-color-white">
-                <LineChart @ref="lineChart3" />
+                <LineChart @ref="lineCharts[2]" />
             </div>
         </div>
         <div class="row mt-3">
-            @*Trzecia linia*@
             <div class="col-md-4 col-sm-1 mb-4 text-color-white">
-                <LineChart @ref="lineChart4" />
+                <LineChart @ref="lineCharts[3]" />
             </div>
             <div class="col-md-4 col-sm-1 mb-4 text-color-white">
-                <LineChart @ref="lineChart5" />
+                <LineChart @ref="lineCharts[4]" />
             </div>
         </div>
     }
 </div>
-@* Modal dodanie paliwa *@
-<div class="modal fade @(isFuelOpen ? "show" : "")" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display:@(isFuelOpen ? "block" : "none");">
+
+<div class="modal fade @(isFuelOpen ? "show" : "")" tabindex="-1" style="display:@(isFuelOpen ? "block" : "none");">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header modal-header-moje">
-                <h5 class="modal-title" id="exampleModalLabel">Tankowanie</h5>
+            <div class="modal-header">
+                <h5 class="modal-title">Tankowanie</h5>
                 <button type="button" class="btn-close" @onclick="CloseFuel"></button>
             </div>
-            <div class="modal-body modal-body-moje">
-                <FuelAddModal OnFormFuelSubmit="HandleFuelSubmit" />
+            <div class="modal-body">
+                <FuelAddModal OnFormFuelSubmit="@(model => HandleSubmitAsync<CarHistoryFuel>("api/Fuel", model))" />
             </div>
         </div>
     </div>
 </div>
 
-@* Modal dodanie napraw *@
-<div class="modal fade @(isRapairOpen ? "show" : "")" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display:@(isRapairOpen ? "block" : "none");">
+<div class="modal fade @(isRepairOpen ? "show" : "")" tabindex="-1" style="display:@(isRepairOpen ? "block" : "none");">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header modal-header-moje">
-                <h5 class="modal-title" id="exampleModalLabel">Naprawa</h5>
+            <div class="modal-header">
+                <h5 class="modal-title">Naprawa</h5>
                 <button type="button" class="btn-close" @onclick="CloseRepair"></button>
             </div>
-            <div class="modal-body modal-body-moje">
-                <RapairAddModel OnFormSubmit="HandleRepairSubmit" />
+            <div class="modal-body">
+                <RepairAddModal OnFormSubmit="@(model => HandleSubmitAsync<CarHistoryRepair>("api/Fuel", model))" />
             </div>
         </div>
     </div>
 </div>
 
-<ChoicModal SubmitChoice="Delete" Question="Czy chcesz usunąć samochód?" isChoiceOpen=@isChoiceOpen/>
+<ChoiceModal SubmitChoice="DeleteAsync" Question="Czy chcesz usunąć samochód?" isChoiceOpen="@isChoiceOpen" />
 
 <div class="fixed-buttons">
-    <button class="btn btn-success" style="display: @(IsDisabled ? "none":"block")" @onclick=Save>Zapisz</button>
-    <button class="btn btn-primary" style="display: @(Id == "0" ? "none":"block")" @onclick=EditModal>Edytuj</button>
-    <button class="btn btn-danger" style="display: @(Id == "0" ? "none":"block")" @onclick=ChoiceModal>Usuń</button>
+    <button class="btn btn-success" style="display: @(isDisabled ? "none" : "block")" @onclick="SaveAsync">Zapisz</button>
+    <button class="btn btn-primary" style="display: @(Id == "0" ? "none" : "block")" @onclick="EditModal">Edytuj</button>
+    <button class="btn btn-danger" style="display: @(Id == "0" ? "none" : "block")" @onclick="ChoiceModal">Usuń</button>
 </div>

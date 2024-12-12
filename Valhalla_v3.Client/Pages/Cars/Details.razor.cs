@@ -1,6 +1,7 @@
 ﻿using BlazorBootstrap;
 using Microsoft.AspNetCore.Components;
 using System;
+using System.Drawing;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
@@ -13,269 +14,151 @@ namespace Valhalla_v3.Client.Pages.Cars;
 public partial class Details
 {
     [Parameter]
-    public string Id { get; set; }
+    public string Id { get; set; } = string.Empty;
 
     private Tabs activeTab = Tabs.Details;
-    private Car? car { get; set; }
-    private int mileage { get; set; }
-    private decimal FuelCost { get; set; }
-    private decimal RepairCost { get; set; }
-    private decimal SumCost { get; set; }
-    private bool isFuelOpen = false;
-    private bool isRapairOpen = false;
-    private bool isChoiceOpen = false;
-    private bool IsDisabled = true;
+    private Car? car;
+    private int mileage;
+    private decimal fuelCost;
+    private decimal repairCost;
+    private decimal sumCost;
+    private bool isFuelOpen;
+    private bool isRepairOpen;
+    private bool isChoiceOpen;
+    private bool isDisabled = true;
 
-    private LineChartOptions lineChartOptions = default!;
-    
-    private LineChart lineChart1 = default!;
-    private LineChart lineChart2 = default!;
-    private LineChart lineChart3 = default!;
-    private LineChart lineChart4 = default!;
-    private LineChart lineChart5 = default!;
-    
-    private ChartData chartData1 = default!;
-    private ChartData chartData2 = default!;
-    private ChartData chartData3 = default!;
-    private ChartData chartData4 = default!;
-    private ChartData chartData5 = default!;
-
-    private void reload()
-    {
-        List<string> label = new List<string>()
-        {
-            "Styczeń",
-            "Luty",
-            "Marzec",
-            "Kwieceń",
-            "Maj",
-            "Czerwiec",
-            "Lipiec",
-            "Sierpień",
-            "Wrzesień",
-            "Październik",
-            "Listopad",
-            "Grudzień"
-        };
-        var color1 = ColorUtility.CategoricalTwelveColors[1].ToColor();
-        var color2 = ColorUtility.CategoricalTwelveColors[2].ToColor();
-        var color3 = ColorUtility.CategoricalTwelveColors[3].ToColor();
-        var color4 = ColorUtility.CategoricalTwelveColors[4].ToColor();
-        var color5 = ColorUtility.CategoricalTwelveColors[5].ToColor();
-        lineChartOptions = new() { Responsive = true, Interaction = new Interaction { Mode = InteractionMode.Index } };
-
-        var datasets1 = new List<IChartDataset>() {
-        new LineChartDataset
-        {
-            Label = $"Litry paliwa",
-            Data = CarHelpers.GetFuels(car),
-            BackgroundColor = color1.ToRgbString(),
-            BorderColor = color1.ToRgbString(),
-            BorderWidth = 2,
-            HoverBorderWidth = 4,
-        }};
-        chartData1 = new ChartData { Labels = label, Datasets = datasets1 };
-
-        var datasets2 = new List<IChartDataset>() {
-        new LineChartDataset
-        {
-            Label = $"Koszt paliwa",
-            Data = CarHelpers.GetCostFuels(car),
-            BackgroundColor = color2.ToRgbString(),
-            BorderColor = color2.ToRgbString(),
-            BorderWidth = 2,
-            HoverBorderWidth = 4,
-        }};
-        chartData2 = new ChartData { Labels = label, Datasets = datasets2 };
-
-        var datasets3 = new List<IChartDataset>() {
-        new LineChartDataset
-        {
-            Label = $"Średnie spalanie",
-            Data = CarHelpers.GetAvgBurning(car),
-            BackgroundColor = color3.ToRgbString(),
-            BorderColor = color3.ToRgbString(),
-            BorderWidth = 2,
-            HoverBorderWidth = 4,
-        }};
-        chartData3 = new ChartData { Labels = label, Datasets = datasets3 };
-
-        var datasets4 = new List<IChartDataset>() {
-        new LineChartDataset
-        {
-            Label = $"Przebieg",
-            Data = CarHelpers.GetMileage(car),
-            BackgroundColor = color4.ToRgbString(),
-            BorderColor = color4.ToRgbString(),
-            BorderWidth = 2,
-            HoverBorderWidth = 4,
-        }};
-        chartData4 = new ChartData { Labels = label, Datasets = datasets4 };
-
-        var datasets5 = new List<IChartDataset>() {
-        new LineChartDataset
-        {
-            Label = $"Koszty naprawy",
-            Data = CarHelpers.GetCostRapair(car),
-            BackgroundColor = color5.ToRgbString(),
-            BorderColor = color5.ToRgbString(),
-            BorderWidth = 2,
-            HoverBorderWidth = 4,
-        }};
-        chartData5 = new ChartData { Labels = label, Datasets = datasets5 };
-    }
+    private LineChartOptions lineChartOptions = new();
+    private ChartData[] chartData = new ChartData[5];
+    private LineChart[] lineCharts = new LineChart[5];
 
     protected override async Task OnInitializedAsync()
     {
-        Operator oper = new() { Name = "admin", Id = 3 };
-        car = new() { 
-           OperatorCreateId = 1
-        , OperatorModifyId = 1
-        };
-        if(Id != "0")
-            await LoadCar();
+        car = new Car { OperatorCreateId = 1, OperatorModifyId = 1 };
+
+        if (Id != "0")
+        {
+            await LoadCarAsync();
+        }
         else
-            IsDisabled = false;
-        reload();
+        {
+            isDisabled = false;
+        }
+
+        ReloadCharts();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (lineChart1 != null)
+        if (!firstRender)
         {
-            await lineChart1.InitializeAsync(chartData1, lineChartOptions);
-            await lineChart2.InitializeAsync(chartData2, lineChartOptions);
-            await lineChart3.InitializeAsync(chartData3, lineChartOptions);
-            await lineChart4.InitializeAsync(chartData4, lineChartOptions);
-            await lineChart5.InitializeAsync(chartData5, lineChartOptions);
+            ReloadCharts();
+            for (int i = 0; i < lineCharts.Length; i++)
+            {
+                if (lineCharts[i] != null)
+                {
+                    await lineCharts[i].InitializeAsync(chartData[i], lineChartOptions);
+                }
+            }
         }
         await base.OnAfterRenderAsync(firstRender);
     }
 
-    private async Task SelectTab(Tabs tab)
+    private void ReloadCharts()
     {
-        activeTab = tab;
-        await InvokeAsync(StateHasChanged);
+        var labels = new[]
+        {
+            "Styczeń", "Luty", "Marzec", "Kwieceń", "Maj", "Czerwiec",
+            "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"
+        };
+
+        var colors = ColorUtility.CategoricalTwelveColors;
+
+        chartData[0] = CreateChartData("Litry paliwa", CarHelpers.GetFuels(car), colors[1].ToColor());
+        chartData[1] = CreateChartData("Koszt paliwa", CarHelpers.GetCostFuels(car), colors[2].ToColor());
+        chartData[2] = CreateChartData("Średnie spalanie", CarHelpers.GetAvgBurning(car), colors[3].ToColor());
+        chartData[3] = CreateChartData("Przebieg", CarHelpers.GetMileage(car), colors[4].ToColor());
+        chartData[4] = CreateChartData("Koszty naprawy", CarHelpers.GetCostRapair(car), colors[5].ToColor());
     }
 
-    private async Task LoadCar()
+    private static ChartData CreateChartData(string label, IEnumerable<double?> data, Color color)
+    {
+        return new ChartData
+        {
+            Labels = new List<string>
+            {
+                "Styczeń", "Luty", "Marzec", "Kwieceń", "Maj", "Czerwiec",
+                "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"
+            },
+            Datasets = new List<IChartDataset>
+            {
+                new LineChartDataset
+                {
+                    Label = label,
+                    Data = data.ToList(),
+                    BackgroundColor = color.ToRgbString(),
+                    BorderColor = color.ToRgbString(),
+                    BorderWidth = 2,
+                    HoverBorderWidth = 4
+                }
+            }
+        };
+    }
+
+    private async Task LoadCarAsync()
     {
         try
         {
-            var response = await Http.GetFromJsonAsync<Car>(navigation.ToAbsoluteUri($"api/car/{Id}"));
-            if (response != null)
+            car = await Http.GetFromJsonAsync<Car>(navigation.ToAbsoluteUri($"api/car/{Id}"));
+            if (car != null)
             {
-                car = response;
-                ReloadDate();
+                ReloadCosts();
             }
-
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
         }
     }
-    
-    private void ReloadDate()
+
+    private void ReloadCosts()
     {
-        FuelCost = car.Fuels.Where(x => x.DateTimeModify.Month == DateTime.Now.Month && x.DateTimeModify.Year == DateTime.Now.Year).Sum(x => x.Cost);
-        RepairCost = car.CarHistoryRepair.Where(x => x.Date.Month == DateTime.Now.Month && x.Date.Year == DateTime.Now.Year).Sum(x => x.Cost);
-        SumCost = FuelCost + RepairCost;
-    }
-    
-    void OpenFuel()
-    {
-        isFuelOpen = true;
-        StateHasChanged();
+        if (car != null)
+        {
+            var now = DateTime.Now;
+            fuelCost = car.Fuels.Where(f => f.DateTimeModify.Month == now.Month && f.DateTimeModify.Year == now.Year).Sum(f => f.Cost);
+            repairCost = car.CarHistoryRepair.Where(r => r.Date.Month == now.Month && r.Date.Year == now.Year).Sum(r => r.Cost);
+            sumCost = fuelCost + repairCost;
+        }
     }
 
-    void CloseFuel()
+    private async Task HandleSubmitAsync<T>(string apiEndpoint, T model)
     {
-        isFuelOpen = false;
-        StateHasChanged();
-    }
+        model.GetType().GetProperty("CarId")?.SetValue(model, car?.Id);
+        model.GetType().GetProperty("OperatorCreateId")?.SetValue(model, 1);
+        model.GetType().GetProperty("OperatorModifyId")?.SetValue(model, 1);
 
-    private async void HandleFuelSubmit(CarHistoryFuel model)
-    {
-        model.CarId = car.Id;
-        model.OperatorCreateId = 1;
-        model.OperatorModifyId = 1;
-        var json = JsonSerializer.Serialize(model);
-        var content = new StringContent(json, Encoding.UTF8, "application/json");
         try
         {
-            var response = await Http.PostAsync(navigation.ToAbsoluteUri($"api/Fuel"), content);
+            var content = new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json");
+            var response = await Http.PostAsync(navigation.ToAbsoluteUri(apiEndpoint), content);
             if (response.IsSuccessStatusCode)
             {
-                ReloadDate();
-                CloseFuel();
-
+                ReloadCosts();
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
         }
-
     }
 
-    void OpenRepair()
+    private async Task DeleteAsync(bool confirm)
     {
-        isRapairOpen = true;
-        StateHasChanged();
-    }
+        if (!confirm) return;
 
-    void CloseRepair()
-    {
-        isRapairOpen = false;
-        StateHasChanged();
-    }
-
-    private async void HandleRepairSubmit(CarHistoryRepair model)
-    {
-        model.CarId = car.Id;
-        model.OperatorCreateId = 1;
-        model.OperatorModifyId = 1;
-        var json = JsonSerializer.Serialize(model);
-        var content = new StringContent(json, Encoding.UTF8, "application/json");
         try
         {
-            var response = await Http.PostAsync(navigation.ToAbsoluteUri($"api/Repair"), content);
-            if (response.IsSuccessStatusCode)
-            {
-                ReloadDate();
-                CloseFuel();
-
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-        }
-
-        CloseRepair();
-    }
-
-    private void EditModal()
-    {
-        IsDisabled = !IsDisabled;
-    }
-    
-    private void ChoiceModal()
-    {
-        isChoiceOpen = true;
-    }
-    
-    private async void Delete(bool choic)
-    {
-        if (!choic)
-        {
-            isChoiceOpen = false;
-            return;
-        }
-        try
-        {
-            var response = await Http.DeleteAsync(navigation.ToAbsoluteUri($"api/Car/{car.Id}"));
+            var response = await Http.DeleteAsync(navigation.ToAbsoluteUri($"api/Car/{car?.Id}"));
             if (response.IsSuccessStatusCode)
             {
                 navigation.NavigateTo("/cars");
@@ -287,7 +170,40 @@ public partial class Details
         }
     }
 
-    private async Task Save()
+    private async Task SelectTab(Tabs tab)
+    {
+        if (activeTab != tab)
+        {
+            activeTab = tab;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private void ToggleModal(ref bool modalState, bool newState)
+    {
+        modalState = newState;
+        StateHasChanged();
+    }
+
+    private void OpenFuel() => ToggleModal(ref isFuelOpen, true);
+
+    private void CloseFuel() => ToggleModal(ref isFuelOpen, false);
+
+    private void OpenRepair() => ToggleModal(ref isRepairOpen, true);
+
+    private void CloseRepair() => ToggleModal(ref isRepairOpen, false);
+
+    private void ChoiceModal() => ToggleModal(ref isChoiceOpen, true);
+
+    private void ToggleState(ref bool state)
+    {
+        state = !state;
+        StateHasChanged();
+    }
+
+    private void EditModal() => ToggleState(ref isDisabled);
+
+    private async Task SaveAsync()
     {
         var json = JsonSerializer.Serialize(car);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -296,8 +212,8 @@ public partial class Details
             var response = await Http.PostAsync(navigation.ToAbsoluteUri($"api/Car"), content);
             if (response.IsSuccessStatusCode)
             {
-                var Id = response.Content.ReadFromJsonAsync<int>();
-                navigation.NavigateTo($"cars/{Id.Result}");
+                var Id = await response.Content.ReadFromJsonAsync<int>();
+                navigation.NavigateTo($"cars/{Id}");
             }
         }
         catch (Exception ex)
@@ -306,6 +222,7 @@ public partial class Details
         }
     }
 }
+
 
 public enum Tabs
 {

@@ -6,7 +6,7 @@ using Valhalla_v3.Shared.CarHistory;
 
 namespace Valhalla_v3.Client.Pages.Cars;
 
-public partial class RapairAddModel
+public partial class RepairAddModal
 {
     private CarHistoryRepair formModel = new CarHistoryRepair();
     private List<Mechanic> ListMechanic = new();

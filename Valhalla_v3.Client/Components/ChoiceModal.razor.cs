@@ -2,7 +2,7 @@
 
 namespace Valhalla_v3.Client.Components;
 
-public partial class ChoicModal
+public partial class ChoiceModal
 {
     [Parameter]
     public string Question { get; set; }

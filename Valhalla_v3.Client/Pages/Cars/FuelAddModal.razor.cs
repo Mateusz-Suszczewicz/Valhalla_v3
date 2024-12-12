@@ -14,6 +14,7 @@ public partial class FuelAddModal
     [Parameter]
     public EventCallback<CarHistoryFuel> OnFormFuelSubmit { get; set; }
 
+
     protected override async Task OnInitializedAsync()
     {
         await LoadGaStation();
