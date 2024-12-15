@@ -76,8 +76,8 @@ public partial class JobList
 
     private async Task Create(Job job)
     {
-        job.OperatorCreateId = 3;
-        job.OperatorModifyId = 3;
+        job.OperatorCreateId = 1;
+        job.OperatorModifyId = 1;
         var json = JsonSerializer.Serialize(job);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
         try
@@ -142,8 +142,8 @@ public partial class JobList
         }
         Project project = new Project()
         {
-            OperatorCreateId = 3,
-            OperatorModifyId = 3,
+            OperatorCreateId = 1,
+            OperatorModifyId = 1,
             Name = name
         };
         var json = JsonSerializer.Serialize(project);
