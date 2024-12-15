@@ -28,7 +28,8 @@ public partial class Details
     private bool isRepairOpen;
     private bool isChoiceOpen;
     private bool isDisabled = true;
-
+    private string ErrorMessage;
+    
     private LineChartOptions lineChartOptions = new();
     private ChartData[] chartData = new ChartData[5];
     private LineChart[] lineCharts = new LineChart[5];
@@ -110,33 +111,46 @@ public partial class Details
     {
         try
         {
-            car = await Http.GetFromJsonAsync<Car>(navigation.ToAbsoluteUri($"api/car/{Id}"));
-            if (car != null)
+            var response = await Http.GetAsync(navigation.ToAbsoluteUri($"api/car/{Id}"));
+            if (response.IsSuccessStatusCode)
             {
+                car = await response.Content.ReadFromJsonAsync<Car>();
                 ReloadCosts();
+                ErrorMessage = string.Empty;
+            }
+            else
+            {
+                var errorDetails = await response.Content.ReadAsStringAsync();
+                ErrorMessage = $"Błąd API - {response.StatusCode}: {errorDetails}";
             }
         }
         catch (Exception ex)
         {
+            ErrorMessage = $"Błąd aplikacji: {ex.Message} StackTrace: {ex.StackTrace}";
             Console.WriteLine(ex.Message);
         }
     }
 
     private void ReloadCosts()
     {
-        if (car != null)
+        var now = DateTime.Now;
+        
+        if (car.Fuels.Any())
         {
-            var now = DateTime.Now;
             fuelCost = car.Fuels.Where(f => f.DateTimeModify.Month == now.Month && f.DateTimeModify.Year == now.Year).Sum(f => f.Cost);
+            mileage = car.Fuels.Max(x => x.Mileage);
+        }
+        
+        if (car.CarHistoryRepair.Any())
+        {
             repairCost = car.CarHistoryRepair.Where(r => r.DateTimeModify.Month == now.Month && r.DateTimeModify.Year == now.Year).Sum(r => r.Cost);
-            sumCost = fuelCost + repairCost;
-
-            mileage = car.Fuels.Select(x => x.Mileage).Max();
-            //if(car.CarHistoryRepair.Select(x => x.Mileage).Max() > mileage)
-				mileage = car.CarHistoryRepair.Select(x => x.Mileage).Max();
-            StateHasChanged();
-		}
-    }
+            if(car.CarHistoryRepair.Select(x => x.Mileage).Max() > mileage)
+				mileage = car.CarHistoryRepair.Max(x => x.Mileage);
+        }
+        
+        sumCost = fuelCost + repairCost;
+        StateHasChanged();
+	}
 
     private async Task HandleSubmitAsync<T>(string apiEndpoint, T model)
     {
@@ -160,10 +174,17 @@ public partial class Details
                 isFuelOpen = false;
                 isRepairOpen = false;
                 ReloadCosts();
+                ErrorMessage = string.Empty;
+            }
+            else
+            {
+                var errorDetails = await response.Content.ReadAsStringAsync();
+                ErrorMessage = $"Błąd API - {response.StatusCode}: {errorDetails}";
             }
         }
         catch (Exception ex)
         {
+            ErrorMessage = $"Błąd aplikacji: {ex.Message}; StackTrace: {ex.StackTrace}";
             Console.WriteLine(ex.Message);
         }
     }
@@ -178,10 +199,17 @@ public partial class Details
             if (response.IsSuccessStatusCode)
             {
                 navigation.NavigateTo("/cars");
+                ErrorMessage = string.Empty;
+            }
+            else
+            {
+                var errorDetails = await response.Content.ReadAsStringAsync();
+                ErrorMessage = $"Błąd API - {response.StatusCode}: {errorDetails}";
             }
         }
         catch (Exception ex)
         {
+            ErrorMessage = $"Błąd aplikacji: {ex.Message} StackTrace: {ex.StackTrace}";
             Console.WriteLine(ex.Message);
         }
     }
@@ -230,10 +258,17 @@ public partial class Details
             {
                 var Id = await response.Content.ReadFromJsonAsync<int>();
                 navigation.NavigateTo($"cars/{Id}");
+                ErrorMessage = string.Empty;
+            }
+            else
+            {
+                var errorDetails = await response.Content.ReadAsStringAsync();
+                ErrorMessage = $"Błąd API - {response.StatusCode}: {errorDetails}";
             }
         }
         catch (Exception ex)
         {
+            ErrorMessage = $"Błąd aplikacji: {ex.Message} StackTrace: {ex.StackTrace}";
             Console.WriteLine(ex.Message);
         }
     }

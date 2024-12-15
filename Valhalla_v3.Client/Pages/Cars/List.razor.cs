@@ -6,7 +6,8 @@ namespace Valhalla_v3.Client.Pages.Cars;
 public partial class List
 {
     private List<Car> messages = new();
-    private string error;
+    private string ErrorMessage;
+
     protected override async Task OnInitializedAsync()
     {
         await LoadCars();
@@ -14,17 +15,25 @@ public partial class List
 
     private async Task LoadCars()
     {
+        messages.Clear();
         try
         {
-            var response = await Http.GetFromJsonAsync<List<Car>>(navigation.ToAbsoluteUri("api/car"));
-            if (response != null)
+            var response = await Http.GetAsync(navigation.ToAbsoluteUri("api/car"));
+            if (response.IsSuccessStatusCode)
             {
-                messages.AddRange(response);
+
+                messages = await response.Content.ReadFromJsonAsync<List<Car>>();
+                ErrorMessage =  string.Empty;
+            }
+            else
+            {
+                var errorDetails = await response.Content.ReadAsStringAsync();
+                ErrorMessage = $"Błąd API - {response.StatusCode}: {errorDetails}";
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
-            error = ex.Message;
+            ErrorMessage = $"Błąd aplikacji: {ex.Message} StackTrace: {ex.StackTrace}";
             Console.WriteLine(ex.Message);
         }
     }

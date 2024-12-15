@@ -5,7 +5,12 @@
 @inject NavigationManager navigation
 
 <PageTitle>Samochody</PageTitle>
-
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <div class="alert alert-danger">
+        @ErrorMessage
+    </div>
+}
 <div class="container-fluid text-center">
     <div class="row">
         <h1>Samochody</h1>

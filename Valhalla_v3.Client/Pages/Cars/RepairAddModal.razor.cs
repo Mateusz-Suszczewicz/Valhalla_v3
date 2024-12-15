@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Azure;
+using Microsoft.AspNetCore.Components;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
@@ -11,6 +12,8 @@ public partial class RepairAddModal
     private CarHistoryRepair formModel = new CarHistoryRepair();
     private List<Mechanic> ListMechanic = new();
     private bool isMechanicOpen = false;
+    private string ErrorMessage;
+
     [Parameter]
     public int CarId
     {
@@ -30,19 +33,27 @@ public partial class RepairAddModal
 
     private async Task LoadMechnic()
     {
+        ListMechanic.Clear();
         try
         {
-            var response = await Http.GetFromJsonAsync<List<Mechanic>>(navigation.ToAbsoluteUri($"api/Mechanic"));
-            if (response != null)
+            var response = await Http.GetAsync(navigation.ToAbsoluteUri($"api/Mechanic"));
+            if (response.IsSuccessStatusCode)
             {
-                ListMechanic = response;
-                StateHasChanged();
+                ListMechanic = await response.Content.ReadFromJsonAsync<List<Mechanic>>();
+                ErrorMessage = string.Empty;
+            }
+            else
+            {
+                var errorDetails = await response.Content.ReadAsStringAsync();
+                ErrorMessage = $"Błąd API - {response.StatusCode}: {errorDetails}";
             }
         }
         catch (Exception ex)
         {
+            ErrorMessage = $"Błąd aplikacji: {ex.Message} StackTrace: {ex.StackTrace}";
             Console.WriteLine(ex.Message);
         }
+        
     }
 
     // Obsługa walidacji formularza i wywołanie callbacku
@@ -79,11 +90,17 @@ public partial class RepairAddModal
             {
                 LoadMechnic();
                 CloseStation();
-
+                ErrorMessage = string.Empty;
+            }
+            else
+            {
+                var errorDetails = await response.Content.ReadAsStringAsync();
+                ErrorMessage = $"Błąd API - {response.StatusCode}: {errorDetails}";
             }
         }
         catch (Exception ex)
         {
+            ErrorMessage = $"Błąd aplikacji: {ex.Message} StackTrace: {ex.StackTrace}";
             Console.WriteLine(ex.Message);
         }
         CloseStation();

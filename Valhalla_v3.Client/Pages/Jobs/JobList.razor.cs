@@ -19,6 +19,8 @@ public partial class JobList
     private int projectsId { get; set; }
     private int _id { get; set; }
     private bool? OnlyNoDoneJobs = true;
+    private string ErrorMessage;
+
     protected override async Task OnInitializedAsync()
     {
         LoadJob();
@@ -35,22 +37,26 @@ public partial class JobList
         
         try
         {
-            var response = await Http.GetFromJsonAsync<List<Job>>(navigation.ToAbsoluteUri($"api/job/{queryParam}"));
-            if (response != null)
+            var response = await Http.GetAsync(navigation.ToAbsoluteUri($"api/job/{queryParam}"));
+            if (response.IsSuccessStatusCode)
             {
-                _items.Clear();
-                _items.AddRange(response);
+                _items = await response.Content.ReadFromJsonAsync<List<Job>>();
                 _items = _items.Where(x => x.Term <= DateTime.Now.Date).ToList();
                 if(projectsId != 0)
                     _items = _items.Where(x => x.ProjectId == projectsId).ToList();
                 if((bool)OnlyNoDoneJobs)
                     _items = _items.Where(x => !x.IsCompleted).ToList();
-
+                ErrorMessage = string.Empty;
+            }
+            else
+            {
+                var errorDetails = await response.Content.ReadAsStringAsync();
+                ErrorMessage = $"Błąd API - {response.StatusCode}: {errorDetails}";
             }
         }
         catch (Exception ex)
-
         {
+            ErrorMessage = $"Błąd aplikacji: {ex.Message} StackTrace: {ex.StackTrace}";
             Console.WriteLine(ex.Message);
         }
         StateHasChanged();
@@ -61,16 +67,22 @@ public partial class JobList
         projects.Clear();
         try
         {
-            var response = await Http.GetFromJsonAsync<List<Project>>(navigation.ToAbsoluteUri($"api/project"));
+            var response = await Http.GetAsync(navigation.ToAbsoluteUri($"api/project"));
             if (response != null)
             {
-                projects = response;
+                projects = await response.Content.ReadFromJsonAsync<List<Project>>();
+                ErrorMessage = string.Empty;
                 StateHasChanged();
             }
-
+            else
+            {
+                var errorDetails = await response.Content.ReadAsStringAsync();
+                ErrorMessage = $"Błąd API - {response.StatusCode}: {errorDetails}";
+            }
         }
         catch (Exception ex)
         {
+            ErrorMessage = $"Błąd aplikacji: {ex.Message} StackTrace: {ex.StackTrace}";
             Console.WriteLine(ex.Message);
         }
         StateHasChanged();
@@ -89,10 +101,17 @@ public partial class JobList
             {
                 CloseModal(false);
                 await LoadJob();
+                ErrorMessage = string.Empty ;
+            }
+            else
+            {
+                var errorDetails = await response.Content.ReadAsStringAsync();
+                ErrorMessage = $"Błąd API - {response.StatusCode}: {errorDetails}";
             }
         }
         catch (Exception ex)
         {
+            ErrorMessage = $"Błąd aplikacji: {ex.Message} StackTrace: {ex.StackTrace}";
             Console.WriteLine(ex.Message);
         }
     }
@@ -110,15 +129,21 @@ public partial class JobList
         { 
             try
             {
-                var response = await Http.GetFromJsonAsync<Job>(navigation.ToAbsoluteUri($"api/job/{id}"));
-                if (response != null)
+                var response = await Http.GetAsync(navigation.ToAbsoluteUri($"api/job/{id}"));
+                if (response.IsSuccessStatusCode)
                 {
-                    job = response;
+                    job = await response.Content.ReadFromJsonAsync<Job>();
+                    ErrorMessage = string.Empty;
                 }
-
+                else
+                {
+                    var errorDetails = await response.Content.ReadAsStringAsync();
+                    ErrorMessage = $"Błąd API - {response.StatusCode}: {errorDetails}";
+                }
             }
             catch (Exception ex)
             {
+                ErrorMessage = $"Błąd aplikacji: {ex.Message} StackTrace: {ex.StackTrace}";
                 Console.WriteLine(ex.Message);
             }
         }
@@ -158,10 +183,17 @@ public partial class JobList
             {
                 IsTextOpen = false;
                 await LoadProject();
+                ErrorMessage = string.Empty;
+            }
+            else
+            {
+                var errorDetails = await response.Content.ReadAsStringAsync();
+                ErrorMessage = $"Błąd API - {response.StatusCode}: {errorDetails}";
             }
         }
         catch (Exception ex)
         {
+            ErrorMessage = $"Błąd aplikacji: {ex.Message} StackTrace: {ex.StackTrace}";
             Console.WriteLine(ex.Message);
         }
         IsTextOpen = false;

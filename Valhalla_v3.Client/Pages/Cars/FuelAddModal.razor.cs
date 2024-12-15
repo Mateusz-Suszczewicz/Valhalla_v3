@@ -12,6 +12,7 @@ public partial class FuelAddModal
     private CarHistoryFuel formModel = new CarHistoryFuel();
     private List<GasStation> ListGasStation = new();
     private bool isGasSttionOpen = false;
+    private string ErrorMessage;
     [Parameter]
     public int CarId
     {
@@ -32,14 +33,21 @@ public partial class FuelAddModal
     {
         try
         {
-            var response = await Http.GetFromJsonAsync<List<GasStation>>(navigation.ToAbsoluteUri($"api/GasStation"));
-            if (response != null)
+            var response = await Http.GetAsync(navigation.ToAbsoluteUri($"api/GasStation"));
+            if (response.IsSuccessStatusCode)
             {
-                ListGasStation = response;
+                ListGasStation = await response.Content.ReadFromJsonAsync<List<GasStation>>();
+                ErrorMessage = string.Empty;
+            }
+            else
+            {
+                var errorDetails = await response.Content.ReadAsStringAsync();
+                ErrorMessage = $"Błąd API - {response.StatusCode}: {errorDetails}";
             }
         }
         catch (Exception ex)
         {
+            ErrorMessage = $"Błąd aplikacji: {ex.Message} StackTrace: {ex.StackTrace}";
             Console.WriteLine(ex.Message);
         }
     }
@@ -76,12 +84,17 @@ public partial class FuelAddModal
             {
                 LoadGaStation();
                 CloseStation();
-
-
+                ErrorMessage = string.Empty;
+            }
+            else
+            {
+                var errorDetails = await response.Content.ReadAsStringAsync();
+                ErrorMessage = $"Błąd API - {response.StatusCode}: {errorDetails}";
             }
         }
         catch (Exception ex)
         {
+            ErrorMessage = $"Błąd aplikacji: {ex.Message} StackTrace: {ex.StackTrace}";
             Console.WriteLine(ex.Message);
         }
     }

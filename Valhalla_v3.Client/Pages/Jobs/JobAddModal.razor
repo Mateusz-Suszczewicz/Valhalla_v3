@@ -1,7 +1,12 @@
 ﻿@using Valhalla_v3.Shared.CarHistory
 @inject NavigationManager navigation
 @inject HttpClient Http
-
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <div class="alert alert-danger">
+        @ErrorMessage
+    </div>
+}
 <div class="modal-dialog modal-xl" @onkeydown="HandleKeyDown" tabindex="-1">
     <div class="modal-content">
         <div class="modal-header modal-header-moje">

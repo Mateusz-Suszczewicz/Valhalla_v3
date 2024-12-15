@@ -1,6 +1,14 @@
 ﻿@inject NavigationManager navigation
 @inject HttpClient Http
 
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <div class="alert alert-danger">
+        @ErrorMessage
+    </div>
+}
+
+
 <EditForm Model="@formModel" OnValidSubmit=HandleValidMechanicSubmit>
     <DataAnnotationsValidator />
     <div class="mb-3">
