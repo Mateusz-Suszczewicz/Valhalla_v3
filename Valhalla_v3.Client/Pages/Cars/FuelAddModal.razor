@@ -18,13 +18,17 @@
     <div class="mb-3">
         <label for="Mileage" class="form-label">Stacja</label>
         <InputSelect id="Mileage" class="form-control" @bind-Value="formModel.GasStationId">
-            @if (formModel.GasStationId == 0)
+            <option selected value="">Wybierz stację</option>
+            @foreach (var gasStation in ListGasStation)
             {
-                <option selected value="">Wybierz stację</option>
-            }
-            @foreach (var fuel in ListGasStation)
-            {
-                <option value="@fuel.Id">@fuel.Name</option>
+                if(formModel.GasStationId == gasStation.Id)
+                {
+                    <option Selected value="@gasStation.Id">@gasStation.Name</option>
+                }
+                else
+                {
+                    <option value="@gasStation.Id">@gasStation.Name</option>
+                }
             }
         </InputSelect>
     </div>

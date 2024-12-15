@@ -49,11 +49,15 @@
             <div ondragover="event.preventDefault()" class="border-secondary rounded border">
                 @foreach (var item in _items.Where(x => x.Term < DateTime.Now.Date))
                 {
-                    <div class="border-success m-2 border" draggable="true" @ondragstart="e => DragStartHandler(e, item)">
-                        <input class="form-check-input m-2" type="checkbox" @bind="item.IsCompleted" @onclick="() => SetProjectDone(item.Id)" style="width:15%" />
-                        <label class="form-check-label m-2" @onclick="()=>OpemModal(item.Id)" style="width: 85%; text-decoration: @(item.IsCompleted ? "line-through" : "none")">
-                            @item.Name
-                        </label>
+                    <div class="border-success m-2 d-flex border" draggable="true" @ondragstart="e => DragStartHandler(e, item)">
+                        <div style="width:7%" class="mt-1">
+                            <input class="form-check-input m-2" type="checkbox" @bind="item.IsCompleted" @onclick="() => SetProjectDone(item.Id)" />
+                        </div>
+                        <div style="width:93%" @onclick="()=>OpemModal(item.Id)">
+                            <label class="form-check-label m-2"  style="text-decoration: @(item.IsCompleted ? "line-through" : "none")">
+                                @item.Name
+                            </label>
+                        </div>
                     </div>
                 }
             </div>

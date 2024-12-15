@@ -28,6 +28,7 @@ public partial class RepairAddModal
             if (response != null)
             {
                 ListMechanic = response;
+                StateHasChanged();
             }
         }
         catch (Exception ex)
@@ -40,6 +41,7 @@ public partial class RepairAddModal
     private async Task HandleValidMechanicSubmit()
     {
         await OnFormSubmit.InvokeAsync(formModel);
+        formModel = new();
     }
 
 
@@ -58,8 +60,8 @@ public partial class RepairAddModal
 
     private async void HandleMechanicSubmit(Mechanic model)
     {
-        model.OperatorCreateId = 1;
-        model.OperatorModifyId = 1;
+        model.OperatorCreateId = 3;
+        model.OperatorModifyId = 3;
         var json = JsonSerializer.Serialize(model);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
         try

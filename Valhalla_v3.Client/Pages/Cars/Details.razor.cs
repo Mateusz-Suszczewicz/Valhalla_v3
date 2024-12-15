@@ -9,6 +9,7 @@ using System.Text.Json;
 using Valhalla_v3.Client.Helpers;
 using Valhalla_v3.Shared;
 using Valhalla_v3.Shared.CarHistory;
+using Valhalla_v3.Shared.ToDo;
 
 namespace Valhalla_v3.Client.Pages.Cars;
 
@@ -127,27 +128,37 @@ public partial class Details
         {
             var now = DateTime.Now;
             fuelCost = car.Fuels.Where(f => f.DateTimeModify.Month == now.Month && f.DateTimeModify.Year == now.Year).Sum(f => f.Cost);
-            repairCost = car.CarHistoryRepair.Where(r => r.Date.Month == now.Month && r.Date.Year == now.Year).Sum(r => r.Cost);
+            repairCost = car.CarHistoryRepair.Where(r => r.DateTimeModify.Month == now.Month && r.DateTimeModify.Year == now.Year).Sum(r => r.Cost);
             sumCost = fuelCost + repairCost;
 
             mileage = car.Fuels.Select(x => x.Mileage).Max();
             if(car.CarHistoryRepair.Select(x => x.Mileage).Max() > mileage)
 				mileage = car.CarHistoryRepair.Select(x => x.Mileage).Max();
+            StateHasChanged();
 		}
     }
 
     private async Task HandleSubmitAsync<T>(string apiEndpoint, T model)
     {
         model.GetType().GetProperty("CarId")?.SetValue(model, car?.Id);
-        model.GetType().GetProperty("OperatorCreateId")?.SetValue(model, 1);
-        model.GetType().GetProperty("OperatorModifyId")?.SetValue(model, 1);
+        model.GetType().GetProperty("OperatorCreateId")?.SetValue(model, 3);
+        model.GetType().GetProperty("OperatorModifyId")?.SetValue(model, 3);
+        model.GetType().GetProperty("DateTimeAdd")?.SetValue(model, DateTime.Now);
+        model.GetType().GetProperty("DateTimeModify")?.SetValue(model, DateTime.Now);
 
         try
         {
-            var content = new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json");
+            var json = JsonSerializer.Serialize(model);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
             var response = await Http.PostAsync(navigation.ToAbsoluteUri(apiEndpoint), content);
             if (response.IsSuccessStatusCode)
             {
+                if (model is CarHistoryFuel)
+                    car.Fuels.Add((CarHistoryFuel)(object)model);
+                if (model is CarHistoryRepair)
+                    car.CarHistoryRepair.Add((CarHistoryRepair)(object)model);
+                isFuelOpen = false;
+                isRepairOpen = false;
                 ReloadCosts();
             }
         }

@@ -67,6 +67,7 @@ public partial class Home
             if (response.IsSuccessStatusCode)
             {
                 CloseFuel();
+                model = new();
             }
         }
         catch (Exception ex)
