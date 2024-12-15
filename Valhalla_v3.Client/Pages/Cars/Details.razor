@@ -161,7 +161,7 @@
                 <button type="button" class="btn-close" @onclick="CloseFuel"></button>
             </div>
             <div class="modal-body modal-body-moje">
-                <FuelAddModal OnFormFuelSubmit="@(model => HandleSubmitAsync<CarHistoryFuel>("api/Fuel", model))" />
+                <FuelAddModal OnFormFuelSubmit="@(model => HandleSubmitAsync<CarHistoryFuel>("api/Fuel", model))" CarId=car.Id />
             </div>
         </div>
     </div>
@@ -175,7 +175,7 @@
                 <button type="button" class="btn-close" @onclick="CloseRepair"></button>
             </div>
             <div class="modal-body modal-body-moje">
-                <RepairAddModal OnFormSubmit="@(model => HandleSubmitAsync<CarHistoryRepair>("api/Repair", model))" />
+                <RepairAddModal OnFormSubmit="@(model => HandleSubmitAsync<CarHistoryRepair>("api/Repair", model))" CarId=car.Id />
             </div>
         </div>
     </div>

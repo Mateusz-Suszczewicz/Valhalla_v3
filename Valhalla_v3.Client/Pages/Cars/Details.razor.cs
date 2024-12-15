@@ -132,7 +132,7 @@ public partial class Details
             sumCost = fuelCost + repairCost;
 
             mileage = car.Fuels.Select(x => x.Mileage).Max();
-            if(car.CarHistoryRepair.Select(x => x.Mileage).Max() > mileage)
+            //if(car.CarHistoryRepair.Select(x => x.Mileage).Max() > mileage)
 				mileage = car.CarHistoryRepair.Select(x => x.Mileage).Max();
             StateHasChanged();
 		}

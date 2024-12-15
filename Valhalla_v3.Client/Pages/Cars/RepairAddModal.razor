@@ -2,21 +2,28 @@
 @inject HttpClient Http
 
 <EditForm Model="@formModel" OnValidSubmit="HandleValidMechanicSubmit">
+    <DataAnnotationsValidator />
     <div class="mb-3">
         <label for="Cost" class="form-label">Koszt</label>
-        <InputNumber id="Cost" class="form-control" @bind-Value="formModel.Cost" />
+        <InputNumber id="Cost" class="form-control" @bind-Value="formModel.Cost" required ParsingErrorMessage="Koszt musi być liczbą" />
+        <ValidationMessage For="@(() => formModel.Cost)" />
+
     </div>
     <div class="mb-3">
         <label for="Mileage" class="form-label">Przebieg</label>
-        <InputNumber id="Mileage" class="form-control" @bind-Value="formModel.Mileage" />
+        <InputNumber id="Mileage" class="form-control" @bind-Value="formModel.Mileage" required ParsingErrorMessage="Przebieg musi być liczbą" />
+        <ValidationMessage For="@(() => formModel.Mileage)" />
+
     </div>
     <div class="mb-3">
         <label for="Description" class="form-label">Opis</label>
         <InputTextArea id="Description" class="form-control" @bind-Value="formModel.Description" />
+        <ValidationMessage For="@(() => formModel.Description)" />
+
     </div>
     <div class="mb-3">
         <label for="Mechanic" class="form-label">Mechanik</label>
-        <InputSelect id="Mechanic" class="form-control" @bind-Value="formModel.MechanicId">
+        <InputSelect id="Mechanic" class="form-control" @bind-Value="formModel.MechanicId" required>
             <option selected value="">Wybierz mechanika</option>
             @foreach (var mechanic in ListMechanic)
             {
@@ -30,6 +37,8 @@
                 }
             }
         </InputSelect>
+        <ValidationMessage For="@(() => formModel.MechanicId)" />
+
     </div>
     <div class="d-flex justify-content-between">
         <button class="btn btn-primary w-25" type="submit">Zapisz</button>

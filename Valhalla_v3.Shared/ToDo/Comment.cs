@@ -7,7 +7,8 @@ namespace Valhalla_v3.Shared.ToDo;
 public  class Comment: MainClass
 {
 	[MaxLength(500)]
-	public required string Content { get; set; }
+    [Required(ErrorMessage = "Pole Komentarz jest wymagane.")]
+    public string Content { get; set; }
 	public int JobId { get; set; }
 
     [JsonIgnore]

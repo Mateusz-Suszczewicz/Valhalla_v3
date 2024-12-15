@@ -5,14 +5,19 @@ namespace Valhalla_v3.Shared.CarHistory;
 
 public class CarHistoryRepair : MainClass
 {
-	public int CarId { get; set; }
-	public int MechanicId { get; set; }
-	public int Mileage { get; set; }
+    [Required(ErrorMessage = "Pole Samochód jest wymagane.")]
+    public int CarId { get; set; }
+    [Required(ErrorMessage = "Pole Mechanik jest wymagane.")]
+    public int MechanicId { get; set; }
+    [Required(ErrorMessage = "Pole Przebieg jest wymagane.")]
+    public int Mileage { get; set; }
 	public DateTime Date { get; set; }
-	public decimal Cost { get; set; }
-	[MaxLength(500)]
-	public string? Description { get; set; }
-	public virtual Mechanic? Mechanic { get; set; }
+    [Required(ErrorMessage = "Pole Koszt jest wymagane.")]
+    public decimal Cost { get; set; }
+    [StringLength(500, ErrorMessage = "Pole Opis może mięć maksymalnie 500 znaków.")]
+    public string? Description { get; set; }
+    [JsonIgnore]
+    public virtual Mechanic? Mechanic { get; set; }
 	[JsonIgnore]
 	public virtual Car? Car { get; set; }
 

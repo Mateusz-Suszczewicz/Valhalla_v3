@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
@@ -11,6 +12,14 @@ public partial class FuelAddModal
     private CarHistoryFuel formModel = new CarHistoryFuel();
     private List<GasStation> ListGasStation = new();
     private bool isGasSttionOpen = false;
+    [Parameter]
+    public int CarId
+    {
+        set
+        {
+            formModel.CarId = value;
+        }
+    }
     [Parameter]
     public EventCallback<CarHistoryFuel> OnFormFuelSubmit { get; set; }
 
@@ -37,6 +46,7 @@ public partial class FuelAddModal
     
     private async Task HandleValidFuelSubmit()
     {
+        Console.WriteLine("wywołanie metody");
         await OnFormFuelSubmit.InvokeAsync(formModel);
         formModel = new();
     }

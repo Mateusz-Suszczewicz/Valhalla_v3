@@ -12,6 +12,14 @@ public partial class RepairAddModal
     private List<Mechanic> ListMechanic = new();
     private bool isMechanicOpen = false;
     [Parameter]
+    public int CarId
+    {
+        set
+        {
+            formModel.CarId = value;
+        }
+    }
+    [Parameter]
     public EventCallback<CarHistoryRepair> OnFormSubmit { get; set; }
 
 

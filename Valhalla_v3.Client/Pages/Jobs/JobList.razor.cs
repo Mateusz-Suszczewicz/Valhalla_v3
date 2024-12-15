@@ -11,11 +11,7 @@ namespace Valhalla_v3.Client.Pages.Jobs;
 
 public partial class JobList
 {
-    private List<Job> _items = new()
-    {
-        new(){ Name = "test1", Term = DateTime.Today, Id = 1 },
-        new(){ Name = "test2", Term = DateTime.Today.AddDays(-1), Id= 2 }
-    };
+    private List<Job> _items = new();
     private Job job = new();
     private bool IsCreateOpen = false;
     private bool IsTextOpen = false;
@@ -31,7 +27,7 @@ public partial class JobList
 
     private async Task LoadJob()
     {
-        //_items.Clear();
+        _items.Clear();
 
         var queryParam = OnlyNoDoneJobs.HasValue
             ? $"?DoneJobs={OnlyNoDoneJobs.Value.ToString().ToLower()}"
@@ -42,7 +38,7 @@ public partial class JobList
             var response = await Http.GetFromJsonAsync<List<Job>>(navigation.ToAbsoluteUri($"api/job/{queryParam}"));
             if (response != null)
             {
-                //_items.Clear();
+                _items.Clear();
                 _items.AddRange(response);
                 _items = _items.Where(x => x.Term <= DateTime.Now.Date).ToList();
                 if(projectsId != 0)
@@ -82,8 +78,8 @@ public partial class JobList
 
     private async Task Create(Job job)
     {
-        job.OperatorCreateId = 1;
-        job.OperatorModifyId = 1;
+        job.OperatorCreateId = 3;
+        job.OperatorModifyId = 3;
         var json = JsonSerializer.Serialize(job);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
         try
@@ -91,7 +87,7 @@ public partial class JobList
             var response = await Http.PostAsync(navigation.ToAbsoluteUri($"api/job"), content);
             if (response.IsSuccessStatusCode)
             {
-                IsCreateOpen = false;
+                CloseModal(false);
                 await LoadJob();
             }
         }
@@ -105,6 +101,7 @@ public partial class JobList
     {
         IsCreateOpen = close;
         job = new Job();
+        StateHasChanged();
     }
 
     private async Task OpemModal(int id)
