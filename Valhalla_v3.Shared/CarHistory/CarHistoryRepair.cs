@@ -14,6 +14,6 @@ public class CarHistoryRepair : MainClass
 	public string? Description { get; set; }
 	public virtual Mechanic? Mechanic { get; set; }
 	[JsonIgnore]
-	public virtual Car Car { get; set; }
+	public virtual Car? Car { get; set; }
 
 }

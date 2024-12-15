@@ -18,6 +18,7 @@ public partial class MechanicAddModal
     private async Task HandleValidStationSubmit()
     {
         await OnFormStationSubmit.InvokeAsync(formModel);
+        formModel = new();
     }
 
 }

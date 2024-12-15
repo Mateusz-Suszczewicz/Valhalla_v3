@@ -16,11 +16,11 @@ public class JobController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Job>>> Get()
+    public async Task<ActionResult<IEnumerable<Job>>> Get([FromQuery] bool DoneJobs)
     {
         try
         {
-            var jobs = await _jobService.Get();
+            var jobs = await _jobService.Get(DoneJobs);
             if (jobs == null || !jobs.Any())
                 return NoContent();
 

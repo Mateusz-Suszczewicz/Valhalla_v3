@@ -22,7 +22,7 @@ public partial class JobList
     private List<Project> projects = new();
     private int projectsId { get; set; }
     private int _id { get; set; }
-    private bool OnlyNoDoneJobs = false;
+    private bool? OnlyNoDoneJobs = true;
     protected override async Task OnInitializedAsync()
     {
         LoadJob();
@@ -31,24 +31,29 @@ public partial class JobList
 
     private async Task LoadJob()
     {
-        _items.Clear();
+        //_items.Clear();
 
+        var queryParam = OnlyNoDoneJobs.HasValue
+            ? $"?DoneJobs={OnlyNoDoneJobs.Value.ToString().ToLower()}"
+            : string.Empty;
+        
         try
         {
-            var response = await Http.GetFromJsonAsync<List<Job>>(navigation.ToAbsoluteUri($"api/job"));
+            var response = await Http.GetFromJsonAsync<List<Job>>(navigation.ToAbsoluteUri($"api/job/{queryParam}"));
             if (response != null)
             {
-                _items.Clear();
+                //_items.Clear();
                 _items.AddRange(response);
                 _items = _items.Where(x => x.Term <= DateTime.Now.Date).ToList();
                 if(projectsId != 0)
                     _items = _items.Where(x => x.ProjectId == projectsId).ToList();
-                if(OnlyNoDoneJobs)
+                if((bool)OnlyNoDoneJobs)
                     _items = _items.Where(x => !x.IsCompleted).ToList();
 
             }
         }
         catch (Exception ex)
+
         {
             Console.WriteLine(ex.Message);
         }
@@ -57,7 +62,7 @@ public partial class JobList
 
     private async Task LoadProject()
     {
-        _items.Clear();
+        projects.Clear();
         try
         {
             var response = await Http.GetFromJsonAsync<List<Project>>(navigation.ToAbsoluteUri($"api/project"));
@@ -72,6 +77,7 @@ public partial class JobList
         {
             Console.WriteLine(ex.Message);
         }
+        StateHasChanged();
     }
 
     private async Task Create(Job job)

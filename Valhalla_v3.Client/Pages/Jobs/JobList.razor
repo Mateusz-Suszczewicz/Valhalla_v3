@@ -15,19 +15,19 @@
     <div class="row">
         <div class="col-md-4 mb-4">
             <select class="form-select" id="formGroupExampleInput" aria-label="Default select example" @bind="projectsId" @bind:after="() =>SetProject()">
-                @if (projectsId != 0)
+                <option value="0">Wybierz projekt</option>
+                @foreach (var project in projects)
                 {
-                    <option selected value="@projects.Select(x => x.Id).First(x => x == projectsId)">
-                        @projects.Where(x => x.Id == projectsId).Select(x => x.Name).First()
-                    </option>
-                }
-                else
-                {
-                }
-                    <option value="0">Wybierz projekt</option>
-                @foreach (var project in projects.Where(x => x.Id != projectsId))
-                {
-                    <option value="@project.Id">@project.Name</option>
+                    @if (projectsId == project.Id)
+                    {
+                        <option selected value="@project.Id">
+                            @project.Name
+                        </option>
+                    }
+                    else
+                    {
+                        <option value="@project.Id">@project.Name</option>
+                    }
                 }
             </select>
         </div>
@@ -49,11 +49,15 @@
             <div ondragover="event.preventDefault()" class="border-secondary rounded border">
                 @foreach (var item in _items.Where(x => x.Term < DateTime.Now.Date))
                 {
-                    <div class="border-success m-2 border" draggable="true" @ondragstart="e => DragStartHandler(e, item)">
-                        <input class="form-check-input m-2" type="checkbox" @bind="item.IsCompleted" @onclick="() => SetProjectDone(item.Id)" />
-                        <label class="form-check-label m-2" @onclick="()=>OpemModal(item.Id)" style="text-decoration: @(item.IsCompleted ? "line-through" : "none")">
-                            @item.Name
-                        </label>
+                    <div class="border-success m-2 d-flex border" draggable="true" @ondragstart="e => DragStartHandler(e, item)">
+                        <div style="width:7%" class="mt-1">
+                            <input class="form-check-input m-2" type="checkbox" @bind="item.IsCompleted" @onclick="() => SetProjectDone(item.Id)" />
+                        </div>
+                        <div style="width:93%" @onclick="()=>OpemModal(item.Id)">
+                            <label class="form-check-label m-2"  style="text-decoration: @(item.IsCompleted ? "line-through" : "none")">
+                                @item.Name
+                            </label>
+                        </div>
                     </div>
                 }
             </div>

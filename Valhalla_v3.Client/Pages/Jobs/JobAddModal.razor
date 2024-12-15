@@ -15,7 +15,7 @@
                         <div class="col-md-8">
                             <div class="mb-2">
                                 <label for="formGroupExampleInput" class="form-label">Projekt</label>
-                                <select class="form-select" id="formGroupExampleInput" aria-label="Default select example" @bind=@formModel.ProjectId>
+                                <select class="form-select" id="formGroupExampleInput" aria-label="Default select example" required @bind=@formModel.ProjectId>
                                     @if (projectsId != 0)
                                     {
                                         <option selected value="@projects.Select(x => x.Id).First(x => x == projectsId)">@projects.Where(x => x.Id == projectsId).Select(x => x.Name)</option>

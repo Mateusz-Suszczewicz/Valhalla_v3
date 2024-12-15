@@ -129,25 +129,25 @@
                     <input type="number" class="form-control" disabled id="InNumCostSum" @bind-value="@sumCost">
                     <label for="InNumCostSum">Koszt łączny</label>
                 </div>
+            </div> 
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-4 col-sm-1 mb-4 text-color-white chart-min-height">
+                <LineChart @ref="lineCharts[0]" Style="width: 100%" Height="300"/>
+            </div>
+            <div class="col-md-4 col-sm-1 mb-4 text-color-white chart-min-height">
+                <LineChart @ref="lineCharts[1]" Style="width: 100%" Height="300" />
+            </div>
+            <div class="col-md-4 col-sm-1 mb-4 text-color-white chart-min-height">
+                <LineChart @ref="lineCharts[2]" Style="width: 100%" Height="300" />
             </div>
         </div>
         <div class="row mt-3">
-            <div class="col-md-4 col-sm-1 mb-4 text-color-white">
-                <LineChart @ref="lineCharts[0]" />
+            <div class="col-md-4 col-sm-1 mb-4 text-color-white chart-min-height">
+                <LineChart @ref="lineCharts[3]" Style="width: 100%" Height="300" />
             </div>
-            <div class="col-md-4 col-sm-1 mb-4 text-color-white">
-                <LineChart @ref="lineCharts[1]" />
-            </div>
-            <div class="col-md-4 col-sm-1 mb-4 text-color-white">
-                <LineChart @ref="lineCharts[2]" />
-            </div>
-        </div>
-        <div class="row mt-3">
-            <div class="col-md-4 col-sm-1 mb-4 text-color-white">
-                <LineChart @ref="lineCharts[3]" />
-            </div>
-            <div class="col-md-4 col-sm-1 mb-4 text-color-white">
-                <LineChart @ref="lineCharts[4]" />
+            <div class="col-md-4 col-sm-1 mb-4 text-color-white chart-min-height">
+                <LineChart @ref="lineCharts[4]" Style="width: 100%" Height="300" />
             </div>
         </div>
     }
@@ -156,11 +156,11 @@
 <div class="modal fade @(isFuelOpen ? "show" : "")" tabindex="-1" style="display:@(isFuelOpen ? "block" : "none");">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header modal-header-moje">
                 <h5 class="modal-title">Tankowanie</h5>
                 <button type="button" class="btn-close" @onclick="CloseFuel"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body modal-body-moje">
                 <FuelAddModal OnFormFuelSubmit="@(model => HandleSubmitAsync<CarHistoryFuel>("api/Fuel", model))" />
             </div>
         </div>
@@ -170,12 +170,12 @@
 <div class="modal fade @(isRepairOpen ? "show" : "")" tabindex="-1" style="display:@(isRepairOpen ? "block" : "none");">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header modal-header-moje">
                 <h5 class="modal-title">Naprawa</h5>
                 <button type="button" class="btn-close" @onclick="CloseRepair"></button>
             </div>
-            <div class="modal-body">
-                <RepairAddModal OnFormSubmit="@(model => HandleSubmitAsync<CarHistoryRepair>("api/Fuel", model))" />
+            <div class="modal-body modal-body-moje">
+                <RepairAddModal OnFormSubmit="@(model => HandleSubmitAsync<CarHistoryRepair>("api/Repair", model))" />
             </div>
         </div>
     </div>

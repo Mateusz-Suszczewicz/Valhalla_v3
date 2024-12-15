@@ -14,7 +14,6 @@ public partial class FuelAddModal
     [Parameter]
     public EventCallback<CarHistoryFuel> OnFormFuelSubmit { get; set; }
 
-
     protected override async Task OnInitializedAsync()
     {
         await LoadGaStation();
@@ -39,6 +38,7 @@ public partial class FuelAddModal
     private async Task HandleValidFuelSubmit()
     {
         await OnFormFuelSubmit.InvokeAsync(formModel);
+        formModel = new();
     }
 
     private void OpenStation()
@@ -55,8 +55,8 @@ public partial class FuelAddModal
 
     private async Task HandleStationSubmit(GasStation model)
     {
-        model.OperatorCreateId = 1;
-        model.OperatorModifyId = 1;
+        model.OperatorCreateId = 3;
+        model.OperatorModifyId = 3;
         var json = JsonSerializer.Serialize(model);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
         try
@@ -66,6 +66,7 @@ public partial class FuelAddModal
             {
                 LoadGaStation();
                 CloseStation();
+
 
             }
         }
