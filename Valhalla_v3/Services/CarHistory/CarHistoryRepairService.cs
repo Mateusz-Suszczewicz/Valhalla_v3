@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Valhalla_v3.Database;
+using Valhalla_v3.Migrations;
 using Valhalla_v3.Shared.CarHistory;
 
 namespace Valhalla_v3.Services.CarHistory;
@@ -29,7 +30,10 @@ public class CarHistoryRepairService : ICarHistoryRepairService
 
         if (repair.Id != 0)
             throw new ArgumentException("Repair ID must be 0 for a new entry.");
-
+        
+        if (!validMileage(repair.Mileage))
+            throw new ArgumentException("Mileage must be greater than saved mileage.");
+        
         repair.DateTimeAdd = DateTime.Now;
         repair.DateTimeModify = DateTime.Now;
 
@@ -88,7 +92,10 @@ public class CarHistoryRepairService : ICarHistoryRepairService
 
         if (repair.Id <= 0)
             throw new ArgumentException("Invalid ID. ID must be greater than zero.");
-
+        
+        if (!validMileage(repair.Mileage))
+            throw new ArgumentException("Mileage must be greater than saved mileage.");
+        
         var existingRepair = await _context.CarHistoryRepairs.FirstOrDefaultAsync(x => x.Id == repair.Id);
 
         if (existingRepair == null)
@@ -102,6 +109,13 @@ public class CarHistoryRepairService : ICarHistoryRepairService
         existingRepair.DateTimeModify = DateTime.Now;
 
         await _context.SaveChangesAsync();
+    }
+
+    private bool validMileage(int newMileage)
+    {
+        var fuelMileage = _context.CarHistoryFuels.Max(x => x.Mileage);
+        var repairMileage = _context.CarHistoryRepairs.Max(x => x.Mileage);
+        return CarHelper.MileageValidate(fuelMileage, repairMileage, newMileage);
     }
 }
 

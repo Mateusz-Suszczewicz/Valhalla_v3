@@ -21,7 +21,7 @@
     </div>
     <div class="mb-3">
         <label for="Mileage" class="form-label">Stacja</label>
-        <InputSelect id="Mileage" class="form-control" @bind-Value="formModel.GasStationId" >
+        <InputSelect id="Mileage" class="form-control" @bind-Value="formModel.GasStationId">
             <option selected value="">Wybierz stację</option>
             @foreach (var gasStation in ListGasStation)
             {
@@ -38,11 +38,9 @@
         <ValidationMessage For="@(() => formModel.GasStationId)" />
     </div>
      <div class="d-flex justify-content-between">
-        @* <button class="btn btn-primary w-25" type="submit">Zapisz</button> *@
-        
-        @* <button class="btn btn-primary w-25" @onclick="OpenStation">Dodaj stację</button> *@
+        <button class="btn btn-primary w-25" type="submit">Zapisz</button>
+        <button class="btn btn-primary w-25" @onclick="OpenStation">Dodaj stację</button>
     </div>
-    <input class="btn btn-primary w-25" type="submit" value="Zapisz" />
 
 </EditForm>
 
@@ -51,7 +49,7 @@
         <div class="modal-content">
             <div class="modal-header modal-header-moje">
                 <h5 class="modal-title" id="exampleModalLabel">Stacja paliw</h5>
-                @* <button class="btn-close" @onclick="CloseStation"></button> *@
+                 <button class="btn-close" @onclick="CloseStation"></button> 
             </div>
             <div class="modal-body modal-body-moje">
                 <GasStationAddModal OnFormStationSubmit="HandleStationSubmit" />
@@ -60,26 +58,3 @@
     </div>
 </div>
 
-<script>
-
-        // Example starter JavaScript for disabling form submissions if there are invalid fields
-    (function () {
-      'use strict'
-
-      // Fetch all the forms we want to apply custom Bootstrap validation styles to
-      var forms = document.querySelectorAll('.needs-validation')
-
-      // Loop over them and prevent submission
-      Array.prototype.slice.call(forms)
-        .forEach(function (form) {
-          form.addEventListener('submit', function (event) {
-            if (!form.checkValidity()) {
-              event.preventDefault()
-              event.stopPropagation()
-            }
-
-            form.classList.add('was-validated')
-          }, false)
-        })
-    })()
-</script>

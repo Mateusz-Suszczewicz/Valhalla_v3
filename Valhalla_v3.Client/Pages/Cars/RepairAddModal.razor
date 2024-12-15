@@ -1,17 +1,17 @@
 ﻿@inject NavigationManager navigation
 @inject HttpClient Http
 
-<EditForm Model="@formModel" OnValidSubmit="HandleValidMechanicSubmit">
+<EditForm Model="@formModel" OnValidSubmit=HandleValidMechanicSubmit>
     <DataAnnotationsValidator />
     <div class="mb-3">
         <label for="Cost" class="form-label">Koszt</label>
-        <InputNumber id="Cost" class="form-control" @bind-Value="formModel.Cost" required ParsingErrorMessage="Koszt musi być liczbą" />
+        <InputNumber id="Cost" class="form-control" @bind-Value="formModel.Cost" ParsingErrorMessage="Koszt musi być liczbą" />
         <ValidationMessage For="@(() => formModel.Cost)" />
 
     </div>
     <div class="mb-3">
         <label for="Mileage" class="form-label">Przebieg</label>
-        <InputNumber id="Mileage" class="form-control" @bind-Value="formModel.Mileage" required ParsingErrorMessage="Przebieg musi być liczbą" />
+        <InputNumber id="Mileage" class="form-control" @bind-Value="formModel.Mileage" ParsingErrorMessage="Przebieg musi być liczbą" />
         <ValidationMessage For="@(() => formModel.Mileage)" />
 
     </div>
@@ -23,7 +23,7 @@
     </div>
     <div class="mb-3">
         <label for="Mechanic" class="form-label">Mechanik</label>
-        <InputSelect id="Mechanic" class="form-control" @bind-Value="formModel.MechanicId" required>
+        <InputSelect id="Mechanic" class="form-control" @bind-Value="formModel.MechanicId">
             <option selected value="">Wybierz mechanika</option>
             @foreach (var mechanic in ListMechanic)
             {
@@ -38,11 +38,10 @@
             }
         </InputSelect>
         <ValidationMessage For="@(() => formModel.MechanicId)" />
-
     </div>
     <div class="d-flex justify-content-between">
         <button class="btn btn-primary w-25" type="submit">Zapisz</button>
-        <button class="btn btn-primary w-25" type="button" @onclick="OpenStation">Dodaj mechanika</button>
+        <button class="btn btn-primary w-25" @onclick="OpenStation">Dodaj mechanika</button>
     </div>
 </EditForm>
 <div class="modal fade @(isMechanicOpen ? "show" : "")" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display:@(isMechanicOpen ? "block" : "none");">

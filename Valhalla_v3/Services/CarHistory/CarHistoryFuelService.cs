@@ -30,6 +30,9 @@ public class CarHistoryFuelService : ICarHistoryFuelService
         if (fuel.Id != 0)
             throw new ArgumentException("Fuel ID must be 0 for a new entry.");
 
+        if(!validMileage(fuel.Mileage))
+            throw new ArgumentException("Mileage must be greater than saved mileage.");
+
         fuel.DateTimeAdd = DateTime.Now;
         fuel.DateTimeModify = DateTime.Now;
 
@@ -88,6 +91,9 @@ public class CarHistoryFuelService : ICarHistoryFuelService
 
         if (fuel.Id <= 0)
             throw new ArgumentException("Invalid ID. ID must be greater than zero.");
+        
+        if (!validMileage(fuel.Mileage))
+            throw new ArgumentException("Mileage must be greater than saved mileage.");
 
         var existingFuel = await _context.CarHistoryFuels.FirstOrDefaultAsync(x => x.Id == fuel.Id);
 
@@ -102,6 +108,13 @@ public class CarHistoryFuelService : ICarHistoryFuelService
         existingFuel.DateTimeModify = DateTime.Now;
 
         await _context.SaveChangesAsync();
+    }
+
+    private bool validMileage(int newMileage)
+    {
+        var fuelMileage = _context.CarHistoryFuels.Max(x => x.Mileage);
+        var repairMileage = _context.CarHistoryRepairs.Max(x => x.Mileage);
+        return CarHelper.MileageValidate(fuelMileage, repairMileage, newMileage);
     }
 }
 
