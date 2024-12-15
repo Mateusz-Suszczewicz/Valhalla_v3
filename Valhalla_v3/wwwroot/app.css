@@ -102,3 +102,6 @@ h1:focus {
         bottom: 0;
     }
 }
+.chart-min-height{
+    min-height: 0.3vh;
+}

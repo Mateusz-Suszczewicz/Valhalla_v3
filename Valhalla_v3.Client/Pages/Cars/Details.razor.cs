@@ -1,6 +1,7 @@
 ﻿using BlazorBootstrap;
 using Microsoft.AspNetCore.Components;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Drawing;
 using System.Net.Http.Json;
 using System.Text;
@@ -128,7 +129,11 @@ public partial class Details
             fuelCost = car.Fuels.Where(f => f.DateTimeModify.Month == now.Month && f.DateTimeModify.Year == now.Year).Sum(f => f.Cost);
             repairCost = car.CarHistoryRepair.Where(r => r.Date.Month == now.Month && r.Date.Year == now.Year).Sum(r => r.Cost);
             sumCost = fuelCost + repairCost;
-        }
+
+            mileage = car.Fuels.Select(x => x.Mileage).Max();
+            if(car.CarHistoryRepair.Select(x => x.Mileage).Max() > mileage)
+				mileage = car.CarHistoryRepair.Select(x => x.Mileage).Max();
+		}
     }
 
     private async Task HandleSubmitAsync<T>(string apiEndpoint, T model)

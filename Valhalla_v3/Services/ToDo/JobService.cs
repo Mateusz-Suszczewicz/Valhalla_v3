@@ -11,7 +11,7 @@ public interface IJobService
 {
 	Task<int> Create(Job job);
 	Task<Job> Get(int id);
-	Task<List<Job>> Get();
+	Task<List<Job>> Get(bool DoneJobs);
 	Task Update(Job job);
 	Task Delete(int id);
 }
@@ -73,14 +73,24 @@ public class JobService : IJobService
         return job;
     }
 
-    public async Task<List<Job>> Get()
+    public async Task<List<Job>> Get(bool DoneJobs)
     {
-        var jobList = await _context.Job
+
+        var jobs = _context.Job
             .Include(x => x.OperatorCreate)
             .Include(x => x.OperatorModify)
-            .ToListAsync();
+            .Where(x => x.IsCompleted == DoneJobs);
 
-        return jobList ?? new List<Job>();
+        if (DoneJobs)
+        {
+            jobs = _context.Job
+            .Include(x => x.OperatorCreate)
+            .Include(x => x.OperatorModify);
+        }
+
+        List<Job> jobsList = await jobs.ToListAsync();
+
+        return jobsList ?? new List<Job>();
     }
 
     public async Task Update(Job job)
