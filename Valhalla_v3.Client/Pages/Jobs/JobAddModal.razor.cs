@@ -16,6 +16,8 @@ public partial class JobAddModal
     [Parameter]
     public List<Project> projects { get; set; }
     private int projectsId = new();
+    private string ErrorMessage;
+
     private string kom { get; set; }
     [Parameter]
     public EventCallback<Job> OnFormSubmit { get; set; }
