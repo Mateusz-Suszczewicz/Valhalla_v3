@@ -52,7 +52,7 @@
         <div class="col-md-5 m-2">
             <h3>Po terminie</h3>
             <div ondragover="event.preventDefault()" class="border-secondary rounded border">
-                @foreach (var item in _items.Where(x => x.Term < DateTime.Now.Date))
+                @foreach (var item in _items.Where(x => x.Term.Date < DateTime.Now.Date))
                 {
                     <div class="border-success m-2 border" draggable="true" @ondragstart="e => DragStartHandler(e, item)">
                         <input class="form-check-input mt-2 mb-2 ms-2 me-1" type="checkbox" @bind="item.IsCompleted" @onclick="() => SetProjectDone(item.Id)" />
@@ -66,7 +66,7 @@
         <div class="col-md-5 m-2">
             <h3>Dzisiaj</h3>
             <div ondragover="event.preventDefault()" class="border-secondary rounded border">
-                @foreach (var item in _items.Where(x => x.Term == DateTime.Now.Date))
+                @foreach (var item in _items.Where(x => x.Term.Date == DateTime.Now.Date))
                 {
                     <div class="border-success m-2 border" draggable="true" @ondragstart="e => DragStartHandler(e, item)">
                         <input class="form-check-input mt-2 mb-2 ms-2 me-1" type="checkbox" @bind="item.IsCompleted" @onclick="() => SetProjectDone(item.Id)" />

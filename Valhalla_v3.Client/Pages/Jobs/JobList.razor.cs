@@ -84,8 +84,8 @@ public partial class JobList
 
     private async Task Create(Job job)
     {
-        job.OperatorCreateId = 1;
-        job.OperatorModifyId = 1;
+        job.OperatorCreateId = 3;
+        job.OperatorModifyId = 3;
         var json = JsonSerializer.Serialize(job);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
         try
