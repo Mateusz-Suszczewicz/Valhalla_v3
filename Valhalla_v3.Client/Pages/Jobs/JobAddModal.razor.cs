@@ -15,7 +15,8 @@ public partial class JobAddModal
     public Job formModel { get; set; }
     [Parameter]
     public List<Project> projects { get; set; }
-    private int projectsId = new();
+    [Parameter]
+    public int projectsId { get; set; }
     private string ErrorMessage;
 
     private string kom { get; set; }

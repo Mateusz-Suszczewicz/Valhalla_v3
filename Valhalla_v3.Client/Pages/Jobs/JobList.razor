@@ -5,7 +5,12 @@
 @inject HttpClient Http
 
 <PageTitle>Zadania</PageTitle>
-
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <div class="alert alert-danger">
+        @ErrorMessage
+    </div>
+}
 <div class="container-fluid text-color-black">
     <div class="row">
         <div class="col-md-4 mb-1">
@@ -49,15 +54,11 @@
             <div ondragover="event.preventDefault()" class="border-secondary rounded border">
                 @foreach (var item in _items.Where(x => x.Term < DateTime.Now.Date))
                 {
-                    <div class="border-success m-2 d-flex border" draggable="true" @ondragstart="e => DragStartHandler(e, item)">
-                        <div style="width:7%" class="mt-1">
-                            <input class="form-check-input m-2" type="checkbox" @bind="item.IsCompleted" @onclick="() => SetProjectDone(item.Id)" />
-                        </div>
-                        <div style="width:93%" @onclick="()=>OpemModal(item.Id)">
-                            <label class="form-check-label m-2"  style="text-decoration: @(item.IsCompleted ? "line-through" : "none")">
-                                @item.Name
-                            </label>
-                        </div>
+                    <div class="border-success m-2 border" draggable="true" @ondragstart="e => DragStartHandler(e, item)">
+                        <input class="form-check-input mt-2 mb-2 ms-2 me-1" type="checkbox" @bind="item.IsCompleted" @onclick="() => SetProjectDone(item.Id)" />
+                        <label class="form-check-label mt-2 mb-2 me-2" @onclick="()=>OpemModal(item.Id)" style="text-decoration: @(item.IsCompleted ? "line-through" : "none")">
+                            @item.Name
+                        </label>
                     </div>
                 }
             </div>
@@ -68,8 +69,8 @@
                 @foreach (var item in _items.Where(x => x.Term == DateTime.Now.Date))
                 {
                     <div class="border-success m-2 border" draggable="true" @ondragstart="e => DragStartHandler(e, item)">
-                        <input class="form-check-input m-2" type="checkbox" @bind="item.IsCompleted" @onclick="() => SetProjectDone(item.Id)" />
-                        <label class="form-check-label m-2" @onclick="()=>OpemModal(item.Id)" style="text-decoration: @(item.IsCompleted ? "line-through" : "none")">
+                        <input class="form-check-input mt-2 mb-2 ms-2 me-1" type="checkbox" @bind="item.IsCompleted" @onclick="() => SetProjectDone(item.Id)" />
+                        <label class="form-check-label mt-2 mb-2 me-2" @onclick="()=>OpemModal(item.Id)" style="text-decoration: @(item.IsCompleted ? "line-through" : "none")">
                             @item.Name
                         </label>
                     </div>
@@ -84,7 +85,7 @@
 </div>
 @* Modal dodanie napraw *@
 <div class="modal fade @(IsCreateOpen ? "show" : "")" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display:@(IsCreateOpen ? "block" : "none");">
-    <JobAddModal OnFormSubmit="Create" OnClose="CloseModal" formModel="job" projects="projects" Id="_id" />
+    <JobAddModal OnFormSubmit="Create" OnClose="CloseModal" formModel="job" projects="projects" Id="_id" projectsId="projectsId"/>
 </div>
 
 <Valhalla_v3.Client.Components.TextModal Question="Podaj nazwę projektu" isChoiceOpen="@IsTextOpen" SubmitChoice="CreateProjekt" CloseModal="CloseProject" />

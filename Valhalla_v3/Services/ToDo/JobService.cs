@@ -11,9 +11,10 @@ public interface IJobService
 {
 	Task<int> Create(Job job);
 	Task<Job> Get(int id);
-	Task<List<Job>> Get(bool DoneJobs);
+	Task<List<Job>> Get(bool NoDoneJobs, int ProjectId);
 	Task Update(Job job);
 	Task Delete(int id);
+    Task ChangeTerm(int id, DateTime term);
 }
 
 public class JobService : IJobService
@@ -23,6 +24,19 @@ public class JobService : IJobService
     public JobService(ValhallaContext context)
     {
         _context = context;
+    }
+
+    public async Task ChangeTerm(int id, DateTime term)
+    {
+        if(id == 0)
+            throw new ArgumentException("Job ID must be 0 for a new entry.");
+        var job = await _context.Job.FirstOrDefaultAsync(x => x.Id == id);
+        
+        if (job == null)
+            throw new ArgumentNullException("Job object cannot be null.");
+
+        job.Term = term;
+        await _context.SaveChangesAsync();
     }
 
     public async Task<int> Create(Job job)
@@ -73,19 +87,22 @@ public class JobService : IJobService
         return job;
     }
 
-    public async Task<List<Job>> Get(bool DoneJobs)
+    public async Task<List<Job>> Get(bool NoDoneJobs, int ProjectId)
     {
 
         var jobs = _context.Job
             .Include(x => x.OperatorCreate)
             .Include(x => x.OperatorModify)
-            .Where(x => x.IsCompleted == DoneJobs);
+            .Where(x => x.Term <= DateTime.Now);
 
-        if (DoneJobs)
+        if (ProjectId != 0)
         {
-            jobs = _context.Job
-            .Include(x => x.OperatorCreate)
-            .Include(x => x.OperatorModify);
+            jobs = jobs.Where(x => x.ProjectId == ProjectId);
+        }
+
+        if (NoDoneJobs)
+        {
+            jobs = jobs.Where(x => !x.IsCompleted);
         }
 
         List<Job> jobsList = await jobs.ToListAsync();

@@ -20,7 +20,6 @@ public partial class JobList
     private int _id { get; set; }
     private bool? OnlyNoDoneJobs = true;
     private string ErrorMessage;
-
     protected override async Task OnInitializedAsync()
     {
         LoadJob();
@@ -32,7 +31,7 @@ public partial class JobList
         _items.Clear();
 
         var queryParam = OnlyNoDoneJobs.HasValue
-            ? $"?DoneJobs={OnlyNoDoneJobs.Value.ToString().ToLower()}"
+            ? $"?DoneJobs={OnlyNoDoneJobs.Value.ToString().ToLower()}&&ProjectId={projectsId}"
             : string.Empty;
         
         try
@@ -41,11 +40,6 @@ public partial class JobList
             if (response.IsSuccessStatusCode)
             {
                 _items = await response.Content.ReadFromJsonAsync<List<Job>>();
-                _items = _items.Where(x => x.Term <= DateTime.Now.Date).ToList();
-                if(projectsId != 0)
-                    _items = _items.Where(x => x.ProjectId == projectsId).ToList();
-                if((bool)OnlyNoDoneJobs)
-                    _items = _items.Where(x => !x.IsCompleted).ToList();
                 ErrorMessage = string.Empty;
             }
             else
@@ -90,8 +84,8 @@ public partial class JobList
 
     private async Task Create(Job job)
     {
-        job.OperatorCreateId = 3;
-        job.OperatorModifyId = 3;
+        job.OperatorCreateId = 1;
+        job.OperatorModifyId = 1;
         var json = JsonSerializer.Serialize(job);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
         try
@@ -150,7 +144,7 @@ public partial class JobList
         else
         {
             job = new Job();
-            job.Term = DateTime.Now.Date;
+            job.Term = DateTime.Now;
         }
 
         IsCreateOpen = true;
@@ -205,10 +199,29 @@ public partial class JobList
             await LoadJob();
     }
 
-    private void DragStartHandler(DragEventArgs e, Job item)
+    private async Task DragStartHandler(DragEventArgs e, Job item)
     {
         item.Term = DateTime.Now.Date;
-        Console.WriteLine($"Rozpoczęto przeciąganie: {item}");
+        var queryParam = $"?Id={item.Id}&newTerm={DateTime.Now.Date.ToString("yyyy-MM-ddTHH:mm:ss")}";
+
+        try
+        {
+            var response = await Http.PostAsync(navigation.ToAbsoluteUri($"api/job/changeTerm{queryParam}"), null);
+            if (response.IsSuccessStatusCode)
+            {
+                ErrorMessage = string.Empty;
+            }
+            else
+            {
+                var errorDetails = await response.Content.ReadAsStringAsync();
+                ErrorMessage = $"Błąd API - {response.StatusCode}: {errorDetails}";
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Błąd aplikacji: {ex.Message} StackTrace: {ex.StackTrace}";
+            Console.WriteLine(ex.Message);
+        }
     }
 
     private void SetProjectDone(int id)

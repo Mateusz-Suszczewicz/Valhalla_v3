@@ -155,8 +155,8 @@ public partial class Details
     private async Task HandleSubmitAsync<T>(string apiEndpoint, T model)
     {
         model.GetType().GetProperty("CarId")?.SetValue(model, car?.Id);
-        model.GetType().GetProperty("OperatorCreateId")?.SetValue(model, 3);
-        model.GetType().GetProperty("OperatorModifyId")?.SetValue(model, 3);
+        model.GetType().GetProperty("OperatorCreateId")?.SetValue(model, 1);
+        model.GetType().GetProperty("OperatorModifyId")?.SetValue(model, 1);
         model.GetType().GetProperty("DateTimeAdd")?.SetValue(model, DateTime.Now);
         model.GetType().GetProperty("DateTimeModify")?.SetValue(model, DateTime.Now);
 

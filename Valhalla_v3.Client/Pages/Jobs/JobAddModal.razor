@@ -25,7 +25,7 @@
                                     <option value="0">Wybierz projekt</option>
                                     @foreach (var project in projects)
                                     {
-                                        if(formModel.ProjectId == project.Id)
+                                        if (formModel.ProjectId == project.Id || projectsId == project.Id)
                                         {
                                             <option selected value="@project.Id">@project.Name</option>
                                         }
@@ -50,14 +50,14 @@
                             </div>
                             <div class="mb-2">
                                 <label for="Term" class="form-label">Termin</label>
-                                <InputDate id="Term" class="form-control" @bind-Value="@formModel.Term" requierd ParsingErrorMessage="Termin musi być data" />
+                                <InputDate id="Term" class="form-control" @bind-Value="@formModel.Term" requierd ParsingErrorMessage="Termin musi być datą" />
                                 <ValidationMessage For="@(() => formModel.Term)" />
 
                             </div>
                             <div class="mb-2">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" @bind="@formModel.IsCompleted" id="flexCheckDefault">
-                                    <label class="form-check-label" for="flexCheckDefault">
+                                    <input class="form-check-input" type="checkbox" @bind="@formModel.IsCompleted" id="FromIsComplete">
+                                    <label class="form-check-label" for="FromIsComplete">
                                         Zakończono 
                                     </label>
                                 </div>

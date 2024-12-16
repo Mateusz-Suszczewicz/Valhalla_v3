@@ -16,11 +16,11 @@ public class JobController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Job>>> Get([FromQuery] bool DoneJobs)
+    public async Task<ActionResult<IEnumerable<Job>>> Get([FromQuery] bool NoDoneJobs, int ProjectId)
     {
         try
         {
-            var jobs = await _jobService.Get(DoneJobs);
+            var jobs = await _jobService.Get(NoDoneJobs, ProjectId);
             if (jobs == null || !jobs.Any())
                 return NoContent();
 
@@ -103,6 +103,24 @@ public class JobController : ControllerBase
         {
             Console.WriteLine($"Error: {ex.Message}");
             return StatusCode(500, new { message = "An unexpected error occurred while deleting the job." });
+        }
+    }
+
+    [HttpPost("changeTerm")]
+    public async Task<ActionResult> ChangeTerm([FromQuery] int Id, DateTime newTerm)
+    {
+        if (Id <= 0)
+            return BadRequest(new { message = "Invalid ID. ID must be greater than zero." });
+        try
+        {
+            await _jobService.ChangeTerm(Id, newTerm);
+            
+            return Ok(new { message = $"Job with ID {Id} changed successfully." });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+            return StatusCode(500, new { message = "An unexpected error occurred while changed the term." });
         }
     }
 }
