@@ -31,12 +31,12 @@ public partial class JobList
         _items.Clear();
 
         var queryParam = OnlyNoDoneJobs.HasValue
-            ? $"?DoneJobs={OnlyNoDoneJobs.Value.ToString().ToLower()}&&ProjectId={projectsId}"
+            ? $"?NoDoneJobs={OnlyNoDoneJobs.Value.ToString().ToLower()}&ProjectId={projectsId}"
             : string.Empty;
         
         try
         {
-            var response = await Http.GetAsync(navigation.ToAbsoluteUri($"api/job/{queryParam}"));
+            var response = await Http.GetAsync(navigation.ToAbsoluteUri($"api/job{queryParam}"));
             if (response.IsSuccessStatusCode)
             {
                 _items = await response.Content.ReadFromJsonAsync<List<Job>>();
@@ -236,4 +236,9 @@ public partial class JobList
         IsTextOpen = false;
     }
 
+    private void ChangeDoneJobs()
+    {
+        OnlyNoDoneJobs = !OnlyNoDoneJobs;
+        LoadJob();
+    }
 }

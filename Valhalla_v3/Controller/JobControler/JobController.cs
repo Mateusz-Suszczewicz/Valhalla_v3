@@ -16,7 +16,7 @@ public class JobController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Job>>> Get([FromQuery] bool NoDoneJobs, int ProjectId)
+    public async Task<ActionResult<IEnumerable<Job>>> Get([FromQuery] bool NoDoneJobs, [FromQuery] int ProjectId)
     {
         try
         {

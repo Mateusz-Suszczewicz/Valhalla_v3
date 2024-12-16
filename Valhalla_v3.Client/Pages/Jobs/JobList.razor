@@ -40,8 +40,8 @@
             <button class="btn btn-primary" @onclick=OpenTextModal>Dodaj projekt</button>
         </div>
         <div class="col-md-2 text-white">
-            <div class="form-check" @onclick="() => LoadJob()">
-                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" @bind="OnlyNoDoneJobs" >
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" @onclick="ChangeDoneJobs" @bind="OnlyNoDoneJobs" >
                 <label class="form-check-label" for="flexCheckDefault">
                     Tylko niezakończone zadania
                 </label>
