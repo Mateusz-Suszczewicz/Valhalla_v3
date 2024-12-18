@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Valhalla_v3.Client", "Valha
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Valhalla_v3.Shared", "Valhalla_v3.Shared\Valhalla_v3.Shared.csproj", "{CC5C1021-381B-4717-B1D9-D4558039B0CF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Valhalla_v3.Tests", "Valhalla_v3.Tests\Valhalla_v3.Tests.csproj", "{1B64A22B-8D81-4ED9-8BFA-7C5789FEBF76}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,9 @@ Global
 		{CC5C1021-381B-4717-B1D9-D4558039B0CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CC5C1021-381B-4717-B1D9-D4558039B0CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CC5C1021-381B-4717-B1D9-D4558039B0CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B64A22B-8D81-4ED9-8BFA-7C5789FEBF76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B64A22B-8D81-4ED9-8BFA-7C5789FEBF76}.Release|Any CPU.ActiveCfg = Release|AnyCPU
+		{1B64A22B-8D81-4ED9-8BFA-7C5789FEBF76}.Release|Any CPU.Build.0 = Release|AnyCPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

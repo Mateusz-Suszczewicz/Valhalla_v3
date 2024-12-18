@@ -1,8 +1,13 @@
 ﻿@using Valhalla_v3.Shared.CarHistory
 @inject NavigationManager navigation
 @inject HttpClient Http
-
-<div class="modal-dialog modal-xl">
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <div class="alert alert-danger">
+        @ErrorMessage
+    </div>
+}
+<div class="modal-dialog modal-xl" @onkeydown="HandleKeyDown" tabindex="-1">
     <div class="modal-content">
         <div class="modal-header modal-header-moje">
             <h5 class="modal-title" id="exampleModalLabel">Zadanie</h5>
@@ -10,42 +15,49 @@
         </div>
         <div class="modal-body modal-body-moje">
             <EditForm Model="@formModel" OnValidSubmit="HandleValidStationSubmit">
+                <DataAnnotationsValidator />
                 <div class="container-fluid text-color-black">
                     <div class="row">
                         <div class="col-md-8">
                             <div class="mb-2">
                                 <label for="formGroupExampleInput" class="form-label">Projekt</label>
-                                <select class="form-select" id="formGroupExampleInput" aria-label="Default select example" @bind=@formModel.ProjectId>
-                                    @if (projectsId != 0)
+                                <select class="form-select" id="formGroupExampleInput" aria-label="Default select example" required @bind=@formModel.ProjectId >
+                                    <option value="0">Wybierz projekt</option>
+                                    @foreach (var project in projects)
                                     {
-                                        <option selected value="@projects.Select(x => x.Id).First(x => x == projectsId)">@projects.Where(x => x.Id == projectsId).Select(x => x.Name)</option>
-                                    }
-                                    else
-                                    {
-                                        <option value="0">Wybierz projekt</option>
-                                    }
-                                    @foreach (var project in projects.Where(x => x.Id != projectsId))
-                                    {
-                                        <option value="@project.Id">@project.Name</option>
+                                        if (formModel.ProjectId == project.Id)
+                                        {
+                                            <option selected value="@project.Id">@project.Name</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@project.Id">@project.Name</option>
+                                        }
                                     }
                                 </select>
+                                <ValidationMessage For="@(() => formModel.ProjectId)"/>
                             </div>
                             <div class="mb-2">
                                 <label for="Name" class="form-label">Nazwa</label>
-                                <InputText id="Name" class="form-control" @bind-Value="@formModel.Name" />
+                                <InputText id="Name" class="form-control" @bind-Value="@formModel.Name"  requierd />
+                                <ValidationMessage For="@(() => formModel.Name)" />
                             </div>
                             <div class="mb-2">
                                 <label for="Description" class="form-label">Opis</label>
                                 <InputTextArea id="Description" class="form-control" @bind-Value="@formModel.Description" />
+                                <ValidationMessage For="@(() => formModel.Description)" />
+
                             </div>
                             <div class="mb-2">
                                 <label for="Term" class="form-label">Termin</label>
-                                <InputDate id="Term" class="form-control" @bind-Value="@formModel.Term" />
+                                <InputDate id="Term" class="form-control" @bind-Value="@formModel.Term" requierd ParsingErrorMessage="Termin musi być datą" />
+                                <ValidationMessage For="@(() => formModel.Term)" />
+
                             </div>
                             <div class="mb-2">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" @bind="@formModel.IsCompleted" id="flexCheckDefault">
-                                    <label class="form-check-label" for="flexCheckDefault">
+                                    <input class="form-check-input" type="checkbox" @bind="@formModel.IsCompleted" id="FromIsComplete">
+                                    <label class="form-check-label" for="FromIsComplete">
                                         Zakończono 
                                     </label>
                                 </div>
@@ -74,3 +86,27 @@
         </div>
     </div>
 </div>
+
+<script>
+
+        // Example starter JavaScript for disabling form submissions if there are invalid fields
+    (function () {
+      'use strict'
+
+      // Fetch all the forms we want to apply custom Bootstrap validation styles to
+      var forms = document.querySelectorAll('.needs-validation')
+
+      // Loop over them and prevent submission
+      Array.prototype.slice.call(forms)
+        .forEach(function (form) {
+          form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+              event.preventDefault()
+              event.stopPropagation()
+            }
+
+            form.classList.add('was-validated')
+          }, false)
+        })
+    })()
+</script>

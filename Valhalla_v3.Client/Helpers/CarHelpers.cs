@@ -9,7 +9,7 @@ public static class CarHelpers
         List<double?> liters = new List<double?>();
         for (int i = 1; i <= 12; i++)
         {
-            liters.Add(car.Fuels.Where(x => x.DateTimeModify.Month == i && x.DateTimeModify.Year == DateTime.Now.Year).Sum(z => Convert.ToDouble(z.Cost / z.CostPerLitr)));
+            liters.Add(car.Fuels.Where(x => x.DateTimeModify.Month == i && x.DateTimeModify.Year == DateTime.Now.Year).Sum(z => Convert.ToDouble(Math.Round(z.Cost / z.CostPerLitr,2))));
         }
         return liters;
     }
@@ -39,7 +39,7 @@ public static class CarHelpers
                 var minMilage = car.Fuels?.Where(x => x.DateTimeModify.Month == i && x.DateTimeModify.Year == DateTime.Now.Year)?.Min(z => z.Mileage);
                 var maxMilage = car.Fuels?.Where(x => x.DateTimeModify.Month == i + 1 && x.DateTimeModify.Year == DateTime.Now.Year).Select(z => z.Mileage).FirstOrDefault();
                 var pastMilage = maxMilage - minMilage <= 0 ? 1 : maxMilage - minMilage;
-                var spalanie = litr / (Convert.ToDecimal(pastMilage) / 100);
+                var spalanie = Math.Round(litr / (Convert.ToDecimal(pastMilage) / 100),2);
                 liters.Add(Convert.ToDouble(spalanie));
             }
             else
@@ -50,15 +50,32 @@ public static class CarHelpers
 
     public static List<double?> GetMileage(Car car)
     {
-        List<double?> liters = new List<double?>();
-        for (int i = 1; i <= 12; i++)
+        var currentYear = DateTime.Now.Year;
+        List<double?> mileage = new List<double?>(12);
+
+        for (int month = 1; month <= 12; month++)
         {
-            var milage = car.Fuels.Where(x => x.DateTimeModify.Month == i && x.DateTimeModify.Year == DateTime.Now.Year).Sum(z => Convert.ToDouble(z.Mileage));
-            milage += car.CarHistoryRepair.Where(x => x.DateTimeModify.Month == i && x.DateTimeModify.Year == DateTime.Now.Year).Sum(z => Convert.ToDouble(z.Mileage));
-            liters.Add(milage);
+            // Najwyższy przebieg z listy Fuel
+            var mileageFuels = car.Fuels?
+                .Where(x => x.DateTimeModify.Year == currentYear && x.DateTimeModify.Month == month)
+                .Select(z => (double?)Convert.ToDouble(z.Mileage))
+                .DefaultIfEmpty(0)
+                .Max();
+
+            // Najwyższy przebieg z listy Repair
+            var mileageRepair = car.CarHistoryRepair?
+                .Where(x => x.DateTimeModify.Year == currentYear && x.DateTimeModify.Month == month)
+                .Select(z => (double?)Convert.ToDouble(z.Mileage))
+                .DefaultIfEmpty(0)
+                .Max();
+
+            // Dodaj wyższy przebieg lub null, jeśli oba są null
+            mileage.Add((mileageFuels > mileageRepair) ? mileageFuels : mileageRepair);
         }
-        return liters;
+
+        return mileage;
     }
+
 
     public static List<double?> GetCostRapair(Car car)
     {

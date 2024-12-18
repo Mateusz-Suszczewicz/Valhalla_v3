@@ -18,32 +18,43 @@ public interface ICarService
 
 public class CarService : ICarService
 {
-	private readonly ValhallaComtext _context;
+	private readonly ValhallaContext _context;
 
-	public CarService(ValhallaComtext context) 
+	public CarService(ValhallaContext context) 
 	{
 		_context = context;
 	}
 
-	public async Task<int> Create(Car car)
-	{
-		try
-		{
-			if (car.Id != 0)
-				throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
-			car.DateTimeAdd = DateTime.Now;
-			car.DateTimeModify = DateTime.Now;
-			_context.AddAsync(car);
-			await _context.SaveChangesAsync();
-			return car.Id;
-		}
-		catch(Exception ex)
-		{
-			throw ex;
-		}
-	}
+    public async Task<int> Create(Car car)
+    {
+        if (car == null)
+            throw new ArgumentException("Car object cannot be null.");
 
-	public async Task Delete(int id)
+        if (car.Id != 0)
+            throw new ArgumentException("Cannot create a car with an existing ID.");
+
+        try
+        {
+            car.DateTimeAdd = DateTime.Now;
+            car.DateTimeModify = DateTime.Now;
+
+            await _context.AddAsync(car);
+            await _context.SaveChangesAsync();
+            return car.Id;
+        }
+        catch (DbUpdateException ex)
+        {
+            Console.WriteLine($"Database error: {ex.Message}");
+            throw new InvalidOperationException("An error occurred while saving the car to the database.", ex);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Unexpected error: {ex.Message}");
+            throw new InvalidOperationException("An unexpected error occurred.", ex);
+        }
+    }
+
+    public async Task Delete(int id)
 	{
 		if (id == 0)
 			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));

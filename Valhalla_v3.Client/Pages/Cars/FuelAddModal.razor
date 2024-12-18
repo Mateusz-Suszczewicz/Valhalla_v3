@@ -2,36 +2,53 @@
 @inject NavigationManager navigation
 @inject HttpClient Http
 
-<EditForm Model="@formModel" OnValidSubmit="HandleValidFuelSubmit">
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <div class="alert alert-danger">
+        @ErrorMessage
+    </div>
+}
+
+<EditForm Model="@formModel" OnValidSubmit=HandleValidFuelSubmit>
+    <DataAnnotationsValidator />
     <div class="mb-3">
         <label for="Cost" class="form-label">Koszt</label>
-        <InputNumber id="Cost" class="form-control" @bind-Value="formModel.Cost" />
+        <InputNumber id="Cost" class="form-control" @bind-Value="formModel.Cost" ParsingErrorMessage="Koszt musi być liczbą" />
+        <ValidationMessage For="@(() => formModel.Cost)" />
     </div>
     <div class="mb-3">
         <label for="CostPerLitr" class="form-label">Cena za litr</label>
-        <InputNumber id="CostPerLitr" class="form-control" @bind-Value="formModel.CostPerLitr" />
+        <InputNumber id="CostPerLitr" class="form-control" @bind-Value="formModel.CostPerLitr" ParsingErrorMessage="Koszt za litr musi być liczbą" />
+        <ValidationMessage For="@(() => formModel.CostPerLitr)" />
     </div>
     <div class="mb-3">
         <label for="Mileage" class="form-label">Przebieg</label>
-        <InputNumber id="Mileage" class="form-control" @bind-Value="formModel.Mileage" />
+        <InputNumber id="Mileage" class="form-control" @bind-Value="formModel.Mileage" ParsingErrorMessage="Przebieg musi być liczbą" />
+        <ValidationMessage For="@(() => formModel.Mileage)" />
     </div>
     <div class="mb-3">
         <label for="Mileage" class="form-label">Stacja</label>
         <InputSelect id="Mileage" class="form-control" @bind-Value="formModel.GasStationId">
-            @if (formModel.GasStationId == 0)
+            <option selected value="">Wybierz stację</option>
+            @foreach (var gasStation in ListGasStation)
             {
-                <option selected value="">Wybierz stację</option>
-            }
-            @foreach (var fuel in ListGasStation)
-            {
-                <option value="@fuel.Id">@fuel.Name</option>
+                if(formModel.GasStationId == gasStation.Id)
+                {
+                    <option Selected value="@gasStation.Id">@gasStation.Name</option>
+                }
+                else
+                {
+                    <option value="@gasStation.Id">@gasStation.Name</option>
+                }
             }
         </InputSelect>
+        <ValidationMessage For="@(() => formModel.GasStationId)" />
     </div>
      <div class="d-flex justify-content-between">
-        <button class="btn btn-primary w-25" type="button" @onclick="HandleValidFuelSubmit">Zapisz</button>
-        <button class="btn btn-primary w-25"type="button" @onclick="OpenStation">Dodaj stację</button>
+        <button class="btn btn-primary w-25" type="submit">Zapisz</button>
+        <button class="btn btn-primary w-25" @onclick="OpenStation">Dodaj stację</button>
     </div>
+
 </EditForm>
 
 <div class="modal fade @(isGasSttionOpen ? "show" : "")" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display:@(isGasSttionOpen ? "block" : "none");">
@@ -39,7 +56,7 @@
         <div class="modal-content">
             <div class="modal-header modal-header-moje">
                 <h5 class="modal-title" id="exampleModalLabel">Stacja paliw</h5>
-                <button type="button" class="btn-close" @onclick="CloseStation"></button>
+                 <button class="btn-close" @onclick="CloseStation"></button> 
             </div>
             <div class="modal-body modal-body-moje">
                 <GasStationAddModal OnFormStationSubmit="HandleStationSubmit" />
@@ -47,3 +64,4 @@
         </div>
     </div>
 </div>
+

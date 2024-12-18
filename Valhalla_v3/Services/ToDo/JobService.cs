@@ -9,86 +9,129 @@ namespace Valhalla_v3.Services.ToDo;
 
 public interface IJobService
 {
-	public Task<int> Create(Job job);
-	public Task<Job> Get(int id);
-	public Task<List<Job>> Get();
-	public Task Update(Job job);
-	public Task Delete(int id);
+	Task<int> Create(Job job);
+	Task<Job> Get(int id);
+	Task<List<Job>> Get(bool NoDoneJobs, int ProjectId);
+	Task Update(Job job);
+	Task Delete(int id);
+    Task ChangeTerm(int id, DateTime term);
 }
 
 public class JobService : IJobService
 {
-	private readonly ValhallaComtext _context;
+    private readonly ValhallaContext _context;
 
-	public JobService(ValhallaComtext context) 
-	{
-		_context = context;
-	}
+    public JobService(ValhallaContext context)
+    {
+        _context = context;
+    }
 
-	public async Task<int> Create(Job job)
-	{
-		if (job.Id != 0)
-			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
-		job.DateTimeAdd = DateTime.Now;
-		job.DateTimeModify = DateTime.Now;
-		_context.AddAsync(job);
-		await _context.SaveChangesAsync();
-		return job.Id;
-	}
+    public async Task ChangeTerm(int id, DateTime term)
+    {
+        if(id == 0)
+            throw new ArgumentException("Job ID must be 0 for a new entry.");
+        var job = await _context.Job.FirstOrDefaultAsync(x => x.Id == id);
+        
+        if (job == null)
+            throw new ArgumentNullException("Job object cannot be null.");
 
-	public async Task Delete(int id)
-	{
-		if (id == 0)
-			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
+        job.Term = term;
+        await _context.SaveChangesAsync();
+    }
 
-		var job = _context.Job.First(x => x.Id == id);
+    public async Task<int> Create(Job job)
+    {
+        if (job == null)
+            throw new ArgumentNullException(nameof(job), "Job object cannot be null.");
 
-		if(job == null)
-			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.InternalServerError));
+        if (job.Id != 0)
+            throw new ArgumentException("Job ID must be 0 for a new entry.");
 
-		_context.Job.Remove(job);
-		await _context.SaveChangesAsync();
-	}
+        job.DateTimeAdd = DateTime.Now;
+        job.DateTimeModify = DateTime.Now;
 
-	public async Task<Job> Get(int id)
-	{
-		if (id == 0)
-			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
+        await _context.Job.AddAsync(job);
+        await _context.SaveChangesAsync();
 
-		var job = await _context.Job
+        return job.Id;
+    }
+
+    public async Task Delete(int id)
+    {
+        if (id <= 0)
+            throw new ArgumentException("Invalid ID. ID must be greater than zero.");
+
+        var job = await _context.Job.FirstOrDefaultAsync(x => x.Id == id);
+
+        if (job == null)
+            throw new KeyNotFoundException($"Job with ID {id} not found.");
+
+        _context.Job.Remove(job);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task<Job> Get(int id)
+    {
+        if (id <= 0)
+            throw new ArgumentException("Invalid ID. ID must be greater than zero.");
+
+        var job = await _context.Job
             .Include(x => x.OperatorCreate)
             .Include(x => x.OperatorModify)
-			.Include(x => x.Comments)
-			.FirstOrDefaultAsync(x => x.Id == id);
+            .Include(x => x.Comments)
+            .FirstOrDefaultAsync(x => x.Id == id);
 
-		return job;
-	}
+        if (job == null)
+            throw new KeyNotFoundException($"Job with ID {id} not found.");
 
-	public async Task<List<Job>> Get()
-	{
-		var jobList = await _context.Job
-			.Include(x => x.OperatorCreate)
-			.Include(x => x.OperatorModify)
-			.ToListAsync();
+        return job;
+    }
 
-		return jobList;
-	}
+    public async Task<List<Job>> Get(bool NoDoneJobs, int ProjectId)
+    {
 
-	public async Task Update(Job job)
-	{
-		if (job.Id == 0)
-			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
+        var jobs = _context.Job
+            .Include(x => x.OperatorCreate)
+            .Include(x => x.OperatorModify)
+            .Where(x => x.Term <= DateTime.Now);
 
-		var OldJob = _context.Job.First(x => x.Id == job.Id);
-		if (OldJob == null)
-			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
-		OldJob.Description = job.Description;
-		OldJob.Name = job.Name;
-		OldJob.IsCompleted = job.IsCompleted;
-		OldJob.Term = job.Term;
-		OldJob.Project = job.Project;
-		OldJob.DateTimeModify = DateTime.Now;
-		OldJob.Comments = job.Comments;
-		await _context.SaveChangesAsync();
-	}
+        if (ProjectId != 0)
+        {
+            jobs = jobs.Where(x => x.ProjectId == ProjectId);
+        }
+
+        if (NoDoneJobs)
+        {
+            jobs = jobs.Where(x => !x.IsCompleted);
+        }
+
+        List<Job> jobsList = await jobs.ToListAsync();
+
+        return jobsList ?? new List<Job>();
+    }
+
+    public async Task Update(Job job)
+    {
+        if (job == null)
+            throw new ArgumentNullException(nameof(job), "Job object cannot be null.");
+
+        if (job.Id <= 0)
+            throw new ArgumentException("Invalid ID. ID must be greater than zero.");
+
+        var existingJob = await _context.Job.FirstOrDefaultAsync(x => x.Id == job.Id);
+
+        if (existingJob == null)
+            throw new KeyNotFoundException($"Job with ID {job.Id} not found.");
+
+        existingJob.Description = job.Description;
+        existingJob.Name = job.Name;
+        existingJob.IsCompleted = job.IsCompleted;
+        existingJob.Term = job.Term;
+        existingJob.ProjectId = job.ProjectId;
+        existingJob.DateTimeModify = DateTime.Now;
+        existingJob.Comments = job.Comments;
+
+        await _context.SaveChangesAsync();
+    }
 }
+

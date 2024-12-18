@@ -4,9 +4,10 @@ namespace Valhalla_v3.Shared;
 
 public class MainClassFull : MainClass
 {
-	[StringLength(100)]
+    [Required(ErrorMessage = "Pole Nazwa jest wymagane.")]
+    [StringLength(100, ErrorMessage ="Pole Nazwa może mięć maksymalnie 100 znaków.")]
 	public string Name { get; set; }
 
-	[StringLength(500)]
+	[StringLength(500, ErrorMessage = "Pole Opis może mięć maksymalnie 500 znaków.")]
 	public string? Description { get; set; }
 }

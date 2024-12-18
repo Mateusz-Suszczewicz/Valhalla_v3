@@ -1,7 +1,9 @@
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor;
 using MudBlazor.Services;
+using System.Globalization;
 using Valhalla_v3.Components;
 using Valhalla_v3.Database;
 using Valhalla_v3.Services;
@@ -53,7 +55,7 @@ else
     connection = Environment.GetEnvironmentVariable("Connection");
 }
 
-builder.Services.AddDbContext<ValhallaComtext>(options =>
+builder.Services.AddDbContext<ValhallaContext>(options =>
     options.UseSqlServer(connection));
 
 var app = builder.Build();
@@ -73,6 +75,14 @@ else
 	// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 	app.UseHsts();
 }
+var defaultCulture = new CultureInfo("pl-PL");
+var localizationOptions = new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture(defaultCulture),
+    SupportedCultures = new List<CultureInfo> { defaultCulture },
+    SupportedUICultures = new List<CultureInfo> { defaultCulture }
+};
+app.UseRequestLocalization(localizationOptions);
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseAuthentication();
@@ -82,7 +92,7 @@ try
 {
     using (var scope = app.Services.CreateScope())
     {
-        var dbContext = scope.ServiceProvider.GetRequiredService<ValhallaComtext>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ValhallaContext>();
         dbContext.Database.Migrate();
     }
 }

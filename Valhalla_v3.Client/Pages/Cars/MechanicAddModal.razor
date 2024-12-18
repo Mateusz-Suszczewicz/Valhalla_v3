@@ -2,41 +2,51 @@
 @inject NavigationManager navigation
 
 <EditForm Model="@formModel" OnValidSubmit="HandleValidStationSubmit">
+    <DataAnnotationsValidator />
     <div class="mb-3">
         <label for="Cost" class="form-label">Nazwa</label>
-        <InputText id="Cost" class="form-control" @bind-Value="formModel.Name" />
+        <InputText id="Cost" class="form-control" @bind-Value="formModel.Name" requierd/>
+        <ValidationMessage For="@(() => formModel.Name)" />
     </div>
     <div class="mb-3">
         <label for="CostPerLitr" class="form-label">Opis</label>
         <InputTextArea id="CostPerLitr" class="form-control" @bind-Value="formModel.Description" />
+        <ValidationMessage For="@(() => formModel.Description)" />
     </div>
     <div class="mb-3">
         <label for="Mileage" class="form-label">Ulica</label>
         <InputText id="Mileage" class="form-control" @bind-Value="formModel.Street" />
+        <ValidationMessage For="@(() => formModel.Street)" />
     </div>
     <div class="mb-3">
         <label for="Mileage" class="form-label">Numer</label>
         <InputText id="Mileage" class="form-control" @bind-Value="formModel.StreetNumber" />
+        <ValidationMessage For="@(() => formModel.StreetNumber)" />
     </div>
     <div class="mb-3">
         <label for="Mileage" class="form-label">Kod pocztowy</label>
         <InputText id="Mileage" class="form-control" @bind-Value="formModel.PostalCode" />
+        <ValidationMessage For="@(() => formModel.PostalCode)" />
     </div>
     <div class="mb-3">
         <label for="Mileage" class="form-label">Miasto</label>
         <InputText id="Mileage" class="form-control" @bind-Value="formModel.City" />
+        <ValidationMessage For="@(() => formModel.City)" />
     </div>
     <div class="mb-3">
         <label for="Mileage" class="form-label">Kraj</label>
         <InputText id="Mileage" class="form-control" @bind-Value="formModel.Country"/>
+        <ValidationMessage For="@(() => formModel.Country)" />
     </div>
     <div class="mb-3">
         <label for="Mileage" class="form-label">Telefon 1</label>
         <InputText id="Mileage" class="form-control" @bind-Value="formModel.Phone1" />
+        <ValidationMessage For="@(() => formModel.Phone1)" />
     </div>
     <div class="mb-3">
         <label for="Mileage" class="form-label">Telefon 2</label>
         <InputText id="Mileage" class="form-control" @bind-Value="formModel.Phone2" />
+        <ValidationMessage For="@(() => formModel.Phone2)" />
     </div>
     <button class="btn btn-primary w-50" type="submit">Zapisz</button>
 </EditForm>

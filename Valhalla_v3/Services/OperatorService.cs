@@ -1,6 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Net;
-using System.Web.Http;
 using Valhalla_v3.Database;
 using Valhalla_v3.Shared;
 
@@ -15,58 +13,83 @@ public interface IOperatorService
     public Task Delete(int id);
 }
 
-public class OperatorService(ValhallaComtext context) : IOperatorService
+public class OperatorService : IOperatorService
 {
-    private readonly ValhallaComtext _context = context;
+    private readonly ValhallaContext _context;
+
+    public OperatorService(ValhallaContext context)
+    {
+        _context = context;
+    }
 
     public async Task<int> Create(Operator oper)
     {
+        if (oper == null)
+            throw new ArgumentNullException(nameof(oper), "Operator object cannot be null.");
+
         if (oper.Id != 0)
-            throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
-		oper.DateTimeAdd = DateTime.Now;
-		oper.DateTimeModify = DateTime.Now;
-        await _context.AddAsync(oper);
+            throw new ArgumentException("Operator ID must be 0 for a new entry.");
+
+        oper.DateTimeAdd = DateTime.Now;
+        oper.DateTimeModify = DateTime.Now;
+
+        await _context.Operator.AddAsync(oper);
         await _context.SaveChangesAsync();
+
         return oper.Id;
     }
 
     public async Task Delete(int id)
     {
-        if (id == 0)
-            throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
+        if (id <= 0)
+            throw new ArgumentException("Invalid ID. ID must be greater than zero.");
 
-        var oper = _context.Operator.First(x => x.Id == id) ?? throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.InternalServerError));
+        var oper = await _context.Operator.FirstOrDefaultAsync(x => x.Id == id);
+
+        if (oper == null)
+            throw new KeyNotFoundException($"Operator with ID {id} not found.");
+
         _context.Operator.Remove(oper);
         await _context.SaveChangesAsync();
     }
 
     public async Task<Operator> Get(int id)
     {
-        if (id == 0)
-            throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
+        if (id <= 0)
+            throw new ArgumentException("Invalid ID. ID must be greater than zero.");
 
-        var oper = await _context.Operator
-            .FirstOrDefaultAsync(x => x.Id == id);
+        var oper = await _context.Operator.FirstOrDefaultAsync(x => x.Id == id);
+
+        if (oper == null)
+            throw new KeyNotFoundException($"Operator with ID {id} not found.");
+
         return oper;
     }
 
     public async Task<List<Operator>> Get()
     {
-        var operList = await _context.Operator
-            .ToListAsync();
+        var operList = await _context.Operator.ToListAsync();
 
-        return  operList;
+        return operList ?? new List<Operator>();
     }
 
     public async Task Update(Operator oper)
     {
-        if (oper.Id != 0)
-            throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
+        if (oper == null)
+            throw new ArgumentNullException(nameof(oper), "Operator object cannot be null.");
 
-        var Oldoper = _context.Operator.First(x => x.Id == oper.Id) ?? throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
-        Oldoper.Name = oper.Name;
-		Oldoper.Password = oper.Password;
-		Oldoper.DateTimeModify = DateTime.Now;
+        if (oper.Id <= 0)
+            throw new ArgumentException("Invalid ID. ID must be greater than zero.");
+
+        var existingOper = await _context.Operator.FirstOrDefaultAsync(x => x.Id == oper.Id);
+
+        if (existingOper == null)
+            throw new KeyNotFoundException($"Operator with ID {oper.Id} not found.");
+
+        existingOper.Name = oper.Name;
+        existingOper.Password = oper.Password;
+        existingOper.DateTimeModify = DateTime.Now;
+
         await _context.SaveChangesAsync();
     }
 }

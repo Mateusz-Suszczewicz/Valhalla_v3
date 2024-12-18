@@ -8,29 +8,53 @@ namespace Valhalla_v3.Controller.CarControler;
 [Route("api/[controller]")]
 public class MechanicController : ControllerBase
 {
-    private readonly IMechanicService _MechanicService;
+    private readonly IMechanicService _mechanicService;
 
-    public MechanicController(IMechanicService MechanicService)
+    public MechanicController(IMechanicService mechanicService)
     {
-        _MechanicService = MechanicService;
+        _mechanicService = mechanicService;
     }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Mechanic>>> Get()
     {
-        return await _MechanicService.Get();
+        try
+        {
+            var mechanics = await _mechanicService.Get();
+            if (mechanics == null || !mechanics.Any())
+                return NoContent(); 
+
+            return Ok(mechanics); 
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+            return StatusCode(500, new { message = "An unexpected error occurred while retrieving mechanics." });
+        }
     }
 
     [HttpPost]
-    public async Task<ActionResult> Create([FromBody] Mechanic fuel)
+    public async Task<ActionResult> Create([FromBody] Mechanic mechanic)
     {
-        if (fuel == null)
+        if (mechanic == null)
         {
-            return BadRequest();
+            return BadRequest(new { message = "Mechanic object cannot be null." });
         }
-        var id = await _MechanicService.Create(fuel);
 
-        return CreatedAtAction("Create", id);
+        try
+        {
+            var id = await _mechanicService.Create(mechanic);
+            return CreatedAtAction(nameof(Create), new { id }, mechanic); 
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+            return StatusCode(500, new { message = "An unexpected error occurred while creating the mechanic." });
+        }
     }
-
 }
+

@@ -16,44 +16,111 @@ public class JobController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Job>>> Get()
+    public async Task<ActionResult<IEnumerable<Job>>> Get([FromQuery] bool NoDoneJobs, [FromQuery] int ProjectId)
     {
-        return await _jobService.Get();
+        try
+        {
+            var jobs = await _jobService.Get(NoDoneJobs, ProjectId);
+            if (jobs == null || !jobs.Any())
+                return NoContent();
+
+            return Ok(jobs);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+            return StatusCode(500, new { message = "An unexpected error occurred while retrieving jobs." });
+        }
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<Job>> Get(int id)
     {
-        if(id == 0)
-            return NotFound();
-        return await _jobService.Get(id);
+        if (id <= 0)
+            return BadRequest(new { message = "Invalid ID. ID must be greater than zero." });
+
+        try
+        {
+            var job = await _jobService.Get(id);
+            if (job == null)
+                return NotFound(new { message = $"Job with ID {id} not found." });
+
+            return Ok(job);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+            return StatusCode(500, new { message = "An unexpected error occurred while retrieving the job." });
+        }
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] Job car)
+    public async Task<IActionResult> Create([FromBody] Job job)
     {
+        if (job == null)
+            return BadRequest(new { message = "Job object cannot be null." });
+
         try
         {
-            if (car.Id != 0)
-                await _jobService.Update(car);
+            if (job.Id != 0)
+            {
+                await _jobService.Update(job);
+                return Ok(new { message = "Job updated successfully." });
+            }
             else
-                car.Id = await _jobService.Create(car);
-            return CreatedAtAction("Create", car.Id);
+            {
+                job.Id = await _jobService.Create(job);
+                return CreatedAtAction(nameof(Create), new { id = job.Id }, job);
+            }
         }
-        catch(Exception ex)
+        catch (ArgumentException ex)
         {
-            Console.WriteLine(ex.Message);
-            throw ex;
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+            return StatusCode(500, new { message = "An unexpected error occurred while creating or updating the job." });
         }
     }
 
     [HttpDelete("{id}")]
     public async Task<ActionResult> Delete(int id)
     {
-        if (id == 0)
-            return NotFound();
-        await _jobService.Delete(id);
-        return CreatedAtAction("Delete", id);
+        if (id <= 0)
+            return BadRequest(new { message = "Invalid ID. ID must be greater than zero." });
 
+        try
+        {
+            var job = await _jobService.Get(id);
+            if (job == null)
+                return NotFound(new { message = $"Job with ID {id} not found." });
+
+            await _jobService.Delete(id);
+            return Ok(new { message = $"Job with ID {id} deleted successfully." }); 
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+            return StatusCode(500, new { message = "An unexpected error occurred while deleting the job." });
+        }
+    }
+
+    [HttpPost("changeTerm")]
+    public async Task<ActionResult> ChangeTerm([FromQuery] int Id, DateTime newTerm)
+    {
+        if (Id <= 0)
+            return BadRequest(new { message = "Invalid ID. ID must be greater than zero." });
+        try
+        {
+            await _jobService.ChangeTerm(Id, newTerm);
+            
+            return Ok(new { message = $"Job with ID {Id} changed successfully." });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+            return StatusCode(500, new { message = "An unexpected error occurred while changed the term." });
+        }
     }
 }
