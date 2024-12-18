@@ -6,6 +6,7 @@ using Valhalla_v3.Shared.ToDo;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using System.Linq;
+using Valhalla_v3.Shared.CarHistory;
 
 namespace Valhalla_v3.Client.Pages.Jobs;
 
@@ -16,7 +17,7 @@ public partial class JobList
     private bool IsCreateOpen = false;
     private bool IsTextOpen = false;
     private List<Project> projects = new();
-    private int projectsId { get; set; }
+    private int projectsId { get; set; } = new();
     private int _id { get; set; }
     private bool? OnlyNoDoneJobs = true;
     private string ErrorMessage;
@@ -37,15 +38,20 @@ public partial class JobList
         try
         {
             var response = await Http.GetAsync(navigation.ToAbsoluteUri($"api/job{queryParam}"));
-            if (response.IsSuccessStatusCode)
+            switch (response.StatusCode)
             {
-                _items = await response.Content.ReadFromJsonAsync<List<Job>>();
-                ErrorMessage = string.Empty;
-            }
-            else
-            {
-                var errorDetails = await response.Content.ReadAsStringAsync();
-                ErrorMessage = $"Błąd API - {response.StatusCode}: {errorDetails}";
+                case System.Net.HttpStatusCode.OK:
+                    _items = await response.Content.ReadFromJsonAsync<List<Job>>() ?? new List<Job>();
+                    ErrorMessage = string.Empty;
+                    break;
+
+                case System.Net.HttpStatusCode.NoContent:
+                    return;
+
+                default:
+                    var errorDetails = await response.Content.ReadAsStringAsync();
+                    ErrorMessage = $"Błąd API - {response.StatusCode}: {errorDetails}";
+                    break;
             }
         }
         catch (Exception ex)
@@ -62,16 +68,20 @@ public partial class JobList
         try
         {
             var response = await Http.GetAsync(navigation.ToAbsoluteUri($"api/project"));
-            if (response != null)
+            switch (response.StatusCode)
             {
-                projects = await response.Content.ReadFromJsonAsync<List<Project>>();
-                ErrorMessage = string.Empty;
-                StateHasChanged();
-            }
-            else
-            {
-                var errorDetails = await response.Content.ReadAsStringAsync();
-                ErrorMessage = $"Błąd API - {response.StatusCode}: {errorDetails}";
+                case System.Net.HttpStatusCode.OK:
+                    projects = await response.Content.ReadFromJsonAsync<List<Project>>() ?? new List<Project>();
+                    ErrorMessage = string.Empty;
+                    break;
+
+                case System.Net.HttpStatusCode.NoContent:
+                    return;
+
+                default:
+                    var errorDetails = await response.Content.ReadAsStringAsync();
+                    ErrorMessage = $"Błąd API - {response.StatusCode}: {errorDetails}";
+                    break;
             }
         }
         catch (Exception ex)
@@ -84,8 +94,8 @@ public partial class JobList
 
     private async Task Create(Job job)
     {
-        job.OperatorCreateId = 3;
-        job.OperatorModifyId = 3;
+        job.OperatorCreateId = 1;
+        job.OperatorModifyId = 1;
         var json = JsonSerializer.Serialize(job);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
         try
@@ -124,15 +134,20 @@ public partial class JobList
             try
             {
                 var response = await Http.GetAsync(navigation.ToAbsoluteUri($"api/job/{id}"));
-                if (response.IsSuccessStatusCode)
+                switch (response.StatusCode)
                 {
-                    job = await response.Content.ReadFromJsonAsync<Job>();
-                    ErrorMessage = string.Empty;
-                }
-                else
-                {
-                    var errorDetails = await response.Content.ReadAsStringAsync();
-                    ErrorMessage = $"Błąd API - {response.StatusCode}: {errorDetails}";
+                    case System.Net.HttpStatusCode.OK:
+                        job = await response.Content.ReadFromJsonAsync<Job>() ?? new Job();
+                        ErrorMessage = string.Empty;
+                        break;
+
+                    case System.Net.HttpStatusCode.NoContent:
+                        return;
+
+                    default:
+                        var errorDetails = await response.Content.ReadAsStringAsync();
+                        ErrorMessage = $"Błąd API - {response.StatusCode}: {errorDetails}";
+                        break;
                 }
             }
             catch (Exception ex)
@@ -145,6 +160,7 @@ public partial class JobList
         {
             job = new Job();
             job.Term = DateTime.Now;
+            job.ProjectId = projectsId;
         }
 
         IsCreateOpen = true;
@@ -164,8 +180,8 @@ public partial class JobList
         }
         Project project = new Project()
         {
-            OperatorCreateId = 1,
-            OperatorModifyId = 1,
+            OperatorCreateId = 3,
+            OperatorModifyId = 3,
             Name = name
         };
         var json = JsonSerializer.Serialize(project);

@@ -85,7 +85,7 @@
 </div>
 @* Modal dodanie napraw *@
 <div class="modal fade @(IsCreateOpen ? "show" : "")" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display:@(IsCreateOpen ? "block" : "none");">
-    <JobAddModal OnFormSubmit="Create" OnClose="CloseModal" formModel="job" projects="projects" Id="_id" projectsId="projectsId"/>
+    <JobAddModal OnFormSubmit="Create" OnClose="CloseModal" formModel="job" projects="projects" Id="_id"/>
 </div>
 
 <Valhalla_v3.Client.Components.TextModal Question="Podaj nazwę projektu" isChoiceOpen="@IsTextOpen" SubmitChoice="CreateProjekt" CloseModal="CloseProject" />

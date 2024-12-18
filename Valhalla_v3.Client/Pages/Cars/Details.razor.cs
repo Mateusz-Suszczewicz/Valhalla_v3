@@ -10,6 +10,7 @@ using Valhalla_v3.Client.Helpers;
 using Valhalla_v3.Shared;
 using Valhalla_v3.Shared.CarHistory;
 using Valhalla_v3.Shared.ToDo;
+using static MudBlazor.CategoryTypes;
 
 namespace Valhalla_v3.Client.Pages.Cars;
 
@@ -112,16 +113,22 @@ public partial class Details
         try
         {
             var response = await Http.GetAsync(navigation.ToAbsoluteUri($"api/car/{Id}"));
-            if (response.IsSuccessStatusCode)
+            switch (response.StatusCode)
             {
-                car = await response.Content.ReadFromJsonAsync<Car>();
-                ReloadCosts();
-                ErrorMessage = string.Empty;
-            }
-            else
-            {
-                var errorDetails = await response.Content.ReadAsStringAsync();
-                ErrorMessage = $"Błąd API - {response.StatusCode}: {errorDetails}";
+                case System.Net.HttpStatusCode.OK:
+                    car = await response.Content.ReadFromJsonAsync<Car>() ?? new Car();
+                    ReloadCosts();
+                    ErrorMessage = string.Empty;
+                    break;
+
+                case System.Net.HttpStatusCode.NoContent:
+                    car = new Car();
+                    return;
+
+                default:
+                    var errorDetails = await response.Content.ReadAsStringAsync();
+                    ErrorMessage = $"Błąd API - {response.StatusCode}: {errorDetails}";
+                    break;
             }
         }
         catch (Exception ex)

@@ -4,6 +4,8 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using Valhalla_v3.Shared.CarHistory;
+using static MudBlazor.CategoryTypes;
+using Valhalla_v3.Shared.ToDo;
 
 namespace Valhalla_v3.Client.Pages.Cars;
 
@@ -37,15 +39,20 @@ public partial class RepairAddModal
         try
         {
             var response = await Http.GetAsync(navigation.ToAbsoluteUri($"api/Mechanic"));
-            if (response.IsSuccessStatusCode)
+            switch (response.StatusCode)
             {
-                ListMechanic = await response.Content.ReadFromJsonAsync<List<Mechanic>>();
-                ErrorMessage = string.Empty;
-            }
-            else
-            {
-                var errorDetails = await response.Content.ReadAsStringAsync();
-                ErrorMessage = $"Błąd API - {response.StatusCode}: {errorDetails}";
+                case System.Net.HttpStatusCode.OK:
+                    ListMechanic = await response.Content.ReadFromJsonAsync<List<Mechanic>>() ?? new List<Mechanic>();
+                    ErrorMessage = string.Empty;
+                    break;
+
+                case System.Net.HttpStatusCode.NoContent:
+                    return;
+
+                default:
+                    var errorDetails = await response.Content.ReadAsStringAsync();
+                    ErrorMessage = $"Błąd API - {response.StatusCode}: {errorDetails}";
+                    break;
             }
         }
         catch (Exception ex)

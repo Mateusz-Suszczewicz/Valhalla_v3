@@ -25,7 +25,7 @@
                                     <option value="0">Wybierz projekt</option>
                                     @foreach (var project in projects)
                                     {
-                                        if (formModel.ProjectId == project.Id || projectsId == project.Id)
+                                        if (formModel.ProjectId == project.Id)
                                         {
                                             <option selected value="@project.Id">@project.Name</option>
                                         }
