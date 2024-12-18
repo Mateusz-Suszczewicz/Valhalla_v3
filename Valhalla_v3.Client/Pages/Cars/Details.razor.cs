@@ -125,19 +125,7 @@ public partial class Details
         chartData5 = new ChartData { Labels = label, Datasets = datasets5 };
     }
 
-    protected override async Task OnInitializedAsync()
-    {
-        Operator oper = new() { Name = "admin", Id = 3 };
-        car = new() { 
-           OperatorCreateId = 1
-        , OperatorModifyId = 1
-        };
-        if(Id != "0")
-            await LoadCar();
-        else
-            IsDisabled = false;
-        reload();
-    }
+   
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
