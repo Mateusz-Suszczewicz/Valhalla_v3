@@ -180,8 +180,8 @@ public partial class JobList
         }
         Project project = new Project()
         {
-            OperatorCreateId = 3,
-            OperatorModifyId = 3,
+            OperatorCreateId = 1,
+            OperatorModifyId = 1,
             Name = name
         };
         var json = JsonSerializer.Serialize(project);
@@ -211,8 +211,7 @@ public partial class JobList
 
     private async Task SetProject()
     {
-        if(projectsId != 0) 
-            await LoadJob();
+        await LoadJob();
     }
 
     private async Task DragStartHandler(DragEventArgs e, Job item)

@@ -112,8 +112,13 @@ public class CarHistoryFuelService : ICarHistoryFuelService
 
     private bool validMileage(int newMileage)
     {
-        var fuelMileage = _context.CarHistoryFuels.Max(x => x.Mileage);
-        var repairMileage = _context.CarHistoryRepairs.Max(x => x.Mileage);
+        var fuelMileage = _context.CarHistoryFuels.Any()
+            ? _context.CarHistoryFuels.Max(x => x.Mileage)
+            : 0;
+
+        var repairMileage = _context.CarHistoryRepairs.Any()
+            ? _context.CarHistoryRepairs.Max(x => x.Mileage)
+            : 0;
         return CarHelper.MileageValidate(fuelMileage, repairMileage, newMileage);
     }
 }

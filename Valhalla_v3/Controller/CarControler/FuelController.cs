@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 using Valhalla_v3.Services.CarHistory;
 using Valhalla_v3.Shared.CarHistory;
 
@@ -59,7 +60,8 @@ public class FuelController : ControllerBase
         catch (Exception ex)
         {
             Console.WriteLine($"Error: {ex.Message}");
-            return StatusCode(500, new { message = "An unexpected error occurred while creating fuel history." });
+            var json = JsonSerializer.Serialize(fuel);
+            return StatusCode(500, new { message = $"An unexpected error occurred while creating fuel history." });
         }
     }
 }
