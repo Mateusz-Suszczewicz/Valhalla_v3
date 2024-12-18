@@ -1,10 +1,19 @@
 ﻿@page "/admin"
+@using Valhalla_v3.Client.Components
+@using Valhalla_v3.Client.Pages.Cars
 @rendermode InteractiveAuto
 @inject HttpClient Http
 @inject NavigationManager navigation
+
 <PageTitle>Panel administratora</PageTitle>
 
 <h1>Panel administratora</h1>
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <div class="alert alert-danger">
+        @ErrorMessage
+    </div>
+}
 
 <Tabs>
     <Tab Title="Słowniki" IsActive="true">
@@ -24,19 +33,24 @@
                                 @foreach(var project in projects)
                                 {
                                     <tr>
-                                        <th scope="row">@projects.IndexOf(project)</th>
+                                        <th scope="row">@(projects.IndexOf(project) + 1)</th>
                                         <td>@project.Name</td>
-                                        <td></td>
+                                        <td>
+                                            <button class="btn btn-danger" @onclick="() => DeleteProjectAsync(project.Id)"><i class="bi bi-trash-fill"></i></button>
+                                            <button class="btn btn-warning"><i class="bi bi-eye-fill"></i></button>
+                                        </td>
                                     </tr>
                                 }
                             </tbody>
                         </table>
+                        <div class="fixed-buttons">
+                            <button class="btn btn-success">Dodaj nowy projekt</button>
+                        </div>
                     </Content>
                 </Tab>
                 <Tab Title="Stacje paliw">
                     <Content>
                         <table class="mt-2 table-dark table-hover table">
-
                             <thead>
                                 <tr>
                                     <th scope="col">#</th>
@@ -49,14 +63,20 @@
                                 @foreach (var gasStation in gasStations)
                                 {
                                     <tr>
-                                        <th scope="row">@gasStations.IndexOf(gasStation)</th>
+                                        <th scope="row">@(gasStations.IndexOf(gasStation)+1)</th>
                                         <td>@gasStation.Name</td>
                                         <td>@gasStation.Description</td>
-                                        <td></td>
+                                        <td>
+                                            <button class="btn btn-danger" @onclick="() => DeleteGasStationAsync(gasStation.Id)"><i class="bi bi-trash-fill"></i></button>
+                                            <button class="btn btn-warning"><i class="bi bi-eye-fill"></i></button>
+                                        </td>
                                     </tr>
                                 }
                             </tbody>
                         </table>
+                        <div class="fixed-buttons">
+                            <button class="btn btn-success">Dodaj nową stację</button>
+                        </div>
                     </Content>
                 </Tab>
                 <Tab Title="Mechanicy">
@@ -74,15 +94,35 @@
                                 @foreach (var mechanic in mechanics)
                                 {
                                     <tr>
-                                        <th scope="row">@mechanics.IndexOf(mechanic)</th>
+                                        <th scope="row">@(mechanics.IndexOf(mechanic) + 1)</th>
                                         <td>@mechanic.Name</td>
                                         <td>@mechanic.Description</td>
-                                        <td></td>
+                                        <td>
+                                            <button class="btn btn-danger" @onclick="() => DeleteMechanicAsync(mechanic.Id)"><i class="bi bi-trash-fill"></i></button>
+                                            <button class="btn btn-warning" @onclick="() => OpenMechanic(mechanic.Id)"><i class="bi bi-eye-fill"></i></button>
+                                        </td>
 
                                     </tr>
                                 }
                             </tbody>
                         </table>
+                        <div class="fixed-buttons">
+                            <button class="btn btn-success" @onclick="() => OpenMechanic(0)">Dodaj nowego mechanika</button>
+                        </div>
+
+                        <div class="modal fade @(isMechanicOpen ? "show" : "")" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display:@(isMechanicOpen ? "block" : "none");">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header modal-header-moje">
+                                        <h5 class="modal-title" id="exampleModalLabel">Mechanik</h5>
+                                        <button type="button" class="btn-close" @onclick="CloseMechanic"></button>
+                                    </div>
+                                    <div class="modal-body modal-body-moje">
+                                        <MechanicAddModal OnFormStationSubmit="HandleMechanicSubmit" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </Content>
                 </Tab>
                 <Tab Title="Operatorzy">
@@ -96,17 +136,22 @@
                                 </tr>
                             </thead>
                             <tbody>
-
                                 @foreach (var oper in operators)
                                 {
                                     <tr>
-                                        <th scope="row">@operators.IndexOf(oper)</th>
+                                        <th scope="row">@(operators.IndexOf(oper) + 1)</th>
                                         <td>@oper.Name</td>
-                                        <td></td>
+                                        <td>
+                                            <button class="btn btn-danger" @onclick="() => DeleteOperatorAsync(oper.Id)"><i class="bi bi-trash-fill"></i></button>
+                                            <button class="btn btn-warning"><i class="bi bi-eye-fill"></i></button>
+                                        </td>
                                     </tr>
                                 }
                             </tbody>
                         </table>
+                        <div class="fixed-buttons">
+                            <button class="btn btn-success">Dodaj nowego operatora</button>
+                        </div>
                     </Content>
                 </Tab>
             </Tabs>
