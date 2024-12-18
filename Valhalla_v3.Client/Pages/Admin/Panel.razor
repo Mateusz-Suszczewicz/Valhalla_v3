@@ -21,12 +21,14 @@
                                 </tr>
                             </thead>
                             <tbody>
-
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>Mark</td>
-                                </tr>
-
+                                @foreach(var project in projects)
+                                {
+                                    <tr>
+                                        <th scope="row">@projects.IndexOf(project)</th>
+                                        <td>@project.Name</td>
+                                        <td></td>
+                                    </tr>
+                                }
                             </tbody>
                         </table>
                     </Content>
@@ -44,11 +46,15 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>Mark</td>
-                                    <td>Otto</td>
-                                </tr>
+                                @foreach (var gasStation in gasStations)
+                                {
+                                    <tr>
+                                        <th scope="row">@gasStations.IndexOf(gasStation)</th>
+                                        <td>@gasStation.Name</td>
+                                        <td>@gasStation.Description</td>
+                                        <td></td>
+                                    </tr>
+                                }
                             </tbody>
                         </table>
                     </Content>
@@ -65,13 +71,16 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @foreach (var mechanic in mechanics)
+                                {
+                                    <tr>
+                                        <th scope="row">@mechanics.IndexOf(mechanic)</th>
+                                        <td>@mechanic.Name</td>
+                                        <td>@mechanic.Description</td>
+                                        <td></td>
 
-
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>Mark</td>
-                                    <td>Otto</td>
-                                </tr>
+                                    </tr>
+                                }
                             </tbody>
                         </table>
                     </Content>
@@ -88,14 +97,14 @@
                             </thead>
                             <tbody>
 
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>Mark</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">2</th>
-                                    <td>Mark</td>
-                                </tr>
+                                @foreach (var oper in operators)
+                                {
+                                    <tr>
+                                        <th scope="row">@operators.IndexOf(oper)</th>
+                                        <td>@oper.Name</td>
+                                        <td></td>
+                                    </tr>
+                                }
                             </tbody>
                         </table>
                     </Content>
