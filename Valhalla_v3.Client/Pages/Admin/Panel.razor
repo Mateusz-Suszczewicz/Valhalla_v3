@@ -1,6 +1,8 @@
 ﻿@page "/admin"
 @using Valhalla_v3.Client.Components
 @using Valhalla_v3.Client.Pages.Cars
+@using Valhalla_v3.Shared.CarHistory
+@using Valhalla_v3.Shared.ToDo
 @rendermode InteractiveAuto
 @inject HttpClient Http
 @inject NavigationManager navigation
@@ -36,7 +38,7 @@
                                         <th scope="row">@(projects.IndexOf(project) + 1)</th>
                                         <td>@project.Name</td>
                                         <td>
-                                            <button class="btn btn-danger" @onclick="() => DeleteProjectAsync(project.Id)"><i class="bi bi-trash-fill"></i></button>
+                                            <button class="btn btn-danger" @onclick="() => DeleteAsync<Project>(project.Id)"><i class="bi bi-trash-fill"></i></button>
                                             <button class="btn btn-warning"><i class="bi bi-eye-fill"></i></button>
                                         </td>
                                     </tr>
@@ -67,7 +69,7 @@
                                         <td>@gasStation.Name</td>
                                         <td>@gasStation.Description</td>
                                         <td>
-                                            <button class="btn btn-danger" @onclick="() => DeleteGasStationAsync(gasStation.Id)"><i class="bi bi-trash-fill"></i></button>
+                                            <button class="btn btn-danger" @onclick="() => DeleteAsync<GasStation>(gasStation.Id)"><i class="bi bi-trash-fill"></i></button>
                                             <button class="btn btn-warning"><i class="bi bi-eye-fill"></i></button>
                                         </td>
                                     </tr>
@@ -98,7 +100,7 @@
                                         <td>@mechanic.Name</td>
                                         <td>@mechanic.Description</td>
                                         <td>
-                                            <button class="btn btn-danger" @onclick="() => DeleteMechanicAsync(mechanic.Id)"><i class="bi bi-trash-fill"></i></button>
+                                            <button class="btn btn-danger" @onclick="() => DeleteAsync<Mechanic>(mechanic.Id)"><i class="bi bi-trash-fill"></i></button>
                                             <button class="btn btn-warning" @onclick="() => OpenMechanic(mechanic.Id)"><i class="bi bi-eye-fill"></i></button>
                                         </td>
 
@@ -142,7 +144,7 @@
                                         <th scope="row">@(operators.IndexOf(oper) + 1)</th>
                                         <td>@oper.Name</td>
                                         <td>
-                                            <button class="btn btn-danger" @onclick="() => DeleteOperatorAsync(oper.Id)"><i class="bi bi-trash-fill"></i></button>
+                                            <button class="btn btn-danger" @onclick="() => DeleteAsync<Operator>(oper.Id)"><i class="bi bi-trash-fill"></i></button>
                                             <button class="btn btn-warning"><i class="bi bi-eye-fill"></i></button>
                                         </td>
                                     </tr>

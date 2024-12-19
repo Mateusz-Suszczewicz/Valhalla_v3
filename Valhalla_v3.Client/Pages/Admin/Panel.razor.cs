@@ -151,66 +151,28 @@ public partial class Panel
         }
     }
 
-    private async Task DeleteProjectAsync(int id)
-    {
-        if (id != 0) return;
 
+    private async Task DeleteAsync<T>(int id)
+    {
+        if (id == 0)
+        {
+            ErrorMessage = "Nieprawidłowe ID";
+            return;
+        }
+
+        var endpointInfo = GetEndpointInfo<T>();
+        if (endpointInfo == null)
+        {
+            throw new InvalidOperationException("Unsupported type for processing");
+        }
+
+        string endpoint = endpointInfo.Value.Item1;
         try
         {
-            var response = await Http.DeleteAsync(navigation.ToAbsoluteUri($"api/project/{id}"));
+            var response = await Http.DeleteAsync(navigation.ToAbsoluteUri($"api/{endpoint}/{id}"));
             if (response.IsSuccessStatusCode)
             {
-                await LoadProjectsAsync();
-                ErrorMessage = string.Empty;
-            }
-            else
-            {
-                var errorDetails = await response.Content.ReadAsStringAsync();
-                ErrorMessage = $"Błąd API - {response.StatusCode}: {errorDetails}";
-            }
-        }
-        catch (Exception ex)
-        {
-            ErrorMessage = $"Błąd aplikacji: {ex.Message} StackTrace: {ex.StackTrace}";
-            Console.WriteLine(ex.Message);
-        }
-    }
-    
-    private async Task DeleteGasStationAsync(int id)
-    {
-        if (id != 0) return;
-
-        try
-        {
-            var response = await Http.DeleteAsync(navigation.ToAbsoluteUri($"api/gastation/{id}"));
-            if (response.IsSuccessStatusCode)
-            {
-                await LoadGasStationssAsync();
-                ErrorMessage = string.Empty;
-            }
-            else
-            {
-                var errorDetails = await response.Content.ReadAsStringAsync();
-                ErrorMessage = $"Błąd API - {response.StatusCode}: {errorDetails}";
-            }
-        }
-        catch (Exception ex)
-        {
-            ErrorMessage = $"Błąd aplikacji: {ex.Message} StackTrace: {ex.StackTrace}";
-            Console.WriteLine(ex.Message);
-        }
-    }
-
-    private async Task DeleteMechanicAsync(int id)
-    {
-        if (id != 0) return;
-
-        try
-        {
-            var response = await Http.DeleteAsync(navigation.ToAbsoluteUri($"api/mechanic/{id}"));
-            if (response.IsSuccessStatusCode)
-            {
-                await LoadMechanicsAsync();
+                await endpointInfo.Value.Item2(); // Wywołanie metody asynchronicznej
                 ErrorMessage = string.Empty;
             }
             else
@@ -226,30 +188,20 @@ public partial class Panel
         }
     }
 
-    private async Task DeleteOperatorAsync(int id)
+    private (string, Func<Task>)? GetEndpointInfo<T>()
     {
-        if (id != 0) return;
+        var endpoints = new Dictionary<Type, (string, Func<Task>)>
+        {
+            { typeof(Project), ("project", async () => await LoadProjectsAsync()) },
+            { typeof(GasStation), ("gasStation", async () => await LoadGasStationssAsync()) },
+            { typeof(Mechanic), ("mechanic", async () => await LoadMechanicsAsync()) },
+            { typeof(Operator), ("operator", async () => await LoadOperatorsAsync()) }
+        };
 
-        try
-        {
-            var response = await Http.DeleteAsync(navigation.ToAbsoluteUri($"api/operator/{id}"));
-            if (response.IsSuccessStatusCode)
-            {
-                await LoadOperatorsAsync();
-                ErrorMessage = string.Empty;
-            }
-            else
-            {
-                var errorDetails = await response.Content.ReadAsStringAsync();
-                ErrorMessage = $"Błąd API - {response.StatusCode}: {errorDetails}";
-            }
-        }
-        catch (Exception ex)
-        {
-            ErrorMessage = $"Błąd aplikacji: {ex.Message} StackTrace: {ex.StackTrace}";
-            Console.WriteLine(ex.Message);
-        }
+        return endpoints.TryGetValue(typeof(T), out var endpointInfo) ? endpointInfo : null;
     }
+
+
 
     void CloseMechanic()
     {
