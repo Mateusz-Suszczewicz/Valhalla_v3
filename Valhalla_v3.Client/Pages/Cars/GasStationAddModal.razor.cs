@@ -5,10 +5,11 @@ namespace Valhalla_v3.Client.Pages.Cars;
 
 public partial class GasStationAddModal
 {
-    private GasStation formModel = new GasStation();
+    [Parameter]
+    public GasStation gasStation { get; set; } = new();
 
     [Parameter]
-    public EventCallback<GasStation> OnFormStationSubmit { get; set; }
+    public EventCallback<GasStation> StationSubmit { get; set; }
 
 
     protected override async Task OnInitializedAsync()
@@ -19,7 +20,7 @@ public partial class GasStationAddModal
     // Obsługa walidacji formularza i wywołanie callbacku
     private async Task HandleValidStationSubmit()
     {
-        await OnFormStationSubmit.InvokeAsync(formModel);
-        formModel = new();
+        await StationSubmit.InvokeAsync(gasStation);
+        gasStation = new();
     }
 }

@@ -33,6 +33,27 @@ public class MechanicController : ControllerBase
         }
     }
 
+    [HttpGet("{id}")]
+    public async Task<ActionResult<Mechanic>> Get(int id)
+    {
+        if (id <= 0)
+            return BadRequest(new { message = "Invalid ID. ID must be greater than zero." });
+
+        try
+        {
+            var mechanic = await _mechanicService.Get(id);
+            if (mechanic == null)
+                return NotFound(new { message = $"Mechanic with ID {id} not found." });
+
+            return Ok(mechanic);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+            return StatusCode(500, new { message = $"An unexpected error occurred while retrieving the mechanic.{ex.InnerException}" });
+        }
+    }
+
     [HttpPost]
     public async Task<ActionResult> Create([FromBody] Mechanic mechanic)
     {
@@ -53,7 +74,7 @@ public class MechanicController : ControllerBase
         catch (Exception ex)
         {
             Console.WriteLine($"Error: {ex.Message}");
-            return StatusCode(500, new { message = "An unexpected error occurred while creating the mechanic." });
+            return StatusCode(500, new { message = $"An unexpected error occurred while creating the mechanic. {ex.InnerException}" });
         }
     }
 }

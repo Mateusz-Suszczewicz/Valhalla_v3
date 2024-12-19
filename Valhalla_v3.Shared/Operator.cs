@@ -13,7 +13,7 @@ public class Operator
     public DateTime DateTimeModify { get; set; }
 
     [MaxLength(50)]
-	public required string Name { get; set; }
+	public string Name { get; set; }
 	[MaxLength(50)]
 	public string? Password { get; set; }
 }

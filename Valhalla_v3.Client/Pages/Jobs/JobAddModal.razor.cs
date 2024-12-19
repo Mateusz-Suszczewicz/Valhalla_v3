@@ -12,9 +12,9 @@ namespace Valhalla_v3.Client.Pages.Jobs;
 public partial class JobAddModal
 {
     [Parameter]
-    public Job formModel { get; set; }
+    public Job formModel { get; set; } = new();
     [Parameter]
-    public List<Project> projects { get; set; }
+    public List<Project> projects { get; set; } = new();
 
     private string ErrorMessage;
 

@@ -15,6 +15,7 @@ public partial class RepairAddModal
     private List<Mechanic> ListMechanic = new();
     private bool isMechanicOpen = false;
     private string ErrorMessage;
+    private Mechanic mechanic = new();
 
     [Parameter]
     public int CarId
@@ -30,29 +31,23 @@ public partial class RepairAddModal
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadMechnic();
+        await LoadMechanicsAsync();
     }
 
-    private async Task LoadMechnic()
+    private async Task LoadMechanicsAsync()
     {
-        ListMechanic.Clear();
         try
         {
-            var response = await Http.GetAsync(navigation.ToAbsoluteUri($"api/Mechanic"));
-            switch (response.StatusCode)
+            var (mechanics, error) = await apiService.GetListAsync<Mechanic>("api/Mechanic");
+
+            if (string.IsNullOrEmpty(error))
             {
-                case System.Net.HttpStatusCode.OK:
-                    ListMechanic = await response.Content.ReadFromJsonAsync<List<Mechanic>>() ?? new List<Mechanic>();
-                    ErrorMessage = string.Empty;
-                    break;
-
-                case System.Net.HttpStatusCode.NoContent:
-                    return;
-
-                default:
-                    var errorDetails = await response.Content.ReadAsStringAsync();
-                    ErrorMessage = $"Błąd API - {response.StatusCode}: {errorDetails}";
-                    break;
+                ListMechanic = mechanics ?? new List<Mechanic>();
+                ErrorMessage = string.Empty;
+            }
+            else
+            {
+                ErrorMessage = error; // Obsłuż komunikat o błędzie
             }
         }
         catch (Exception ex)
@@ -60,50 +55,41 @@ public partial class RepairAddModal
             ErrorMessage = $"Błąd aplikacji: {ex.Message} StackTrace: {ex.StackTrace}";
             Console.WriteLine(ex.Message);
         }
-        
     }
 
-    // Obsługa walidacji formularza i wywołanie callbacku
     private async Task HandleValidMechanicSubmit()
     {
         await OnFormSubmit.InvokeAsync(formModel);
         formModel = new();
     }
 
-
-    void OpenStation()
+    async Task OpenMechanic()
     {
+        mechanic = new Mechanic();
         isMechanicOpen = true;
         StateHasChanged();
     }
 
- 
-    async Task CloseStation()
+    async Task CloseMechanic()
     {
-
         isMechanicOpen = false;
+        mechanic = new Mechanic();
         StateHasChanged();
     }
 
-    private async void HandleMechanicSubmit(Mechanic model)
+    private async Task HandleMechanicSubmit(Mechanic model)
     {
-        model.OperatorCreateId = 1;
-        model.OperatorModifyId = 1;
-        var json = JsonSerializer.Serialize(model);
-        var content = new StringContent(json, Encoding.UTF8, "application/json");
         try
         {
-            var response = await Http.PostAsync(navigation.ToAbsoluteUri($"api/Mechanic"), content);
-            if (response.IsSuccessStatusCode)
+            var (success, error) = await apiService.PostAsync("api/Mechanic", model);
+            if (success)
             {
-                LoadMechnic();
-                CloseStation();
+                await LoadMechanicsAsync(); // Załaduj zaktualizowaną listę mechaników
                 ErrorMessage = string.Empty;
             }
             else
             {
-                var errorDetails = await response.Content.ReadAsStringAsync();
-                ErrorMessage = $"Błąd API - {response.StatusCode}: {errorDetails}";
+                ErrorMessage = error; // Obsłuż komunikat o błędzie
             }
         }
         catch (Exception ex)
@@ -111,6 +97,9 @@ public partial class RepairAddModal
             ErrorMessage = $"Błąd aplikacji: {ex.Message} StackTrace: {ex.StackTrace}";
             Console.WriteLine(ex.Message);
         }
-        CloseStation();
+        finally
+        {
+            CloseMechanic(); // Zamknij modal lub wykonaj inne działania końcowe
+        }
     }
 }

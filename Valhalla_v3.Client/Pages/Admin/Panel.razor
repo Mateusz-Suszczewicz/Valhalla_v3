@@ -39,14 +39,14 @@
                                         <td>@project.Name</td>
                                         <td>
                                             <button class="btn btn-danger" @onclick="() => DeleteAsync<Project>(project.Id)"><i class="bi bi-trash-fill"></i></button>
-                                            <button class="btn btn-warning"><i class="bi bi-eye-fill"></i></button>
+                                            <button class="btn btn-warning" @onclick="() => OpenProject(project.Id)"><i class="bi bi-eye-fill"></i></button>
                                         </td>
                                     </tr>
                                 }
                             </tbody>
                         </table>
                         <div class="fixed-buttons">
-                            <button class="btn btn-success">Dodaj nowy projekt</button>
+                            <button class="btn btn-success" @onclick="() => OpenProject(0)">Dodaj nowy projekt</button>
                         </div>
                     </Content>
                 </Tab>
@@ -70,15 +70,29 @@
                                         <td>@gasStation.Description</td>
                                         <td>
                                             <button class="btn btn-danger" @onclick="() => DeleteAsync<GasStation>(gasStation.Id)"><i class="bi bi-trash-fill"></i></button>
-                                            <button class="btn btn-warning"><i class="bi bi-eye-fill"></i></button>
+                                            <button class="btn btn-warning" @onclick="() => OpenGasStation(gasStation.Id)"><i class="bi bi-eye-fill"></i></button>
                                         </td>
                                     </tr>
                                 }
                             </tbody>
                         </table>
                         <div class="fixed-buttons">
-                            <button class="btn btn-success">Dodaj nową stację</button>
+                            <button class="btn btn-success" @onclick="() => OpenGasStation(0)">Dodaj nową stację</button>
                         </div>
+                        <div class="modal fade @(isGasStationOpen ? "show" : "")" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display:@(isGasStationOpen ? "block" : "none");">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header modal-header-moje">
+                                        <h5 class="modal-title" id="exampleModalLabel">Stacja paliw</h5>
+                                        <button class="btn-close" @onclick="CloseGasStation"></button>
+                                    </div>
+                                    <div class="modal-body modal-body-moje">
+                                        <GasStationAddModal StationSubmit="HandleGasStationSubmit" gasStation="gasStation" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </Content>
                 </Tab>
                 <Tab Title="Mechanicy">
@@ -111,7 +125,6 @@
                         <div class="fixed-buttons">
                             <button class="btn btn-success" @onclick="() => OpenMechanic(0)">Dodaj nowego mechanika</button>
                         </div>
-
                         <div class="modal fade @(isMechanicOpen ? "show" : "")" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display:@(isMechanicOpen ? "block" : "none");">
                             <div class="modal-dialog">
                                 <div class="modal-content">
@@ -120,7 +133,7 @@
                                         <button type="button" class="btn-close" @onclick="CloseMechanic"></button>
                                     </div>
                                     <div class="modal-body modal-body-moje">
-                                        <MechanicAddModal OnFormStationSubmit="HandleMechanicSubmit" />
+                                        <MechanicAddModal MechanicSubmit="HandleMechanicSubmit" mechanic="mechanic"/>
                                     </div>
                                 </div>
                             </div>
@@ -145,19 +158,21 @@
                                         <td>@oper.Name</td>
                                         <td>
                                             <button class="btn btn-danger" @onclick="() => DeleteAsync<Operator>(oper.Id)"><i class="bi bi-trash-fill"></i></button>
-                                            <button class="btn btn-warning"><i class="bi bi-eye-fill"></i></button>
+                                            <button class="btn btn-warning" @onclick="() => OpenOperator(oper.Id)"><i class="bi bi-eye-fill"></i></button>
                                         </td>
                                     </tr>
                                 }
                             </tbody>
                         </table>
                         <div class="fixed-buttons">
-                            <button class="btn btn-success">Dodaj nowego operatora</button>
+                            <button class="btn btn-success" @onclick="() => OpenOperator(0)">Dodaj nowego operatora</button>
+                        </div>
+                        <div class="modal fade @(isOperatorOpen ? "show" : "")" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display:@(isOperatorOpen ? "block" : "none");">
+                            <OperatorModal OperSubmit="HandleOperatorSubmit" OnClose="CloseOperators" oper="oper"></OperatorModal>
                         </div>
                     </Content>
                 </Tab>
             </Tabs>
         </Content>
     </Tab>
-    
 </Tabs>

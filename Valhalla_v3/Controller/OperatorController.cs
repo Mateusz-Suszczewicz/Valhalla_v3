@@ -2,7 +2,6 @@
 using Valhalla_v3.Services;
 using Valhalla_v3.Shared;
 
-
 namespace Valhalla_v3.Controller;
 
 [ApiController]
