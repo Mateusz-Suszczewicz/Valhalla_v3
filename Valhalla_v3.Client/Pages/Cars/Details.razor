@@ -76,6 +76,14 @@
                 </div>
             </div>
         </div>
+        <div class="row">
+            <div class="col-md-4 mb-4 mt-3">
+                <div class="form-floating">
+                    <input type="number" disabled="@isDisabled" class="form-control" id="ServiceOil" @bind-value="@ServiceOil">
+                    <label for="InNumCost">Km od ostatniego serwisu olejowego</label>
+                </div>
+            </div>
+        </div>
         <div class="row">@*Trzecia linia*@
             <ul class="nav nav-tabs">
                 <li class="nav-item">
@@ -113,6 +121,7 @@
                     <label for="InNumCostPrzglad">Koszt osatniego przeglądu</label>
                 </div>
             </div>
+
         </div>
     }
 

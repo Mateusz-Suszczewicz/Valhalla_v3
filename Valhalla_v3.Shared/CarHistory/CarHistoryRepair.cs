@@ -26,6 +26,8 @@ public class CarHistoryRepair : MainClass
     [StringLength(500, ErrorMessage = "Pole Opis może mięć maksymalnie 500 znaków.")]
     public string? Description { get; set; }
     
+    public bool ServiceOil { get; set; }
+
     [JsonIgnore]
     public virtual Mechanic? Mechanic { get; set; }
 	

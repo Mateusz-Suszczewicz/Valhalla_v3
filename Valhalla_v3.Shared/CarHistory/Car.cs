@@ -19,7 +19,6 @@ public class Car : MainClass
 	public DateTime? SurveyDate { get; set; }
     public decimal? SurveyCost { get; set; }
 
-
     public virtual ICollection<CarHistoryRepair> CarHistoryRepair { get; set; } = new List<CarHistoryRepair>();
 	public virtual ICollection<CarHistoryFuel> Fuels { get; set; } = new List<CarHistoryFuel>();
 }

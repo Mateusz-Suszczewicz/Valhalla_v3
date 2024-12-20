@@ -22,6 +22,7 @@ public partial class Details
     private Tabs activeTab = Tabs.Details;
     private Car? car;
     private int mileage;
+    private int ServiceOil;
     private decimal fuelCost;
     private decimal repairCost;
     private decimal sumCost;
@@ -153,6 +154,9 @@ public partial class Details
             repairCost = car.CarHistoryRepair.Where(r => r.DateTimeModify.Month == now.Month && r.DateTimeModify.Year == now.Year).Sum(r => r.Cost);
             if(car.CarHistoryRepair.Select(x => x.Mileage).Max() > mileage)
 				mileage = car.CarHistoryRepair.Max(x => x.Mileage);
+            var lastOilService = car.CarHistoryRepair.Where(x => x.ServiceOil).LastOrDefault();
+            if (lastOilService != null)
+                ServiceOil = mileage - lastOilService.Mileage;
         }
         
         sumCost = fuelCost + repairCost;
@@ -256,6 +260,8 @@ public partial class Details
 
     private async Task SaveAsync()
     {
+        car.OperatorCreateId = 3;
+        car.OperatorModifyId = 3;
         var json = JsonSerializer.Serialize(car);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
         try
@@ -263,8 +269,15 @@ public partial class Details
             var response = await Http.PostAsync(navigation.ToAbsoluteUri($"api/Car"), content);
             if (response.IsSuccessStatusCode)
             {
-                var Id = await response.Content.ReadFromJsonAsync<int>();
-                navigation.NavigateTo($"cars/{Id}");
+                var location = response.Headers.Location?.ToString();
+
+                if (!string.IsNullOrEmpty(location))
+                {
+                    // Wyciągnij id z URI, np. https://api.example.com/cars/{id}
+                    var id = location.Split('=').Last().Replace("'", "");
+                    Console.WriteLine($"Utworzono zasób o id: {id}");
+                    navigation.NavigateTo($"cars/{id}", true);
+                }
                 ErrorMessage = string.Empty;
             }
             else

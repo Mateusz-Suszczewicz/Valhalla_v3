@@ -8,6 +8,6 @@ public class MainClassFull : MainClass
     [StringLength(100, ErrorMessage ="Pole Nazwa może mięć maksymalnie 100 znaków.")]
 	public string Name { get; set; }
 
-	[StringLength(500, ErrorMessage = "Pole Opis może mięć maksymalnie 500 znaków.")]
+	[StringLength(1500, ErrorMessage = "Pole Opis może mięć maksymalnie 1500 znaków.")]
 	public string? Description { get; set; }
 }

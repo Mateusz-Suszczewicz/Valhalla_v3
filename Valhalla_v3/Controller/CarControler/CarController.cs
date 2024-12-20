@@ -77,7 +77,7 @@ public class CarController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] Car car)
+    public async Task<ActionResult<int>> Create([FromBody] Car car)
     {
         try
         {

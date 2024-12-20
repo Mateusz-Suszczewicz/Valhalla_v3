@@ -155,6 +155,14 @@ public class ValhallaContext : DbContext, IValhallaContext
         modelBuilder.Entity<Car>()
             .HasMany(b => b.Fuels)
             .WithOne(a => a.Car);
+        
+        modelBuilder.Entity<Car>()
+            .Property(c => c.InsuranceCost)
+            .HasColumnType("decimal(18,2)");
+        
+        modelBuilder.Entity<Car>()
+            .Property(c => c.SurveyCost)
+            .HasColumnType("decimal(18,2)");
     }
 
     private void ConfigureCarHistoryFuelTable(ModelBuilder modelBuilder)

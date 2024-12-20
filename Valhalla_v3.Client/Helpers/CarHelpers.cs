@@ -36,7 +36,7 @@ public static class CarHelpers
                 litr += car.Fuels.Where(x => x.DateTimeModify.Month == i + 1 && x.DateTimeModify.Year == DateTime.Now.Year).Select(z => z.Cost / z.CostPerLitr).FirstOrDefault();
                 if (i == 12)
                     litr += car.Fuels.Where(x => x.DateTimeModify.Month == 1 && x.DateTimeModify.Year == DateTime.Now.Year + 1).Select(z => z.Cost / z.CostPerLitr).FirstOrDefault();
-                var minMilage = car.Fuels?.Where(x => x.DateTimeModify.Month == i && x.DateTimeModify.Year == DateTime.Now.Year)?.Min(z => z.Mileage);
+                var minMilage = car.Fuels?.Where(x => x.DateTimeModify.Month == i && x.DateTimeModify.Year == DateTime.Now.Year).Min(z => z.Mileage);
                 var maxMilage = car.Fuels?.Where(x => x.DateTimeModify.Month == i + 1 && x.DateTimeModify.Year == DateTime.Now.Year).Select(z => z.Mileage).FirstOrDefault();
                 if(maxMilage ==  null || maxMilage == 0)
                     maxMilage = car.Fuels?.Where(x => x.DateTimeModify.Month == i && x.DateTimeModify.Year == DateTime.Now.Year).Max(z => z.Mileage);
