@@ -185,8 +185,8 @@ public partial class Panel
 
     private async Task LoadProjectsAsync() => await LoadDataAsync("project", projects);
     void CloseProject() => CloseEntity<Project>(newProject => project = newProject, isOpen => isProjectOpen = isOpen);
-    private async Task OpenProject(int id) => await OpenEntity<Project>(id, newProject => project = newProject, isOpen => isProjectOpen = isOpen, "mechanic");
-    private async Task HandleProjectSubmit(Project model) => await HandleEntitySubmit(model, "mechanic", LoadProjectsAsync, isOpen => isProjectOpen = isOpen);
+    private async Task OpenProject(int id) => await OpenEntity<Project>(id, newProject => project = newProject, isOpen => isProjectOpen = isOpen, "project");
+    private async Task HandleProjectSubmit(Project model) => await HandleEntitySubmit(model, "project", LoadProjectsAsync, isOpen => isProjectOpen = isOpen);
 
     private async Task LoadMechanicsAsync() => await LoadDataAsync("mechanic", mechanics);
     void CloseMechanic() => CloseEntity<Mechanic>(newMechanic => mechanic = newMechanic, isOpen => isMechanicOpen = isOpen);

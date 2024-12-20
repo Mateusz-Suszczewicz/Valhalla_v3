@@ -195,15 +195,16 @@ namespace Valhalla_v3.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("Activ")
+                        .HasColumnType("bit");
+
                     b.Property<string>("City")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(58)
+                        .HasColumnType("nvarchar(58)");
 
                     b.Property<string>("Country")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(215)
+                        .HasColumnType("nvarchar(215)");
 
                     b.Property<DateTime>("DateTimeAdd")
                         .HasColumnType("datetime2");
@@ -227,27 +228,22 @@ namespace Valhalla_v3.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Phone1")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Phone2")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("PostalCode")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<string>("Street")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(38)
+                        .HasColumnType("nvarchar(38)");
 
                     b.Property<string>("StreetNumber")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -268,15 +264,16 @@ namespace Valhalla_v3.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("Activ")
+                        .HasColumnType("bit");
+
                     b.Property<string>("City")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(58)
+                        .HasColumnType("nvarchar(58)");
 
                     b.Property<string>("Country")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(215)
+                        .HasColumnType("nvarchar(215)");
 
                     b.Property<DateTime>("DateTimeAdd")
                         .HasColumnType("datetime2");
@@ -300,27 +297,22 @@ namespace Valhalla_v3.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Phone1")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Phone2")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("PostalCode")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<string>("Street")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(38)
+                        .HasColumnType("nvarchar(38)");
 
                     b.Property<string>("StreetNumber")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -380,7 +372,7 @@ namespace Valhalla_v3.Migrations
                     b.Property<DateTime>("DateTimeModify")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("JobId")
+                    b.Property<int>("JobId")
                         .HasColumnType("int");
 
                     b.Property<int>("OperatorCreateId")
@@ -435,7 +427,7 @@ namespace Valhalla_v3.Migrations
                     b.Property<int>("ProjectId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("Term")
+                    b.Property<DateTime>("Term")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
@@ -456,6 +448,9 @@ namespace Valhalla_v3.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Activ")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime>("DateTimeAdd")
                         .HasColumnType("datetime2");
@@ -616,9 +611,11 @@ namespace Valhalla_v3.Migrations
 
             modelBuilder.Entity("Valhalla_v3.Shared.ToDo.Comment", b =>
                 {
-                    b.HasOne("Valhalla_v3.Shared.ToDo.Job", null)
+                    b.HasOne("Valhalla_v3.Shared.ToDo.Job", "Job")
                         .WithMany("Comments")
-                        .HasForeignKey("JobId");
+                        .HasForeignKey("JobId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Valhalla_v3.Shared.Operator", "OperatorCreate")
                         .WithMany()
@@ -631,6 +628,8 @@ namespace Valhalla_v3.Migrations
                         .HasForeignKey("OperatorModifyId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.Navigation("Job");
 
                     b.Navigation("OperatorCreate");
 

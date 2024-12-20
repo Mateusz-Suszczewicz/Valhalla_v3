@@ -15,12 +15,13 @@ public partial class JobList
     private List<Job> _items = new();
     private Job job = new();
     private bool IsCreateOpen = false;
-    private bool IsTextOpen = false;
+    private bool IsPProjectOpen = false;
     private List<Project> projects = new();
     private int projectsId { get; set; } = new();
     private int _id { get; set; }
     private bool? OnlyNoDoneJobs = true;
     private string ErrorMessage;
+    private Project project { get; set; } = new Project();
     protected override async Task OnInitializedAsync()
     {
         LoadJob();
@@ -166,24 +167,18 @@ public partial class JobList
         IsCreateOpen = true;
     }
 
-    private void OpenTextModal()
+    private void OpenProject()
     {
-        IsTextOpen = true;
+        project = new Project();
+        IsPProjectOpen = true;
     }
 
-    private async Task CreateProjekt(string name)
+    private async Task CreateProjekt(Project project)
     {
-        if (string.IsNullOrEmpty(name))
-        {
-            IsTextOpen = false;
-            return;
-        }
-        Project project = new Project()
-        {
-            OperatorCreateId = 1,
-            OperatorModifyId = 1,
-            Name = name
-        };
+
+        project.OperatorCreateId = 1;
+        project.OperatorModifyId = 1;
+
         var json = JsonSerializer.Serialize(project);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
         try
@@ -191,7 +186,7 @@ public partial class JobList
             var response = await Http.PostAsync(navigation.ToAbsoluteUri($"api/project"), content);
             if (response.IsSuccessStatusCode)
             {
-                IsTextOpen = false;
+                IsPProjectOpen = false;
                 await LoadProject();
                 ErrorMessage = string.Empty;
             }
@@ -206,7 +201,7 @@ public partial class JobList
             ErrorMessage = $"Błąd aplikacji: {ex.Message} StackTrace: {ex.StackTrace}";
             Console.WriteLine(ex.Message);
         }
-        IsTextOpen = false;
+        IsPProjectOpen = false;
     }
 
     private async Task SetProject()
@@ -248,7 +243,7 @@ public partial class JobList
     
     private void CloseProject()
     {
-        IsTextOpen = false;
+        IsPProjectOpen = false;
     }
 
     private void ChangeDoneJobs()

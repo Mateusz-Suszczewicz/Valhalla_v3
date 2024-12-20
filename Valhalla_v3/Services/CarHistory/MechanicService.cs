@@ -44,6 +44,9 @@ public class MechanicService : IMechanicService
         if (id <= 0)
             throw new ArgumentException("Invalid ID. ID must be greater than zero.");
 
+        if (_context.CarHistoryRepairs.Any(x => x.MechanicId == id))
+            throw new ArgumentException("Nie można usunąć mechanika do którego są podpięte naprawy");
+
         var mechanic = await _context.Mechanics.FirstOrDefaultAsync(x => x.Id == id);
 
         if (mechanic == null)
@@ -74,6 +77,7 @@ public class MechanicService : IMechanicService
         var mechanicList = await _context.Mechanics
             .Include(x => x.OperatorCreate)
             .Include(x => x.OperatorModify)
+            .Where(x => x.Activ)
             .ToListAsync();
 
         return mechanicList ?? new List<Mechanic>();
