@@ -48,6 +48,12 @@
         <InputText id="Mileage" class="form-control" @bind-Value="gasStation.Phone2" />
         <ValidationMessage For="@(() => gasStation.Phone2)" />
     </div>
+        <div class="mb-3">
+        <input class="form-check-input" type="checkbox" id="NoActiv" @bind="gasStation.Activ">
+        <label class="form-check-label" for="NoActiv">
+            Stacja nieaktywny
+        </label>
+    </div>
     <button class="btn btn-primary w-50" type="submit">Zapisz</button>
 </EditForm>
 
