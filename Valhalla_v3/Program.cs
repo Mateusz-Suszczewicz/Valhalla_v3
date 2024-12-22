@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using MudBlazor;
 using MudBlazor.Services;
 using System.Globalization;
 using System.Text;
@@ -62,7 +61,7 @@ else
 builder.Services.AddDbContext<ValhallaContext>(options =>
     options.UseSqlServer(connection));
 
-builder.Services.AddIdentity<Operator, IdentityRole>()
+builder.Services.AddIdentity<Operator, IdentityRole<int>>()
     .AddEntityFrameworkStores<ValhallaContext>()
     .AddDefaultTokenProviders();
 
@@ -88,19 +87,16 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 app.UseResponseCompression();
-// Configure the HTTP request pipeline.
 
 if (app.Environment.IsDevelopment())
 {
     app.UseWebAssemblyDebugging();
     app.UseDeveloperExceptionPage();
     
-    //app.UseSwaggerUI();
 }
 else
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-	// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 	app.UseHsts();
 }
 var defaultCulture = new CultureInfo("pl-PL");
@@ -128,11 +124,7 @@ catch(Exception ex)
 {
     Console.WriteLine(ex.Message);
 }
-//app.UseEndpoints(endpoints =>
-//{
-//    endpoints.MapControllers();
-//    endpoints.MapFallbackToFile("");
-//});
+
 app.MapControllers();
 app.UseStaticFiles();
 
@@ -140,4 +132,29 @@ app.MapRazorComponents<App>()
 	.AddInteractiveServerRenderMode()
 	.AddInteractiveWebAssemblyRenderMode()
 	.AddAdditionalAssemblies(typeof(Valhalla_v3.Client._Imports).Assembly);
+
+
+
+// SeedRoles podczas uruchamiania aplikacji
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();
+    await SeedRoles(roleManager);
+}
+
+async Task SeedRoles(RoleManager<IdentityRole<int>> roleManager)
+{
+    var roles = new[] { "Admin", "User", "Manager" };
+
+    foreach (var role in roles)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+        {
+            await roleManager.CreateAsync(new IdentityRole<int> { Name = role });
+        }
+    }
+}
+
+
+
 app.Run();

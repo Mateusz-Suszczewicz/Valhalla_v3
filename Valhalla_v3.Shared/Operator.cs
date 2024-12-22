@@ -6,11 +6,7 @@ namespace Valhalla_v3.Shared;
 
 public class Operator : IdentityUser<int>
 {
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    [Key]
-    public int Id { get; set; }
-
-    public DateTime DateTimeAdd { get; set; }
+	public DateTime DateTimeAdd { get; set; }
     public DateTime DateTimeModify { get; set; }
 
     [MaxLength(50)]

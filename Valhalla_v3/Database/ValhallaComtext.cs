@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Valhalla_v3.Shared;
 using Valhalla_v3.Shared.CarHistory;
@@ -20,7 +21,7 @@ public interface IValhallaContext
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
 
-public class ValhallaContext : IdentityDbContext<Operator>, IValhallaContext
+public class ValhallaContext : IdentityDbContext<Operator, IdentityRole<int>, int>, IValhallaContext
 {
     public virtual DbSet<Operator> Operator { get; set; }
     public virtual DbSet<Comment> Comment { get; set; }
@@ -58,6 +59,10 @@ public class ValhallaContext : IdentityDbContext<Operator>, IValhallaContext
         ConfigureGasStationTable(modelBuilder);
         ConfigureMechanicTable(modelBuilder);
         base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<IdentityUserRole<int>>(entity =>
+        {
+            entity.HasKey(iur => new { iur.UserId, iur.RoleId });
+        });
     }
 
     private void ConfigureOperatorTable(ModelBuilder modelBuilder)
