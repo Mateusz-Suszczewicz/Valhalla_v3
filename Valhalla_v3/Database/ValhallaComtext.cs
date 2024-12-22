@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Valhalla_v3.Shared;
 using Valhalla_v3.Shared.CarHistory;
 using Valhalla_v3.Shared.ToDo;
@@ -19,7 +20,7 @@ public interface IValhallaContext
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
 
-public class ValhallaContext : DbContext, IValhallaContext
+public class ValhallaContext : IdentityDbContext<Operator>, IValhallaContext
 {
     public virtual DbSet<Operator> Operator { get; set; }
     public virtual DbSet<Comment> Comment { get; set; }
@@ -33,7 +34,8 @@ public class ValhallaContext : DbContext, IValhallaContext
 
     private readonly IConfiguration _configuration;
 
-    public ValhallaContext(IConfiguration configuration)
+    public ValhallaContext(DbContextOptions<ValhallaContext> options, IConfiguration configuration)
+        : base(options)
     {
         _configuration = configuration;
     }
@@ -55,6 +57,7 @@ public class ValhallaContext : DbContext, IValhallaContext
         ConfigureCarHistoryRepairTable(modelBuilder);
         ConfigureGasStationTable(modelBuilder);
         ConfigureMechanicTable(modelBuilder);
+        base.OnModelCreating(modelBuilder);
     }
 
     private void ConfigureOperatorTable(ModelBuilder modelBuilder)

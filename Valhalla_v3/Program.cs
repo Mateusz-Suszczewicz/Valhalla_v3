@@ -1,22 +1,25 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using MudBlazor;
 using MudBlazor.Services;
 using System.Globalization;
+using System.Text;
 using Valhalla_v3.Components;
 using Valhalla_v3.Database;
 using Valhalla_v3.Services;
 using Valhalla_v3.Services.CarHistory;
 using Valhalla_v3.Services.ToDo;
-
+using Valhalla_v3.Shared;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
 	.AddInteractiveServerComponents()
 	.AddInteractiveWebAssemblyComponents();
-builder.Services.AddScoped<IMudPopoverService, MudPopoverService>();
 
 builder.Services.AddMudServices();
 builder.Services.AddScoped<IOperatorService, OperatorService>();
@@ -58,6 +61,30 @@ else
 
 builder.Services.AddDbContext<ValhallaContext>(options =>
     options.UseSqlServer(connection));
+
+builder.Services.AddIdentity<Operator, IdentityRole>()
+    .AddEntityFrameworkStores<ValhallaContext>()
+    .AddDefaultTokenProviders();
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+    };
+});
+
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 app.UseResponseCompression();

@@ -1,0 +1,58 @@
+﻿@page "/login"
+@inject NavigationManager navigation
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
+@rendermode InteractiveAuto
+@attribute [AllowAnonymous]
+<h3>Login</h3>
+
+<EditForm Model="@loginModel" OnValidSubmit="HandleLogin" FormName="test">
+    <DataAnnotationsValidator />
+    <div>
+        <label>Username</label>
+        <InputText @bind-value="@loginModel.Username" />
+    </div>
+    <div>
+        <label>Password</label>
+        <InputText @bind-Value="@loginModel.Password" type="password" />
+    </div>
+    <button type="submit">Login</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <p style="color:red;">@errorMessage</p>
+}
+
+@code {
+    private LoginDto loginModel = new();
+    private string? errorMessage;
+
+    private async Task HandleLogin()
+    {
+        try
+        {
+            var response = await Http.PostAsJsonAsync(navigation.ToAbsoluteUri("api/auth/login"), loginModel);
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
+                await JSRuntime.InvokeVoidAsync("localStorage.setItem", "token", result.Token);
+
+                navigation.NavigateTo("/");
+            }
+            else
+            {
+                errorMessage = "Invalid username or password.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    private class LoginResponse
+    {
+        public string Token { get; set; }
+    }
+}
