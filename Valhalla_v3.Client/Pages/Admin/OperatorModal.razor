@@ -1,0 +1,49 @@
+﻿@inject NavigationManager navigation
+@inject HttpClient Http
+
+<div class="modal-dialog" @onkeydown="HandleKeyDown" tabindex="-1">
+    <div class="modal-content">
+        <div class="modal-header modal-header-moje">
+            <h5 class="modal-title" id="exampleModalLabel">Operator</h5>
+            <button type="button" class="btn-close" @onclick="Close"></button>
+        </div>
+        <div class="modal-body modal-body-moje">
+            <EditForm Model="@oper" OnValidSubmit="HandleValidOperSubmit">
+                <DataAnnotationsValidator />
+                <div class="mb-3">
+                    <label for="Name" class="form-label">Login</label>
+                    <InputText id="Name" class="form-control" @bind-Value="oper.Name" />
+                    <ValidationMessage For="@(() => oper.Name)" />
+                </div>
+                <div class="mb-3">
+                    <label for="Password" class="form-label">Hasło</label>
+                    <InputText id="Password"  class="form-control" @bind-Value="oper.Password" />
+                    <ValidationMessage For="@(() => oper.Password)" />
+                </div>
+                <div class="d-flex justify-content-between">
+                    <button class="btn btn-primary w-25" type="submit">Zapisz</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+<script>
+
+    (function () {
+      'use strict'
+
+      var forms = document.querySelectorAll('.needs-validation')
+
+      Array.prototype.slice.call(forms)
+        .forEach(function (form) {
+          form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+              event.preventDefault()
+              event.stopPropagation()
+            }
+
+            form.classList.add('was-validated')
+          }, false)
+        })
+    })()
+</script>

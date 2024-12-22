@@ -48,7 +48,10 @@ public class ProjectService : IProjectService
 
         if (project == null)
             throw new KeyNotFoundException($"Project with ID {id} not found.");
-
+        
+        if (_context.Job.Any(x => x.ProjectId == id))
+            throw new ArgumentException("Nie można usunąć projektu który ma przypisane zadania");
+        
         _context.Project.Remove(project);
         await _context.SaveChangesAsync();
     }
@@ -88,6 +91,9 @@ public class ProjectService : IProjectService
 
         if (project.Id <= 0)
             throw new ArgumentException("Invalid ID. ID must be greater than zero.");
+        
+        if (_context.Job.Any(x => x.ProjectId == project.Id && !x.IsCompleted) && !project.Activ)
+            throw new ArgumentException("Zakończony projekt nie moze mieć aktywnych zadań.");
 
         var existingProject = await _context.Project.FirstOrDefaultAsync(x => x.Id == project.Id);
 

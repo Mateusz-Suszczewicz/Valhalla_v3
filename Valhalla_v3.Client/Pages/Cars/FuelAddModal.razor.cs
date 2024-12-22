@@ -13,8 +13,10 @@ public partial class FuelAddModal
 {
     private CarHistoryFuel formModel = new CarHistoryFuel();
     private List<GasStation> ListGasStation = new();
-    private bool isGasSttionOpen = false;
+    private bool isGasStationOpen = false;
     private string ErrorMessage;
+    private GasStation gasStation = new();
+
     [Parameter]
     public int CarId
     {
@@ -28,10 +30,10 @@ public partial class FuelAddModal
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadGaStation();
+        await LoadGaStationAsync();
     }
 
-    private async Task LoadGaStation()
+    private async Task LoadGaStationAsync()
     {
         try
         {
@@ -66,43 +68,43 @@ public partial class FuelAddModal
         formModel = new();
     }
 
-    private void OpenStation()
+    async Task OpenGasStation()
     {
-        isGasSttionOpen = true;
+        gasStation = new GasStation();
+        isGasStationOpen = true;
         StateHasChanged();
     }
 
-    private async Task CloseStation()
+    async Task CloseGasStation()
     {
-        isGasSttionOpen = false;
+        isGasStationOpen = false;
+        gasStation = new GasStation();
         StateHasChanged();
     }
 
-    private async Task HandleStationSubmit(GasStation model)
+    private async Task HandleGasStationSubmit(GasStation model)
     {
-        model.OperatorCreateId = 1;
-        model.OperatorModifyId = 1;
-        var json = JsonSerializer.Serialize(model);
-        var content = new StringContent(json, Encoding.UTF8, "application/json");
         try
         {
-            var response = await Http.PostAsync(navigation.ToAbsoluteUri($"api/GasStation"), content);
-            if (response.IsSuccessStatusCode)
+            var (success, error) = await apiService.PostAsync("api/gasStation", model);
+            if (success)
             {
-                LoadGaStation();
-                CloseStation();
+                await LoadGaStationAsync(); // Załaduj zaktualizowaną listę mechaników
                 ErrorMessage = string.Empty;
             }
             else
             {
-                var errorDetails = await response.Content.ReadAsStringAsync();
-                ErrorMessage = $"Błąd API - {response.StatusCode}: {errorDetails}";
+                ErrorMessage = error; // Obsłuż komunikat o błędzie
             }
         }
         catch (Exception ex)
         {
             ErrorMessage = $"Błąd aplikacji: {ex.Message} StackTrace: {ex.StackTrace}";
             Console.WriteLine(ex.Message);
+        }
+        finally
+        {
+            await CloseGasStation(); // Zamknij modal lub wykonaj inne działania końcowe
         }
     }
 }

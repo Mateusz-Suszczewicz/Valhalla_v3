@@ -37,7 +37,7 @@
             </select>
         </div>
         <div class="col-md-2 mb-4">
-            <button class="btn btn-primary" @onclick=OpenTextModal>Dodaj projekt</button>
+            <button class="btn btn-primary" @onclick=OpenProject>Dodaj projekt</button>
         </div>
         <div class="col-md-2 text-white">
             <div class="form-check">
@@ -88,7 +88,19 @@
     <JobAddModal OnFormSubmit="Create" OnClose="CloseModal" formModel="job" projects="projects" Id="_id"/>
 </div>
 
-<Valhalla_v3.Client.Components.TextModal Question="Podaj nazwę projektu" isChoiceOpen="@IsTextOpen" SubmitChoice="CreateProjekt" CloseModal="CloseProject" />
+<div class="modal fade @(IsPProjectOpen ? "show" : "")" tabindex="-1" style="display:@(IsPProjectOpen ? "block" : "none");">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header modal-header-moje">
+                <h5 class="modal-title">Projekt</h5>
+                <button type="button" class="btn-close" @onclick="CloseProject"></button>
+            </div>
+            <div class="modal-body modal-body-moje">
+                <ProjectModal ProjctSubmit="CreateProjekt" project="project"/>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
     let dragged = null;

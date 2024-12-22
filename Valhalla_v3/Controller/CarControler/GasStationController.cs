@@ -32,6 +32,27 @@ public class GasStationController : ControllerBase
             return StatusCode(500, new { message = "An unexpected error occurred while retrieving gas stations." });
         }
     }
+    
+    [HttpGet("{id}")]
+    public async Task<ActionResult<GasStation>> Get(int id)
+    {
+        if (id <= 0)
+            return BadRequest(new { message = "Invalid ID. ID must be greater than zero." });
+
+        try
+        {
+            var gasStation = await _gasStationService.Get(id);
+            if (gasStation == null)
+                return NotFound(new { message = $"Gas Station with ID {id} not found." });
+
+            return Ok(gasStation);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+            return StatusCode(500, new { message = $"An unexpected error occurred while retrieving the gas station.{ex.Message}" });
+        }
+    }
 
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] GasStation gasStation)
@@ -59,7 +80,7 @@ public class GasStationController : ControllerBase
         catch (Exception ex)
         {
             Console.WriteLine($"Error: {ex.Message}");
-            return StatusCode(500, new { message = "An unexpected error occurred while creating or updating the gas station." });
+            return StatusCode(500, new { message = $"An unexpected error occurred while creating or updating the gas station. {ex.InnerException}" });
         }
     }
 }

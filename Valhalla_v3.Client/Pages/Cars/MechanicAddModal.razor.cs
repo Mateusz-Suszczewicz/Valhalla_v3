@@ -5,10 +5,11 @@ namespace Valhalla_v3.Client.Pages.Cars;
 
 public partial class MechanicAddModal
 {
-    private Mechanic formModel = new Mechanic();
+    [Parameter]
+    public Mechanic mechanic { get; set; } = new();
 
     [Parameter]
-    public EventCallback<Mechanic> OnFormStationSubmit { get; set; }
+    public EventCallback<Mechanic> MechanicSubmit { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -17,8 +18,8 @@ public partial class MechanicAddModal
     // Obsługa walidacji formularza i wywołanie callbacku
     private async Task HandleValidStationSubmit()
     {
-        await OnFormStationSubmit.InvokeAsync(formModel);
-        formModel = new();
+        await MechanicSubmit.InvokeAsync(mechanic);
+        mechanic = new();
     }
 
 }

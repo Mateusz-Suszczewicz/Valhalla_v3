@@ -19,6 +19,7 @@ public class GasStation : MainClassFull
     public string? Phone1 { get; set; }
     [MaxLength(20, ErrorMessage = "Pole Numer 2 może mieć maksymalnie 20 znaków.")]
     public string? Phone2 { get; set; }
+    public bool Activ { get; set; }
     [JsonIgnore]
     public virtual ICollection<CarHistoryFuel> Fuels { get; set; } = new List<CarHistoryFuel>();
 }

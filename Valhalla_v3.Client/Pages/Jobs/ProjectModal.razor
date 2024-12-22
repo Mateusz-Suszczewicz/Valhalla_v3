@@ -1,0 +1,49 @@
+﻿@using Valhalla_v3.Shared.CarHistory
+@inject NavigationManager navigation
+
+<EditForm Model="@project" OnValidSubmit="HandleValidProjectSubmit">
+    <DataAnnotationsValidator />
+    <div class="mb-3">
+        <label for="Cost" class="form-label">Nazwa</label>
+        <InputText id="Cost" class="form-control" @bind-Value="project.Name" required />
+        <ValidationMessage For="@(() => project.Name)" />
+    </div>
+    <div class="mb-3">
+        <label for="CostPerLitr" class="form-label">Opis</label>
+        <InputTextArea id="CostPerLitr" class="form-control" @bind-Value="project.Description" />
+        <ValidationMessage For="@(() => project.Description)" />
+    </div>
+    <div class="mb-3">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="NoActiv" @bind="project.Activ">
+            <label class="form-check-label" for="NoActiv">
+                Projekt nieaktywny
+            </label>
+        </div>
+    </div>
+    <button class="btn btn-primary w-50" type="submit">Zapisz</button>
+</EditForm>
+
+<script>
+
+        // Example starter JavaScript for disabling form submissions if there are invalid fields
+    (function () {
+      'use strict'
+
+      // Fetch all the forms we want to apply custom Bootstrap validation styles to
+      var forms = document.querySelectorAll('.needs-validation')
+
+      // Loop over them and prevent submission
+      Array.prototype.slice.call(forms)
+        .forEach(function (form) {
+          form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+              event.preventDefault()
+              event.stopPropagation()
+            }
+
+            form.classList.add('was-validated')
+          }, false)
+        })
+    })()
+</script>

@@ -27,6 +27,7 @@ builder.Services.AddScoped<IMechanicService, MechanicService>();
 builder.Services.AddScoped<ICarHistoryRepairService, CarHistoryRepairService>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<IJobService, JobService>();
+builder.Services.AddScoped<ApiService>();
 builder.Services.AddBlazorBootstrap(); 
 
 builder.Services.AddEndpointsApiExplorer();

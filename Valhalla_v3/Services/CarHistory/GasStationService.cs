@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Valhalla_v3.Database;
 using Valhalla_v3.Shared.CarHistory;
+using Valhalla_v3.Shared.ToDo;
 
 namespace Valhalla_v3.Services.CarHistory;
 
@@ -49,6 +50,9 @@ public class GasStationService : IGasStationService
         if (station == null)
             throw new KeyNotFoundException($"Gas station with ID {id} not found.");
 
+        if (_context.CarHistoryFuels.Any(x => x.GasStationId == station.Id))
+            throw new ArgumentException("Nie można usunąć stacji do której podłączone jest tankowanie");
+
         _context.GasStations.Remove(station);
         await _context.SaveChangesAsync();
     }
@@ -74,6 +78,7 @@ public class GasStationService : IGasStationService
         var stationList = await _context.GasStations
             .Include(x => x.OperatorCreate)
             .Include(x => x.OperatorModify)
+            .Where(x => x.Activ)
             .ToListAsync();
 
         return stationList ?? new List<GasStation>();
