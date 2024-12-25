@@ -1,9 +1,11 @@
 ﻿@page "/"
 @rendermode InteractiveAuto
 
+@using Microsoft.AspNetCore.Components.Authorization
 @using Valhalla_v3.Client.Pages.Cars
 @inject NavigationManager navigation
 @inject HttpClient Http
+@inject AuthenticationStateProvider AuthenticationStateProvider
 <PageTitle>Home</PageTitle>
 
 @if (!string.IsNullOrEmpty(ErrorMessage))

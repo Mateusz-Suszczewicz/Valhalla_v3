@@ -5,6 +5,8 @@ using System.Text.Json;
 using Valhalla_v3.Shared.CarHistory;
 using static MudBlazor.CategoryTypes;
 using Valhalla_v3.Shared.ToDo;
+using Microsoft.JSInterop;
+using System.Net.Http.Headers;
 
 namespace Valhalla_v3.Client.Pages;
 
@@ -14,6 +16,21 @@ public partial class Home
     private bool isCarOpen = false;
     private List<Car> cars = new List<Car>();
     private string ErrorMessage;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity?.IsAuthenticated ?? false)
+        {
+            ErrorMessage = $"Hello, {user.Identity.Name}!";
+        }
+        else
+        {
+            ErrorMessage = "You are not logged in.";
+        }
+    }
 
     private int CarId = 0;
     async Task OpenCar()

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.ResponseCompression;
@@ -7,6 +8,8 @@ using Microsoft.IdentityModel.Tokens;
 using MudBlazor.Services;
 using System.Globalization;
 using System.Text;
+using Valhalla_v3.Client;
+using Valhalla_v3.Client.Service;
 using Valhalla_v3.Components;
 using Valhalla_v3.Database;
 using Valhalla_v3.Services;
