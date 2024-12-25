@@ -19,17 +19,6 @@ public partial class Home
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-
-        if (user.Identity?.IsAuthenticated ?? false)
-        {
-            ErrorMessage = $"Hello, {user.Identity.Name}!";
-        }
-        else
-        {
-            ErrorMessage = "You are not logged in.";
-        }
     }
 
     private int CarId = 0;

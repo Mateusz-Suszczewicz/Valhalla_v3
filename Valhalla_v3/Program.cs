@@ -1,5 +1,8 @@
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Server;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.ResponseCompression;
@@ -9,6 +12,7 @@ using MudBlazor.Services;
 using System.Globalization;
 using System.Text;
 using Valhalla_v3.Client;
+using Valhalla_v3.Client.Helpers;
 using Valhalla_v3.Client.Service;
 using Valhalla_v3.Components;
 using Valhalla_v3.Database;
@@ -67,7 +71,6 @@ builder.Services.AddDbContext<ValhallaContext>(options =>
 builder.Services.AddIdentity<Operator, IdentityRole<int>>()
     .AddEntityFrameworkStores<ValhallaContext>()
     .AddDefaultTokenProviders();
-
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -86,10 +89,29 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddAuthorization();
+
+builder.Services.AddTransient<AuthorizationMessageHandler>();
+builder.Services.AddBlazoredLocalStorage();
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddScoped<AuthenticationStateProvider,
+    CustomAuthenticationStateProvider>();
+builder.Services.AddScoped<IBlazorAuthenticationService, BlazorAuthenticationService>();
+builder.Services.AddAuthorizationCore(config =>
+{
+    config.AddPolicy(Policies.IsAdmin, Policies.IsUserLogged());
+    config.AddPolicy(Policies.IsUserLog, Policies.IsUserLogged());
+    config.AddPolicy(Policies.IsUser, Policies.IsUserPolicy());
+    config.AddPolicy(Policies.IsClaim, Policies.IsClaimed());
+});
+
+
+
+builder.Services.Configure<CircuitOptions>(options => options.DetailedErrors = true);
 
 var app = builder.Build();
 app.UseResponseCompression();
+
 
 if (app.Environment.IsDevelopment())
 {
@@ -161,3 +183,6 @@ async Task SeedRoles(RoleManager<IdentityRole<int>> roleManager)
 
 
 app.Run();
+
+
+

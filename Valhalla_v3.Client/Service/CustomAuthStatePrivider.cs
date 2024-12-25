@@ -1,53 +1,60 @@
 ﻿using System.Security.Claims;
 using System.Text.Json;
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
+
 namespace Valhalla_v3.Client;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 public class CustomAuthenticationStateProvider : AuthenticationStateProvider
 {
-    private readonly IJSRuntime _jsRuntime;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public CustomAuthenticationStateProvider(IJSRuntime jsRuntime)
+    public CustomAuthenticationStateProvider(IHttpContextAccessor httpContextAccessor)
     {
-        _jsRuntime = jsRuntime;
+        _httpContextAccessor = httpContextAccessor;
     }
 
-    public override async Task<AuthenticationState> GetAuthenticationStateAsync()
+    public override Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        string? token = "";
-        try
-        {
-            token = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "token");
+        // 1. Odczytaj token z cookie
+        var token = _httpContextAccessor.HttpContext?.Request.Cookies["AuthCookie"];
+        //      ↑ użyj tu nazwy swojego ciasteczka JWT
 
-            if (string.IsNullOrEmpty(token))
-            {
-                // Niezalogowany użytkownik
-                return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
-            }
-        }
-        catch(Exception ex)
+        if (string.IsNullOrEmpty(token))
         {
-            Console.WriteLine(ex.Message);
+            // Brak ciasteczka => niezalogowany użytkownik
+            var anonymous = new ClaimsPrincipal(new ClaimsIdentity());
+            return Task.FromResult(new AuthenticationState(anonymous));
         }
 
         try
         {
-            var identity = new ClaimsIdentity(ParseClaimsFromJwt(token), "jwt");
+            // 2. Dekoduj JWT i stwórz ClaimsIdentity
+            var claims = ParseClaimsFromJwt(token); // ta sama metoda, co w przypadku localStorage
+            var identity = new ClaimsIdentity(claims, "jwt");
             var user = new ClaimsPrincipal(identity);
-            return new AuthenticationState(user);
+
+            // 3. Zwróć użytkownika
+            return Task.FromResult(new AuthenticationState(user));
         }
         catch
         {
-            // Token nieprawidłowy
-            return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
+            // Token nieprawidłowy => traktuj jako niezalogowanego
+            var anonymous = new ClaimsPrincipal(new ClaimsIdentity());
+            return Task.FromResult(new AuthenticationState(anonymous));
         }
     }
 
-    private IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
+    // Metoda do dekodowania JWT (taka sama jak wcześniej, np. w wersji minimalnej):
+    private IEnumerable<Claim> ParseClaimsFromJwt(string token)
     {
         var claims = new List<Claim>();
-        var payload = jwt.Split('.')[1];
+        var payload = token.Split('.')[1];
         var jsonBytes = Convert.FromBase64String(payload);
         var keyValuePairs = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonBytes);
 
@@ -70,10 +77,5 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider
         var user = new ClaimsPrincipal(identity);
         NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));
     }
-
-    public void NotifyUserLogout()
-    {
-        NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()))));
-    }
-
 }
+

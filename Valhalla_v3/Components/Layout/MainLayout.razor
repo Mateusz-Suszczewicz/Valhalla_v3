@@ -1,4 +1,5 @@
-﻿@using MudBlazor
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using MudBlazor
 @inherits LayoutComponentBase
 
 <div class="page">
@@ -20,6 +21,17 @@
         <article class="content px-4">
             @Body
         </article>
+        <AuthorizeView Policy="@Policies.IsAdmin">
+    <Authorized>
+
+        <p class="back-to-catalog mt-3">
+            <a class="back-link">---- Zobacz listę samurajów ----</a>
+        </p>
+    </Authorized>
+    <NotAuthorized>
+        <p>Proszę się zalogować</p>
+    </NotAuthorized>
+</AuthorizeView>
     </main>
 </div>
 

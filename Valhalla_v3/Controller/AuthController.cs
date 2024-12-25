@@ -12,11 +12,13 @@ public class AuthController : ControllerBase
 {
     private readonly UserManager<Operator> _userManager;
     private readonly SignInManager<Operator> _signInManager;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public AuthController(UserManager<Operator> userManager, SignInManager<Operator> signInManager)
+    public AuthController(UserManager<Operator> userManager, SignInManager<Operator> signInManager, IHttpContextAccessor httpContextAccessor)
     {
         _userManager = userManager;
         _signInManager = signInManager;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     [HttpPost("login")]
@@ -43,7 +45,15 @@ public class AuthController : ControllerBase
                     claims: authClaims,
                     signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
                 );
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTimeOffset.UtcNow.AddHours(1)
+                };
 
+                _httpContextAccessor.HttpContext?.Response.Cookies.Append("AuthCookie", new JwtSecurityTokenHandler().WriteToken(token), cookieOptions);
                 return Ok(new
                 {
                     token = new JwtSecurityTokenHandler().WriteToken(token),

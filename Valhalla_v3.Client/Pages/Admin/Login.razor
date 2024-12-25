@@ -2,10 +2,14 @@
 @using System.Net.Http.Headers
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Http
+@using Valhalla_v3.Client.Helpers
+@using Valhalla_v3.Client.Service
 @inject NavigationManager navigation
 @inject HttpClient Http
 @inject IJSRuntime JSRuntime
-@inject AuthenticationStateProvider AuthenticationStateProvider
+
+
 @rendermode InteractiveAuto
 @attribute [AllowAnonymous]
 <h3>Login</h3>
@@ -14,7 +18,7 @@
     <DataAnnotationsValidator />
     <div>
         <label>Username</label>
-        <InputText id="Name" class="form-control" @bind-Value="loginModel.Username" />
+        <InputText id="Name" class="form-control" @bind-Value="@loginModel.Username" />
         <ValidationMessage For="@(() => loginModel.Username)" />
     </div>
     <div>
@@ -32,6 +36,7 @@
 @code {
     private LoginDto loginModel = new();
     private string? errorMessage;
+    
 
     private async Task HandleLogin()
     {
@@ -42,24 +47,44 @@
             {
                 var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
                 var token = result.Token;
-                await JSRuntime.InvokeVoidAsync("localStorage.setItem", "token", token);
                 if (!string.IsNullOrEmpty(token))
                 {
-                    Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                   
                 }
 
-                navigation.NavigateTo("/");
-
-            }
-            else
-            {
-                errorMessage = "Invalid username or password.";
             }
         }
         catch (Exception ex)
         {
-            errorMessage = ex.Message;
+         
+            throw ex;
         }
+        errorMessage = "Username/password Coś jest źle";
+        // try
+        // {
+        //     var response = await Http.PostAsJsonAsync(navigation.ToAbsoluteUri("api/auth/login"), loginModel);
+        //     if (response.IsSuccessStatusCode)
+        //     {
+        //         var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
+        //         var token = result.Token;
+        //         await JSRuntime.InvokeVoidAsync("localStorage.setItem", "token", token);
+        //         if (!string.IsNullOrEmpty(token))
+        //         {
+        //             Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        //         }
+
+        //         navigation.NavigateTo("/");
+
+        //     }
+        //     else
+        //     {
+        //         errorMessage = "Invalid username or password.";
+        //     }
+        // }
+        // catch (Exception ex)
+        // {
+        //     errorMessage = ex.Message;
+        // }
     }
 
     private class LoginResponse
