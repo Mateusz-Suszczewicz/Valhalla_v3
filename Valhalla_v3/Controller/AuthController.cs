@@ -45,6 +45,7 @@ public class AuthController : ControllerBase
                     claims: authClaims,
                     signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
                 );
+
                 var cookieOptions = new CookieOptions
                 {
                     HttpOnly = true,

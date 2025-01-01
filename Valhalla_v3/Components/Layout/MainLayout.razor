@@ -9,29 +9,29 @@
 
     <main>
 
-        @* Required *@
         <MudThemeProvider />
         <MudPopoverProvider />
 
-        @* Needed for dialogs *@
         <MudDialogProvider />
 
-        @* Needed for snackbars *@
         <MudSnackbarProvider />
         <article class="content px-4">
-            @Body
+            @using Microsoft.AspNetCore.Components.Authorization
+
+@Body
+        
         </article>
         <AuthorizeView Policy="@Policies.IsAdmin">
-    <Authorized>
+            <Authorized>
 
-        <p class="back-to-catalog mt-3">
-            <a class="back-link">---- Zobacz listę samurajów ----</a>
-        </p>
-    </Authorized>
-    <NotAuthorized>
-        <p>Proszę się zalogować</p>
-    </NotAuthorized>
-</AuthorizeView>
+                <p class="back-to-catalog mt-3">
+                    <a class="back-link">---- Zobacz listę samurajów ----</a>
+                </p>
+            </Authorized>
+            <NotAuthorized>
+                <p>Proszę się zalogować</p>
+            </NotAuthorized>
+        </AuthorizeView>
     </main>
 </div>
 

@@ -1,10 +1,6 @@
-﻿using System.Security.Claims;
-using System.Text.Json;
-using Blazored.LocalStorage;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.JSInterop;
+﻿using System.Text.Json;
 
-namespace Valhalla_v3.Client;
+namespace Valhalla_v3.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
@@ -21,36 +17,28 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider
 
     public override Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        // 1. Odczytaj token z cookie
         var token = _httpContextAccessor.HttpContext?.Request.Cookies["AuthCookie"];
-        //      ↑ użyj tu nazwy swojego ciasteczka JWT
 
         if (string.IsNullOrEmpty(token))
         {
-            // Brak ciasteczka => niezalogowany użytkownik
             var anonymous = new ClaimsPrincipal(new ClaimsIdentity());
             return Task.FromResult(new AuthenticationState(anonymous));
         }
 
         try
         {
-            // 2. Dekoduj JWT i stwórz ClaimsIdentity
-            var claims = ParseClaimsFromJwt(token); // ta sama metoda, co w przypadku localStorage
+            var claims = ParseClaimsFromJwt(token);
             var identity = new ClaimsIdentity(claims, "jwt");
             var user = new ClaimsPrincipal(identity);
-
-            // 3. Zwróć użytkownika
             return Task.FromResult(new AuthenticationState(user));
         }
         catch
         {
-            // Token nieprawidłowy => traktuj jako niezalogowanego
             var anonymous = new ClaimsPrincipal(new ClaimsIdentity());
             return Task.FromResult(new AuthenticationState(anonymous));
         }
     }
 
-    // Metoda do dekodowania JWT (taka sama jak wcześniej, np. w wersji minimalnej):
     private IEnumerable<Claim> ParseClaimsFromJwt(string token)
     {
         var claims = new List<Claim>();
@@ -68,6 +56,7 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider
 
         return claims;
     }
+
     public void NotifyUserAuthentication(string token)
     {
         var identity = string.IsNullOrEmpty(token)

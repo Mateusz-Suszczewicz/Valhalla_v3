@@ -16,11 +16,6 @@ public partial class Home
     private bool isCarOpen = false;
     private List<Car> cars = new List<Car>();
     private string ErrorMessage;
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-    }
-
     private int CarId = 0;
     async Task OpenCar()
     {

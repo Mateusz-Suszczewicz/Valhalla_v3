@@ -1,6 +1,5 @@
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server;
 using Microsoft.AspNetCore.Identity;
@@ -11,8 +10,6 @@ using Microsoft.IdentityModel.Tokens;
 using MudBlazor.Services;
 using System.Globalization;
 using System.Text;
-using Valhalla_v3.Client;
-using Valhalla_v3.Client.Helpers;
 using Valhalla_v3.Client.Service;
 using Valhalla_v3.Components;
 using Valhalla_v3.Database;
@@ -96,7 +93,7 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddScoped<AuthenticationStateProvider,
     CustomAuthenticationStateProvider>();
-builder.Services.AddScoped<IBlazorAuthenticationService, BlazorAuthenticationService>();
+
 builder.Services.AddAuthorizationCore(config =>
 {
     config.AddPolicy(Policies.IsAdmin, Policies.IsUserLogged());

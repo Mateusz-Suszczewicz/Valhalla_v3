@@ -1,5 +1,4 @@
-﻿@page "/login"
-@using System.Net.Http.Headers
+﻿@using System.Net.Http.Headers
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Http
@@ -9,86 +8,25 @@
 @inject HttpClient Http
 @inject IJSRuntime JSRuntime
 
-
 @rendermode InteractiveAuto
 @attribute [AllowAnonymous]
-<h3>Login</h3>
+<h2>Logowanie</h2>
 
 <EditForm Model="@loginModel" OnValidSubmit="HandleLogin" FormName="test">
     <DataAnnotationsValidator />
-    <div>
-        <label>Username</label>
-        <InputText id="Name" class="form-control" @bind-Value="@loginModel.Username" />
+    <div class="mb-3">
+        <label for="Nazwafloating" class="form-label" >Nazwa</label>
+        <InputText type="text" class="form-control" id="Nazwafloating" @bind-Value="@loginModel.Username"/>
         <ValidationMessage For="@(() => loginModel.Username)" />
     </div>
-    <div>
-        <label>Password</label>
-        <InputText @bind-Value="@loginModel.Password" type="password" />
+    <div class="mb-3">
+        <label for="Nazwafloating" class="form-label">Hasło</label>
+        <InputText type="password" class="form-control" id="Passwordfloating" @bind-Value="@loginModel.Password" />
     </div>
-    <button type="submit">Login</button>
+    <button class="btn btn-outline-success w-100" type="submit">Zaloguj</button>
 </EditForm>
-
 @if (!string.IsNullOrEmpty(errorMessage))
 {
     <p style="color:red;">@errorMessage</p>
 }
 
-@code {
-    private LoginDto loginModel = new();
-    private string? errorMessage;
-    
-
-    private async Task HandleLogin()
-    {
-        try
-        {
-            var response = await Http.PostAsJsonAsync(navigation.ToAbsoluteUri("api/auth/login"), loginModel);
-            if (response.IsSuccessStatusCode)
-            {
-                var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
-                var token = result.Token;
-                if (!string.IsNullOrEmpty(token))
-                {
-                   
-                }
-
-            }
-        }
-        catch (Exception ex)
-        {
-         
-            throw ex;
-        }
-        errorMessage = "Username/password Coś jest źle";
-        // try
-        // {
-        //     var response = await Http.PostAsJsonAsync(navigation.ToAbsoluteUri("api/auth/login"), loginModel);
-        //     if (response.IsSuccessStatusCode)
-        //     {
-        //         var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
-        //         var token = result.Token;
-        //         await JSRuntime.InvokeVoidAsync("localStorage.setItem", "token", token);
-        //         if (!string.IsNullOrEmpty(token))
-        //         {
-        //             Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        //         }
-
-        //         navigation.NavigateTo("/");
-
-        //     }
-        //     else
-        //     {
-        //         errorMessage = "Invalid username or password.";
-        //     }
-        // }
-        // catch (Exception ex)
-        // {
-        //     errorMessage = ex.Message;
-        // }
-    }
-
-    private class LoginResponse
-    {
-        public string Token { get; set; }
-    }
-}
