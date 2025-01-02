@@ -10,8 +10,8 @@ namespace Valhalla_v3.Services.CarHistory;
 public interface ICarService
 {
 	public Task<int> Create(Car car);
-	public Task<Car> Get(int id);
-	public Task<List<Car>> Get();
+	public Task<Car> Get(int Carid, int UserId);
+	public Task<List<Car>> Get(int UserId);
 	public Task Update(Car car);
 	public Task Delete(int id);
 }
@@ -80,9 +80,9 @@ public class CarService : ICarService
 		}
 	}
 
-	public async Task<Car> Get(int id)
+	public async Task<Car> Get(int Carid, int UserId)
 	{
-		if (id == 0)
+		if (Carid == 0)
 			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
 		
 			var car = await _context.Car
@@ -92,16 +92,18 @@ public class CarService : ICarService
 			.ThenInclude(y => y.GasStation)
             .Include(x => x.CarHistoryRepair)
             .ThenInclude(z => z.Mechanic)
-            .FirstOrDefaultAsync(x => x.Id == id);
+            .FirstOrDefaultAsync(x => x.Id == Carid && x.OperatorModifyId == UserId);
         return car;
 	}
-	public async Task<List<Car>> Get()
+	
+	public async Task<List<Car>> Get(int UserId)
 	{
 		try
 		{
 			var CarList = await _context.Car
 				.Include(x => x.OperatorCreate)
 				.Include(x => x.OperatorModify)
+				.Where(x => x.OperatorModifyId == UserId)
 				.ToListAsync();
 
 			return CarList;

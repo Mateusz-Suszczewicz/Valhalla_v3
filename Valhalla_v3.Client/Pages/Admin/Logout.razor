@@ -1,0 +1,56 @@
+﻿@page "/logout"
+@rendermode InteractiveAuto
+@using Microsoft.JSInterop;
+@using System.Net.Http.Json;
+@using Valhalla_v3.Shared;
+@inject NavigationManager navigation
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
+<p>@errorMessage</p>
+<p>@debugInfo</p>
+@code {
+    private string errorMessage { get; set; }
+    private string debugInfo = "Start";
+
+    protected override void OnInitialized()
+    {
+        debugInfo = "OnInitialized fired";
+        Console.WriteLine("Logout.razor -> OnInitialized");
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+         Console.WriteLine("Logout.razor -> OnAfterRenderAsync");
+        debugInfo = "OnAfterRenderAsync triggered";
+
+        //if (!firstRender) return;
+        try
+        {
+            var token = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "authToken");
+            if (string.IsNullOrEmpty(token))
+            {
+                errorMessage = "(brak wartości pod kluczem 'authToken')";
+                return;
+            }
+            var response = await Http.PostAsJsonAsync(navigation.ToAbsoluteUri("api/auth/logout"), token);
+            if (response.IsSuccessStatusCode)
+            {
+                await JSRuntime.InvokeVoidAsync("localStorage.removeItem", "authToken");
+
+                navigation.NavigateTo("/");
+            }
+            else
+            {
+                var errorDetails = await response.Content.ReadAsStringAsync();
+                errorMessage = $"Błąd API - {response.StatusCode}: {errorDetails}";
+
+            }
+
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+}

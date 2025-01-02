@@ -16,22 +16,10 @@
 
         <MudSnackbarProvider />
         <article class="content px-4">
-            @using Microsoft.AspNetCore.Components.Authorization
 
 @Body
         
         </article>
-        <AuthorizeView Policy="@Policies.IsAdmin">
-            <Authorized>
-
-                <p class="back-to-catalog mt-3">
-                    <a class="back-link">---- Zobacz listę samurajów ----</a>
-                </p>
-            </Authorized>
-            <NotAuthorized>
-                <p>Proszę się zalogować</p>
-            </NotAuthorized>
-        </AuthorizeView>
     </main>
 </div>
 

@@ -43,7 +43,7 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider
     {
         var claims = new List<Claim>();
         var payload = token.Split('.')[1];
-        var jsonBytes = Convert.FromBase64String(payload);
+        var jsonBytes = Base64UrlDecode(payload);
         var keyValuePairs = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonBytes);
 
         if (keyValuePairs != null)
@@ -66,5 +66,27 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider
         var user = new ClaimsPrincipal(identity);
         NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));
     }
+
+    public static byte[] Base64UrlDecode(string base64Url)
+    {
+        // 1. Zamiana znaków URL na Base64
+        var output = base64Url
+            .Replace('-', '+')
+            .Replace('_', '/');
+
+        // 2. Dodanie brakujących znaków '='
+        switch (output.Length % 4)
+        {
+            case 2: output += "=="; break;
+            case 3: output += "="; break;
+            case 0: /* nic nie robić */ break;
+            default:
+                // 1 lub inne - jest źle uformowany
+                throw new ArgumentException("Invalid base64url string!");
+        }
+
+        return Convert.FromBase64String(output);
+    }
+
 }
 

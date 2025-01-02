@@ -24,7 +24,6 @@ public partial class Login
                     await JSRuntime.InvokeVoidAsync("localStorage.setItem", "authToken", token);
                 }
                 navigation.NavigateTo("/");
-
             }
         }
         catch (Exception ex)

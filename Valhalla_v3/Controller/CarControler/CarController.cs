@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using Valhalla_v3.Services.CarHistory;
 using Valhalla_v3.Shared.CarHistory;
 
@@ -16,11 +19,19 @@ public class CarController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize]
     public async Task<ActionResult<IEnumerable<Car>>> Get()
     {
         try
         {
-            var cars = await _carService.Get();
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("Brak sub w tokenie.");
+            }
+            if(!int.TryParse(userId, out int id))
+                return Unauthorized("Błąd w przekazanym id");
+            var cars = await _carService.Get(id);
             if (cars == null || !cars.Any())
                 return NoContent(); 
 
