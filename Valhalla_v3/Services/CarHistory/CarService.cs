@@ -9,11 +9,11 @@ namespace Valhalla_v3.Services.CarHistory;
 
 public interface ICarService
 {
-	public Task<int> Create(Car car);
-	public Task<Car> Get(int Carid, int UserId);
-	public Task<List<Car>> Get(int UserId);
-	public Task Update(Car car);
-	public Task Delete(int id);
+	public Task<int> Create(Car car, int userId);
+	public Task<Car> Get(int Carid, int userId);
+	public Task<List<Car>> Get(int userId);
+	public Task Update(Car car, int userId);
+	public Task Delete(int id, int userId);
 }
 
 public class CarService : ICarService
@@ -25,7 +25,7 @@ public class CarService : ICarService
 		_context = context;
 	}
 
-    public async Task<int> Create(Car car)
+    public async Task<int> Create(Car car, int userId)
     {
         if (car == null)
             throw new ArgumentException("Car object cannot be null.");
@@ -33,11 +33,14 @@ public class CarService : ICarService
         if (car.Id != 0)
             throw new ArgumentException("Cannot create a car with an existing ID.");
 
+		if (userId == 0)
+			throw new ArgumentException("Błąd w przekazywanym Id użytkownika");
         try
         {
             car.DateTimeAdd = DateTime.Now;
             car.DateTimeModify = DateTime.Now;
-
+			car.OperatorModifyId = userId;
+			car.OperatorCreateId = userId;
             await _context.AddAsync(car);
             await _context.SaveChangesAsync();
             return car.Id;
@@ -54,17 +57,18 @@ public class CarService : ICarService
         }
     }
 
-    public async Task Delete(int id)
+    public async Task Delete(int id, int userId)
 	{
 		if (id == 0)
 			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
-
-		var car = await _context.Car
+        if (userId == 0)
+            throw new ArgumentException("Błąd w przekazywanym Id użytkownika");
+        var car = await _context.Car
                 .Include(x => x.Fuels)
             .ThenInclude(y => y.GasStation)
             .Include(x => x.CarHistoryRepair)
             .ThenInclude(z => z.Mechanic)
-            .FirstAsync(x => x.Id == id);
+            .FirstAsync(x => x.Id == id && x.OperatorModifyId == userId);
 
 		if(car == null)
 			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.InternalServerError));
@@ -80,30 +84,33 @@ public class CarService : ICarService
 		}
 	}
 
-	public async Task<Car> Get(int Carid, int UserId)
+	public async Task<Car> Get(int Carid, int userId)
 	{
 		if (Carid == 0)
 			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
-		
-			var car = await _context.Car
+        if (userId == 0)
+            throw new ArgumentException("Błąd w przekazywanym Id użytkownika");
+        var car = await _context.Car
             .Include(x => x.OperatorCreate)
             .Include(x => x.OperatorModify)
 			.Include(x => x.Fuels)
 			.ThenInclude(y => y.GasStation)
             .Include(x => x.CarHistoryRepair)
             .ThenInclude(z => z.Mechanic)
-            .FirstOrDefaultAsync(x => x.Id == Carid && x.OperatorModifyId == UserId);
+            .FirstOrDefaultAsync(x => x.Id == Carid && x.OperatorModifyId == userId);
         return car;
 	}
 	
-	public async Task<List<Car>> Get(int UserId)
+	public async Task<List<Car>> Get(int userId)
 	{
 		try
 		{
-			var CarList = await _context.Car
+            if (userId == 0)
+                throw new ArgumentException("Błąd w przekazywanym Id użytkownika");
+            var CarList = await _context.Car
 				.Include(x => x.OperatorCreate)
 				.Include(x => x.OperatorModify)
-				.Where(x => x.OperatorModifyId == UserId)
+				.Where(x => x.OperatorModifyId == userId)
 				.ToListAsync();
 
 			return CarList;
@@ -114,12 +121,13 @@ public class CarService : ICarService
 		}
 	}
 
-	public async Task Update(Car car)
+	public async Task Update(Car car, int userId)
 	{
 		if (car.Id == 0)
 			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
-
-		var OldCar = _context.Car.First(x => x.Id == car.Id);
+        if (userId == 0)
+            throw new ArgumentException("Błąd w przekazywanym Id użytkownika");
+        var OldCar = _context.Car.First(x => x.Id == car.Id);
 		if (OldCar == null)
 			throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
 		OldCar.Year = car.Year;
@@ -132,6 +140,7 @@ public class CarService : ICarService
 		OldCar.InsuranceDate = car.InsuranceDate;
 		OldCar.SurveyDate = car.SurveyDate;
 		OldCar.SurveyCost = car.SurveyCost;
+		OldCar.OperatorModifyId = userId;
         await _context.SaveChangesAsync();
     }
 }

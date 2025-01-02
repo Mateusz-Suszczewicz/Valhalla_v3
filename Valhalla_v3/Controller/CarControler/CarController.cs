@@ -45,6 +45,7 @@ public class CarController : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [Authorize]
     public async Task<ActionResult<Car>> Get(int id)
     {
         if (id <= 0)
@@ -52,7 +53,15 @@ public class CarController : ControllerBase
 
         try
         {
-            var car = await _carService.Get(id);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("Brak sub w tokenie.");
+            }
+            if (!int.TryParse(userId, out int Userid))
+                return Unauthorized("Błąd w przekazanym id");
+
+            var car = await _carService.Get(id, Userid);
             if (car == null)
                 return NotFound(new { message = $"Car with ID {id} not found." });
 
@@ -66,6 +75,7 @@ public class CarController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize]
     public async Task<ActionResult> Delete(int id)
     {
         if (id <= 0)
@@ -73,11 +83,18 @@ public class CarController : ControllerBase
 
         try
         {
-            var car = await _carService.Get(id);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("Brak sub w tokenie.");
+            
+            if (!int.TryParse(userId, out int Userid))
+                return Unauthorized("Błąd w przekazanym id");
+
+            var car = await _carService.Get(id, Userid);
             if (car == null)
                 return NotFound(new { message = $"Car with ID {id} not found." });
 
-            await _carService.Delete(id);
+            await _carService.Delete(id, Userid);
             return Ok(new { message = $"Car with ID {id} deleted successfully." });
         }
         catch (Exception ex)
@@ -88,21 +105,27 @@ public class CarController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize]
     public async Task<ActionResult<int>> Create([FromBody] Car car)
     {
         try
         {
             if (car == null)
                 return BadRequest(new { message = "Car object cannot be null." });
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("Brak sub w tokenie.");
 
+            if (!int.TryParse(userId, out int Userid))
+                return Unauthorized("Błąd w przekazanym id");
             if (car.Id != 0)
             {
-                await _carService.Update(car);
+                await _carService.Update(car, Userid);
                 return Ok(new { message = "Car updated successfully." });
             }
             else
             {
-                car.Id = await _carService.Create(car);
+                car.Id = await _carService.Create(car, Userid);
                 return CreatedAtAction(nameof(Create), new { id = car.Id }, car);
             }
         }
@@ -116,7 +139,4 @@ public class CarController : ControllerBase
             return StatusCode(500, new { message = "An unexpected error occurred. Please try again later." });
         }
     }
-
-
-    
 }

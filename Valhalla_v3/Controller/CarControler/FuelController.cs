@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using System.Text.Json;
 using Valhalla_v3.Services.CarHistory;
 using Valhalla_v3.Shared.CarHistory;
@@ -17,11 +19,18 @@ public class FuelController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize]
     public async Task<ActionResult<IEnumerable<CarHistoryFuel>>> Get()
     {
         try
         {
-            var fuels = await _carHistoryFuelService.Get();
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("Brak sub w tokenie.");
+
+            if (!int.TryParse(userId, out int Userid))
+                return Unauthorized("Błąd w przekazanym id");
+            var fuels = await _carHistoryFuelService.Get(Userid);
             if (fuels == null || !fuels.Any())
                 return NoContent(); 
 
@@ -35,6 +44,7 @@ public class FuelController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize]
     public async Task<ActionResult> Create([FromBody] CarHistoryFuel fuel)
     {
         if (fuel == null)
@@ -42,14 +52,20 @@ public class FuelController : ControllerBase
 
         try
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("Brak sub w tokenie.");
+
+            if (!int.TryParse(userId, out int Userid))
+                return Unauthorized("Błąd w przekazanym id");
             if (fuel.Id != 0)
             {
-                await _carHistoryFuelService.Update(fuel);
+                await _carHistoryFuelService.Update(fuel, Userid);
                 return Ok(new { message = "Fuel history updated successfully." }); 
             }
             else
             {
-                fuel.Id = await _carHistoryFuelService.Create(fuel);
+                fuel.Id = await _carHistoryFuelService.Create(fuel, Userid);
                 return CreatedAtAction(nameof(Create), new { id = fuel.Id }, fuel); 
             }
         }
