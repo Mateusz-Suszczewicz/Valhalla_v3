@@ -7,11 +7,11 @@ namespace Valhalla_v3.Services.CarHistory;
 
 public interface ICarHistoryRepairService
 {
-	Task<int> Create(CarHistoryRepair Repair);
-	Task<CarHistoryRepair> Get(int id);
-	Task<List<CarHistoryRepair>> Get();
-	Task Update(CarHistoryRepair Repair);
-	Task Delete(int id);
+	Task<int> Create(CarHistoryRepair Repair, int userId);
+	Task<CarHistoryRepair> Get(int id, int userId);
+	Task<List<CarHistoryRepair>> Get(int userId);
+	Task Update(CarHistoryRepair Repair, int userId);
+	Task Delete(int id, int userId);
 }
 
 public class CarHistoryRepairService : ICarHistoryRepairService
@@ -23,32 +23,35 @@ public class CarHistoryRepairService : ICarHistoryRepairService
         _context = context;
     }
 
-    public async Task<int> Create(CarHistoryRepair repair)
+    public async Task<int> Create(CarHistoryRepair repair, int userId)
     {
         if (repair == null)
             throw new ArgumentNullException(nameof(repair), "Repair object cannot be null.");
 
         if (repair.Id != 0)
             throw new ArgumentException("Repair ID must be 0 for a new entry.");
-        
+        if (userId == 0)
+            throw new ArgumentException("Błąd w przekazywanym Id użytkownika");
         if (!validMileage(repair.Mileage))
             throw new ArgumentException("Mileage must be greater than saved mileage.");
         
         repair.DateTimeAdd = DateTime.Now;
         repair.DateTimeModify = DateTime.Now;
-
+        repair.OperatorModifyId = userId;
+        repair.OperatorCreateId = userId;
         await _context.CarHistoryRepairs.AddAsync(repair);
         await _context.SaveChangesAsync();
 
         return repair.Id;
     }
 
-    public async Task Delete(int id)
+    public async Task Delete(int id, int userId)
     {
         if (id <= 0)
             throw new ArgumentException("Invalid ID. ID must be greater than zero.");
-
-        var repair = await _context.CarHistoryRepairs.FirstOrDefaultAsync(x => x.Id == id);
+        if (userId == 0)
+            throw new ArgumentException("Błąd w przekazywanym Id użytkownika");
+        var repair = await _context.CarHistoryRepairs.FirstOrDefaultAsync(x => x.Id == id && x.OperatorModifyId == userId);
 
         if (repair == null)
             throw new KeyNotFoundException($"Repair with ID {id} not found.");
@@ -57,16 +60,17 @@ public class CarHistoryRepairService : ICarHistoryRepairService
         await _context.SaveChangesAsync();
     }
 
-    public async Task<CarHistoryRepair> Get(int id)
+    public async Task<CarHistoryRepair> Get(int id, int userId)
     {
         if (id <= 0)
             throw new ArgumentException("Invalid ID. ID must be greater than zero.");
-
+        if (userId == 0)
+            throw new ArgumentException("Błąd w przekazywanym Id użytkownika");
         var repair = await _context.CarHistoryRepairs
             .Include(x => x.OperatorCreate)
             .Include(x => x.OperatorModify)
             .Include(x => x.Mechanic)
-            .FirstOrDefaultAsync(x => x.Id == id);
+            .FirstOrDefaultAsync(x => x.Id == id && x.OperatorModifyId == userId);
 
         if (repair == null)
             throw new KeyNotFoundException($"Repair with ID {id} not found.");
@@ -74,22 +78,26 @@ public class CarHistoryRepairService : ICarHistoryRepairService
         return repair;
     }
 
-    public async Task<List<CarHistoryRepair>> Get()
+    public async Task<List<CarHistoryRepair>> Get(int userId)
     {
+        if (userId == 0)
+            throw new ArgumentException("Błąd w przekazywanym Id użytkownika");
         var repairList = await _context.CarHistoryRepairs
             .Include(x => x.OperatorCreate)
             .Include(x => x.OperatorModify)
             .Include(x => x.Mechanic)
+            .Where(x => x.OperatorModifyId == userId)
             .ToListAsync();
 
         return repairList ?? new List<CarHistoryRepair>();
     }
 
-    public async Task Update(CarHistoryRepair repair)
+    public async Task Update(CarHistoryRepair repair, int userId)
     {
         if (repair == null)
             throw new ArgumentNullException(nameof(repair), "Repair object cannot be null.");
-
+        if (userId == 0)
+            throw new ArgumentException("Błąd w przekazywanym Id użytkownika");
         if (repair.Id <= 0)
             throw new ArgumentException("Invalid ID. ID must be greater than zero.");
         
@@ -107,7 +115,8 @@ public class CarHistoryRepairService : ICarHistoryRepairService
         existingRepair.Description = repair.Description;
         existingRepair.Mechanic = repair.Mechanic;
         existingRepair.DateTimeModify = DateTime.Now;
-
+        existingRepair.OperatorModifyId = userId;
+        
         await _context.SaveChangesAsync();
     }
 

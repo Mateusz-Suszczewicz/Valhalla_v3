@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using Valhalla_v3.Services.CarHistory;
 using Valhalla_v3.Shared.CarHistory;
 
@@ -16,11 +18,18 @@ public class MechanicController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize]
     public async Task<ActionResult<IEnumerable<Mechanic>>> Get()
     {
         try
         {
-            var mechanics = await _mechanicService.Get();
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("Brak sub w tokenie.");
+
+            if (!int.TryParse(userId, out int Userid))
+                return Unauthorized("Błąd w przekazanym id");
+            var mechanics = await _mechanicService.Get(Userid);
             if (mechanics == null || !mechanics.Any())
                 return NoContent(); 
 
@@ -34,14 +43,20 @@ public class MechanicController : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [Authorize]
     public async Task<ActionResult<Mechanic>> Get(int id)
     {
         if (id <= 0)
             return BadRequest(new { message = "Invalid ID. ID must be greater than zero." });
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized("Brak sub w tokenie.");
 
+        if (!int.TryParse(userId, out int Userid))
+            return Unauthorized("Błąd w przekazanym id");
         try
         {
-            var mechanic = await _mechanicService.Get(id);
+            var mechanic = await _mechanicService.Get(id, Userid);
             if (mechanic == null)
                 return NotFound(new { message = $"Mechanic with ID {id} not found." });
 
@@ -55,16 +70,22 @@ public class MechanicController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize]
     public async Task<ActionResult> Create([FromBody] Mechanic mechanic)
     {
         if (mechanic == null)
         {
             return BadRequest(new { message = "Mechanic object cannot be null." });
         }
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized("Brak sub w tokenie.");
 
+        if (!int.TryParse(userId, out int Userid))
+            return Unauthorized("Błąd w przekazanym id");
         try
         {
-            var id = await _mechanicService.Create(mechanic);
+            var id = await _mechanicService.Create(mechanic, Userid);
             return CreatedAtAction(nameof(Create), new { id }, mechanic); 
         }
         catch (ArgumentException ex)

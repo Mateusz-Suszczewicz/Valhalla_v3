@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using Valhalla_v3.Services.ToDo;
 using Valhalla_v3.Shared.ToDo;
 
@@ -16,11 +18,18 @@ public class JobController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize]
     public async Task<ActionResult<IEnumerable<Job>>> Get([FromQuery] bool NoDoneJobs, [FromQuery] int ProjectId)
     {
         try
         {
-            var jobs = await _jobService.Get(NoDoneJobs, ProjectId);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("Brak sub w tokenie.");
+
+            if (!int.TryParse(userId, out int Userid))
+                return Unauthorized("Błąd w przekazanym id");
+            var jobs = await _jobService.Get(NoDoneJobs, ProjectId, Userid);
             if (jobs == null || !jobs.Any())
                 return NoContent();
 
@@ -34,14 +43,20 @@ public class JobController : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [Authorize]
     public async Task<ActionResult<Job>> Get(int id)
     {
         if (id <= 0)
             return BadRequest(new { message = "Invalid ID. ID must be greater than zero." });
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized("Brak sub w tokenie.");
 
+        if (!int.TryParse(userId, out int Userid))
+            return Unauthorized("Błąd w przekazanym id");
         try
         {
-            var job = await _jobService.Get(id);
+            var job = await _jobService.Get(id, Userid);
             if (job == null)
                 return NotFound(new { message = $"Job with ID {id} not found." });
 
@@ -55,21 +70,27 @@ public class JobController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize]
     public async Task<IActionResult> Create([FromBody] Job job)
     {
         if (job == null)
             return BadRequest(new { message = "Job object cannot be null." });
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized("Brak sub w tokenie.");
 
+        if (!int.TryParse(userId, out int Userid))
+            return Unauthorized("Błąd w przekazanym id");
         try
         {
             if (job.Id != 0)
             {
-                await _jobService.Update(job);
+                await _jobService.Update(job, Userid);
                 return Ok(new { message = "Job updated successfully." });
             }
             else
             {
-                job.Id = await _jobService.Create(job);
+                job.Id = await _jobService.Create(job, Userid);
                 return CreatedAtAction(nameof(Create), new { id = job.Id }, job);
             }
         }
@@ -85,18 +106,24 @@ public class JobController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize]
     public async Task<ActionResult> Delete(int id)
     {
         if (id <= 0)
             return BadRequest(new { message = "Invalid ID. ID must be greater than zero." });
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized("Brak sub w tokenie.");
 
+        if (!int.TryParse(userId, out int Userid))
+            return Unauthorized("Błąd w przekazanym id");
         try
         {
-            var job = await _jobService.Get(id);
+            var job = await _jobService.Get(id, Userid);
             if (job == null)
                 return NotFound(new { message = $"Job with ID {id} not found." });
 
-            await _jobService.Delete(id);
+            await _jobService.Delete(id, Userid);
             return Ok(new { message = $"Job with ID {id} deleted successfully." }); 
         }
         catch (Exception ex)
@@ -107,13 +134,20 @@ public class JobController : ControllerBase
     }
 
     [HttpPost("changeTerm")]
+    [Authorize]
     public async Task<ActionResult> ChangeTerm([FromQuery] int Id, DateTime newTerm)
     {
         if (Id <= 0)
             return BadRequest(new { message = "Invalid ID. ID must be greater than zero." });
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized("Brak sub w tokenie.");
+
+        if (!int.TryParse(userId, out int Userid))
+            return Unauthorized("Błąd w przekazanym id");
         try
         {
-            await _jobService.ChangeTerm(Id, newTerm);
+            await _jobService.ChangeTerm(Id, newTerm, Userid);
             
             return Ok(new { message = $"Job with ID {Id} changed successfully." });
         }

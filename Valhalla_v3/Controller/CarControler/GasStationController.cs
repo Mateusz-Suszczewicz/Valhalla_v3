@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using Valhalla_v3.Services.CarHistory;
 using Valhalla_v3.Shared.CarHistory;
 
@@ -16,11 +18,20 @@ public class GasStationController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize]
     public async Task<ActionResult<IEnumerable<GasStation>>> Get()
     {
         try
         {
-            var gasStations = await _gasStationService.Get();
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("Brak sub w tokenie.");
+
+            if (!int.TryParse(userId, out int Userid))
+                return Unauthorized("Błąd w przekazanym id"); 
+            
+            var gasStations = await _gasStationService.Get(Userid);
+            
             if (gasStations == null || !gasStations.Any())
                 return NoContent(); 
 
@@ -34,14 +45,20 @@ public class GasStationController : ControllerBase
     }
     
     [HttpGet("{id}")]
+    [Authorize]
     public async Task<ActionResult<GasStation>> Get(int id)
     {
         if (id <= 0)
             return BadRequest(new { message = "Invalid ID. ID must be greater than zero." });
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized("Brak sub w tokenie.");
 
+        if (!int.TryParse(userId, out int Userid))
+            return Unauthorized("Błąd w przekazanym id");
         try
         {
-            var gasStation = await _gasStationService.Get(id);
+            var gasStation = await _gasStationService.Get(id, Userid);
             if (gasStation == null)
                 return NotFound(new { message = $"Gas Station with ID {id} not found." });
 
@@ -55,21 +72,27 @@ public class GasStationController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize]
     public async Task<IActionResult> Create([FromBody] GasStation gasStation)
     {
         if (gasStation == null)
             return BadRequest(new { message = "Gas station object cannot be null." });
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized("Brak sub w tokenie.");
 
+        if (!int.TryParse(userId, out int Userid))
+            return Unauthorized("Błąd w przekazanym id");
         try
         {
             if (gasStation.Id != 0)
             {
-                await _gasStationService.Update(gasStation);
+                await _gasStationService.Update(gasStation, Userid);
                 return Ok(new { message = "Gas station updated successfully." }); 
             }
             else
             {
-                gasStation.Id = await _gasStationService.Create(gasStation);
+                gasStation.Id = await _gasStationService.Create(gasStation, Userid);
                 return CreatedAtAction(nameof(Create), new { id = gasStation.Id }, gasStation); 
             }
         }
